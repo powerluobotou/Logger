@@ -1,7 +1,7 @@
-﻿/**
+/**
 * 
 *   基于消息队列的异步日志系统
-*	Created by 萝卜 2021.11.17
+*	Created by andy_ro@qq.com 2021.11.17
 * 
 */
 #include "Log.h"

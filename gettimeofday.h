@@ -1,7 +1,7 @@
 /**
 *
 *   gettimeofday
-*	Created by ÂÜ²· 2021.11.17
+*	Created by andy_ro@qq.com 2021.11.17
 *
 */
 #ifndef GETTIMEOFDAY_H_INCLUDE
