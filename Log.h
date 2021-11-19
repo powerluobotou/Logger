@@ -53,12 +53,12 @@
 #define read_lock(mutex) std::shared_lock<std::shared_mutex> lock(mutex)
 #define write_lock(mutex) std::unique_lock<std::shared_mutex> lock(mutex)
 
-#define LVL_FATAL	0
-#define LVL_ERROR	1
-#define LVL_WARN	2
-#define LVL_INFO	3
-#define LVL_TRACE	4
-#define LVL_DEBUG	5
+#define LVL_FATAL 	0
+#define LVL_ERROR 	1
+#define LVL_WARN 	2
+#define LVL_INFO 	3
+#define LVL_TRACE 	4
+#define LVL_DEBUG 	5
 
 #define PARAM_FATAL 	0,__FILE__,__LINE__,__FUNC__
 #define PARAM_ERROR 	1,__FILE__,__LINE__,__FUNC__
