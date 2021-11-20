@@ -25,7 +25,6 @@
 #include <iostream>
 #include <sstream>
 #include <errno.h>
-#include <atomic>
 
 #include <vector>
 #include <map>

@@ -7,10 +7,10 @@
 #ifndef ATOMIC_H_INCLUDE
 #define ATOMIC_H_INCLUDE
 
+#include "Macro.h"
 #include <atomic>
 
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
-#include <windows.h>
+#ifdef _windows_
 #define atom_incr(i)			InterlockedIncrement((volatile long *)&i)
 #define atom_incr64(i)			InterlockedIncrement64((volatile long long *)&i)
 #define atom_decr(i)			InterlockedDecrement((volatile long *)&i)
@@ -25,7 +25,7 @@
 #define atom_compare_assign64(i,val,cmp) InterlockedCompareExchange64((volatile long long *)&i, (long long)(val), (long long)(cmp))
 #define atom_assign_pointer(i, val) InterlockedExchangePointer(( void * volatile *)&i, (void *)(val))
 #define atom_compare_assign_pointer(i,val,cmp) InterlockedCompareExchangePointer((void * volatile *)&i, (void *)(val), (void *)(cmp))
-#else
+#elif defined(_linux_)
 #define atom_incr(i)			__sync_add_and_fetch(&i, 1)
 #define atom_incr64(i)			__sync_add_and_fetch(&i, 1)
 #define atom_decr(i)			__sync_add_and_fetch(&i, -1)
