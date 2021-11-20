@@ -97,7 +97,7 @@ namespace LOGGER {
 }
 
 #define LOG_INIT LOGGER::Logger::instance()->init
-#define LOG	LOGGER::Logger::instance()->write //LOG_XXXX("%s", msg)
+#define LOG LOGGER::Logger::instance()->write //LOG_XXXX("%s", msg)
 #define LOG_S LOGGER::Logger::instance()->write_s //LOG_XXXX(msg)
 
 #ifdef _windows_
