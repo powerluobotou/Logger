@@ -90,46 +90,47 @@ namespace LOGGER {
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
-		char log_buf[81920];
+		static int const MAXSZ = 81920;
+		char msg[MAXSZ + 2];
 		size_t pos = 0;
 		switch (level) {
 		case LVL_FATAL:
-			pos = snprintf(log_buf, sizeof(log_buf), "F%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "F%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
 		case LVL_ERROR:
-			pos = snprintf(log_buf, sizeof(log_buf), "E%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "E%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
 		case LVL_WARN:
-			pos = snprintf(log_buf, sizeof(log_buf), "W%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "W%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
 		case LVL_INFO:
-			pos = snprintf(log_buf, sizeof(log_buf), "I%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "I%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
 		case LVL_DEBUG:
-			pos = snprintf(log_buf, sizeof(log_buf), "D%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "D%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
 		case LVL_TRACE:
-			pos = snprintf(log_buf, sizeof(log_buf), "T%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			pos = snprintf(msg, MAXSZ, "T%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
@@ -141,15 +142,15 @@ namespace LOGGER {
 		va_list ap;
 		va_start(ap, fmt);
 #ifdef _windows_
-		vsnprintf_s(log_buf + pos, sizeof(log_buf) - pos - 1, _TRUNCATE, fmt, ap);
+		vsnprintf_s(msg + pos, MAXSZ - pos - 1, _TRUNCATE, fmt, ap);
 #else
-		vsnprintf(log_buf + pos, sizeof(log_buf) - pos - 1, fmt, ap);
+		vsnprintf(msg + pos, MAXSZ - pos - 1, fmt, ap);
 #endif
 		va_end(ap);
-		pos = strlen(log_buf);
-		log_buf[pos] = '\n';
-		log_buf[pos + 1] = 0;
-		notify(log_buf);
+		pos = strlen(msg);
+		msg[pos] = '\n';
+		msg[pos + 1] = 0;
+		notify(msg);
 	}
 
 #if 0
