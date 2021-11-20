@@ -27,7 +27,9 @@
 #include <errno.h>
 
 #include <vector>
+#include <list>
 #include <map>
+#include <set>
 #include <functional>
 
 #ifdef _windows_

@@ -5,6 +5,14 @@
 *
 */
 #include "utils.h"
+#include <errno.h>
+
+#ifdef _windows_
+#include <ImageHlp.h>
+#elif defined(_linux_)
+#include <cxxabi.h>
+#include <execinfo.h>
+#endif
 
 #pragma execution_character_set("utf-8")
 

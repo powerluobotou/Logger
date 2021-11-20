@@ -9,24 +9,6 @@
 
 #include "Macro.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <string>
-#include <vector>
-#include <map>
-
-#include <errno.h>
-#include <fcntl.h>
-#include <time.h> 
-#include <thread>
-
-#ifdef _windows_
-#include <ImageHlp.h>
-#elif defined(_linux_)
-#include <cxxabi.h>
-#include <execinfo.h>
-#endif
-
 namespace utils {
 	//gettid
 	/*tid_t*/std::string gettid();
