@@ -58,8 +58,8 @@ namespace EXCEPT {
 		catch (base_error& e) { \
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << " ] " << e.what() \
-			   << " " << utils::trim_file(e.f_) << "(" << e.l_ << ") " << utils::trim_func(e.fn_); \
-			LOG_TRACE(oss.str().c_str()); \
+			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
+			LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
@@ -72,8 +72,8 @@ namespace EXCEPT {
 		catch (base_error& e) { \
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << "(" << e.err_no_ << ") ] " << e.what() \
-			   << " " << utils::trim_file(e.f_) << "(" << e.l_ << ") " << utils::trim_func(e.fn_); \
-			LOG_TRACE(oss.str().c_str()); \
+			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
+			LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
@@ -103,7 +103,7 @@ namespace EXCEPT {
 		 ) : \
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
 		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
-		LOG_S_FATAL(oss.str().c_str()); \
+		LOG_S_FATAL(oss.str()); \
 		LOG_S_ERROR(utils::stack_backtrace()); \
 		abort(); \
 	} \
