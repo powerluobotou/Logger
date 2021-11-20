@@ -7,6 +7,10 @@
 #include "Log.h"
 #include "utils.h"
 
+#ifdef QT_SUPPORT
+#include <QDebug>
+#endif
+
 namespace LOGGER {
 
 	//constructor
@@ -301,6 +305,7 @@ namespace LOGGER {
 				open();
 				day_ = tm.tm_mday;
 			}
+			int level = level_.load();
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
 #ifdef _windows_
@@ -317,6 +322,7 @@ namespace LOGGER {
 				else
 					printf(it->c_str());
 #endif
+				stdout_stream(level, it->c_str());
 				shift(tm, tv);
 			}
 			messages_.clear();
@@ -330,6 +336,20 @@ namespace LOGGER {
 		if (thread_.joinable()) {
 			thread_.join();
 		}
+	}
+
+	//stdout_stream
+	void  Logger::stdout_stream(int level, char const* msg) {
+#ifdef QT_SUPPORT
+		switch (level) {
+		case LVL_FATAL: qInfo/*qFatal*/() << msg;
+		case LVL_ERROR: qCritical() << msg;
+		case LVL_WARN: qWarning() << msg;
+		case LVL_INFO: qInfo() << msg;
+		case LVL_TRACE: qInfo() << msg;
+		case LVL_DEBUG: qDebug() << msg;
+		}
+#endif
 	}
 }
 
