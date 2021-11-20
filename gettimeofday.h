@@ -7,10 +7,10 @@
 #ifndef GETTIMEOFDAY_H_INCLUDE
 #define GETTIMEOFDAY_H_INCLUDE
 
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
+#include "Macro.h"
 
-#include <windows.h>
-#include <stdint.h>
+#ifdef _windows_
+
 #include <chrono>
 
 // struct timeval {
@@ -105,7 +105,7 @@ static void gettimeofday(struct timeval* tv/*, struct timezone* tz*/) {
 
 //gettime
 static double gettime() {
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
+#ifdef _windows_
 	return gettickcount();
 #else
 

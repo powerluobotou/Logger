@@ -1,7 +1,7 @@
 /**
 *
 *   原子锁
-*	Created by andy_ro@qq.com 2021.11.17
+*	Created by andy_ro@qq.com 2021.11.18
 *
 */
 #ifndef ATOMIC_H_INCLUDE

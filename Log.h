@@ -7,65 +7,42 @@
 #ifndef LOG_H_INCLUDE
 #define LOG_H_INCLUDE
 
+#include "Macro.h"
+
 #include <stdarg.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <time.h>
 
-#include <stdio.h>
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
+#ifdef _windows_
 #include <io.h>
 #include <direct.h>
 #include "gettimeofday.h"
 #else
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <sys/time.h>
 #include <dirent.h>
 #endif
-#include <string>
-#include <vector>
-#include <map>
-#include <thread>
+
 #include <mutex>
-#include <condition_variable>
 #include <shared_mutex>
-#include <iostream>
-#include <sstream>
-#include <functional>
-#include <atomic>
+#include <thread>
+#include <condition_variable>
+
 #include "Atomic.h"
 
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
-#include <windows.h>
-#include <time.h>
-#include <sys/timeb.h>
-//#define __FUNC__ __FUNCSIG__//__FUNCTION__
-#define __FUNC__ __FUNCTION__//__FUNCSIG__
-#define INVALID_HANDLE_VALUE ((HANDLE)(-1))
-#else
-#include <unistd.h>
-#include <time.h> 
-#include <sys/time.h>
-#define __FUNC__ __func__
-#define INVALID_HANDLE_VALUE (-1)
-#endif
+#define LVL_FATAL	    0
+#define LVL_ERROR       1
+#define LVL_WARN        2
+#define LVL_INFO        3
+#define LVL_TRACE       4
+#define LVL_DEBUG       5
 
-#define read_lock(mutex) std::shared_lock<std::shared_mutex> lock(mutex)
-#define write_lock(mutex) std::unique_lock<std::shared_mutex> lock(mutex)
-
-#define LVL_FATAL 	0
-#define LVL_ERROR 	1
-#define LVL_WARN 	2
-#define LVL_INFO 	3
-#define LVL_TRACE 	4
-#define LVL_DEBUG 	5
-
-#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__
-#define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__
-#define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__
-#define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__
-#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__
-#define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__
+#define PARAM_FATAL 	0,__FILE__,__LINE__,__FUNC__
+#define PARAM_ERROR 	1,__FILE__,__LINE__,__FUNC__
+#define PARAM_WARN 		2,__FILE__,__LINE__,__FUNC__
+#define PARAM_INFO		3,__FILE__,__LINE__,__FUNC__
+#define PARAM_TRACE		4,__FILE__,__LINE__,__FUNC__
+#define PARAM_DEBUG 	5,__FILE__,__LINE__,__FUNC__
 
 typedef int pid_t;
 typedef int tid_t;
@@ -76,16 +53,14 @@ namespace LOGGER {
 	public:
 		Logger();
 		~Logger();
-		static Logger* instance() {
-			static Logger logger;
-			return &logger;
-		}
-		void init_log(char const* dir, int level, char const* pre_name = NULL, int log_size = 100000000);
-		void write_log(int level, char const* file, int line, char const* func, char const* fmt, ...);
+		static Logger* instance();
+		void init(char const* dir, int level, char const* pre_name = NULL, int log_size = 100000000);
+		void write(int level, char const* file, int line, char const* func, char const* fmt, ...);
+		void write_s(int level, char const* file, int line, char const* func, std::string const& msg);
 	private:
-		void open_fd();
-		void close_fd();
-		void shift_fd(struct tm const& tm, struct timeval const& tv);
+		void open();
+		void close();
+		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
 	private:
@@ -94,7 +69,7 @@ namespace LOGGER {
 		void consume(struct tm const& tm, struct timeval const& tv);
 		void stop();
 	private:
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
+#ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
 #else
 		int fd_ = INVALID_HANDLE_VALUE;
@@ -102,9 +77,8 @@ namespace LOGGER {
 		pid_t pid_ = 0;
 	private:
 		int level_ = 0;
-		int log_day_ = -1;
-		//int log_num_ = 0;
-		int log_size_ = 8192;
+		int day_ = -1;
+		int size_ = 0;
 	private:
 		char path_[512] = { 0 };
 		char prefix_[256] = { 0 };
@@ -122,10 +96,11 @@ namespace LOGGER {
 	};
 }
 
-#define LOG_INIT LOGGER::Logger::instance()->init_log
-#define LOG	LOGGER::Logger::instance()->write_log
+#define LOG_INIT LOGGER::Logger::instance()->init
+#define LOG	LOGGER::Logger::instance()->write //LOG_XXXX("%s", msg)
+#define LOG_S LOGGER::Logger::instance()->write_s //LOG_XXXX(msg)
 
-#if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
+#ifdef _windows_
 #define LOG_FATAL(fmt,...)	LOG(PARAM_FATAL, fmt, ##__VA_ARGS__)
 #define LOG_ERROR(fmt,...)	LOG(PARAM_ERROR, fmt, ##__VA_ARGS__)
 #define LOG_WARN(fmt,...)	LOG(PARAM_WARN,  fmt, ##__VA_ARGS__)
@@ -140,5 +115,12 @@ namespace LOGGER {
 #define LOG_DEBUG(args...) 	LOG(PARAM_DEBUG, ##args)
 #define LOG_TRACE(args...)	LOG(PARAM_TRACE, ##args)
 #endif
+
+#define LOG_S_FATAL(msg)    LOG_S(PARAM_FATAL, msg)
+#define LOG_S_ERROR(msg)    LOG_S(PARAM_ERROR, msg)
+#define LOG_S_WARN(msg)     LOG_S(PARAM_WARN,  msg)
+#define LOG_S_INFO(msg)     LOG_S(PARAM_INFO,  msg)
+#define LOG_S_DEBUG(msg)    LOG_S(PARAM_DEBUG, msg)
+#define LOG_S_TRACE(msg)    LOG_S(PARAM_TRACE, msg)
 
 #endif
