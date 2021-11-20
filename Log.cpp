@@ -53,15 +53,42 @@ namespace LOGGER {
 		}
 	}
 	
+	//set_level
+	void Logger::set_level(int level) {
+		if (level >= LVL_DEBUG) {
+			level_.store(LVL_DEBUG);
+		}
+		else if (level <= LVL_FATAL) {
+			level_.store(LVL_FATAL);
+		}
+		else {
+			level_.store(level);
+		}
+	}
+
+	//get_level
+	char const* Logger::get_level() {
+		switch (level_) {
+		case LVL_FATAL: return "LVL_FATAL";
+		case LVL_ERROR: return "LVL_ERROR";
+		case LVL_WARN: return "LVL_WARN";
+		case LVL_INFO: return "LVL_INFO";
+		case LVL_TRACE: return "LVL_TRACE";
+		case LVL_DEBUG: return "LVL_DEBUG";
+		}
+		return "";
+	}
+
 	//init
 	void Logger::init(char const* dir, int level, char const* pre_name, int log_size) {
 		close();
-		snprintf(prefix_, sizeof(prefix_), "%s/%s", dir, pre_name);
-		level_ = level;
+		//打印level_及以下级别日志
+		level_.store(level);
 		size_ = log_size;
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
+		snprintf(prefix_, sizeof(prefix_), "%s/%s", dir, pre_name);
 		snprintf(path_, sizeof(path_), "%s.%d-%04d%02d%02d.log",
 			prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 #if 1
@@ -85,8 +112,10 @@ namespace LOGGER {
 
 	//write
 	void Logger::write(int level, char const* file, int line, char const* func, char const* fmt, ...) {
-		if (level > level_)
+		//打印level_及以下级别日志
+		if (level > level_.load()) {
 			return;
+		}
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
@@ -307,7 +336,7 @@ namespace LOGGER {
 /*
 int main()
 {
-	Log::instance()->init_log (".", 7, "conn");
+	Log::instance()->init_log (".", LVL_DEBUG, "conn");
 	while(1)
 	{
 		for(int i =0; i < 200000; i++)

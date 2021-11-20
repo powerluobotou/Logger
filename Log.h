@@ -54,6 +54,8 @@ namespace LOGGER {
 		Logger();
 		~Logger();
 		static Logger* instance();
+		void set_level(int level);
+		char const* get_level();
 		void init(char const* dir, int level, char const* pre_name = NULL, int log_size = 100000000);
 		void write(int level, char const* file, int line, char const* func, char const* fmt, ...);
 		void write_s(int level, char const* file, int line, char const* func, std::string const& msg);
@@ -76,9 +78,9 @@ namespace LOGGER {
 #endif
 		pid_t pid_ = 0;
 	private:
-		int level_ = 0;
 		int day_ = -1;
 		int size_ = 0;
+		std::atomic<int> level_ = LVL_FATAL;
 	private:
 		char path_[512] = { 0 };
 		char prefix_[256] = { 0 };
