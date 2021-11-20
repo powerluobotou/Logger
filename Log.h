@@ -30,19 +30,19 @@
 
 #include "Atomic.h"
 
-#define LVL_FATAL	    0
+#define LVL_FATAL       0
 #define LVL_ERROR       1
 #define LVL_WARN        2
 #define LVL_INFO        3
 #define LVL_TRACE       4
 #define LVL_DEBUG       5
 
-#define PARAM_FATAL 	0,__FILE__,__LINE__,__FUNC__
-#define PARAM_ERROR 	1,__FILE__,__LINE__,__FUNC__
-#define PARAM_WARN 		2,__FILE__,__LINE__,__FUNC__
-#define PARAM_INFO		3,__FILE__,__LINE__,__FUNC__
-#define PARAM_TRACE		4,__FILE__,__LINE__,__FUNC__
-#define PARAM_DEBUG 	5,__FILE__,__LINE__,__FUNC__
+#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__
+#define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__
+#define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__
+#define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__
+#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__
+#define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__
 
 typedef int pid_t;
 typedef int tid_t;
