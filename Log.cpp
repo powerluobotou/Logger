@@ -283,10 +283,11 @@ namespace LOGGER {
 				struct tm tm = { 0 };
 				struct timeval tv = { 0 };
 				while (!done_.load()) {
-					get(tm, tv);
 					std::unique_lock<std::mutex> lock(mutex_); {
-						cond_.wait(lock);
-						consume(tm, tv);
+						cond_.wait(lock); {
+							get(tm, tv);
+							consume(tm, tv);
+						}
 						std::this_thread::yield();
 					}
 				}
