@@ -20,7 +20,6 @@ namespace LOGGER {
 	//destructor
 	Logger::~Logger() {
 		stop();
-		close();
 	}
 
 	//instance
@@ -84,17 +83,14 @@ namespace LOGGER {
 	}
 
 	//init
-	void Logger::init(char const* dir, int level, char const* pre_name, int log_size) {
-		close();
+	void Logger::init(char const* dir, int level, char const* prename, int logsize) {
 		//打印level_及以下级别日志
 		level_.store(level);
-		size_ = log_size;
+		size_ = logsize;
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
-		snprintf(prefix_, sizeof(prefix_), "%s/%s", dir, pre_name);
-		snprintf(path_, sizeof(path_), "%s.%d-%04d%02d%02d.log",
-			prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+		snprintf(prefix_, sizeof(prefix_), "%s/%s", dir, prename);
 #if 1
 		struct stat stStat;
 		if (stat(dir, &stStat) < 0) {
@@ -203,24 +199,24 @@ namespace LOGGER {
 	}
 
 	//open
-	void Logger::open() {
-		if (!path_[0]) {
-			return;
-		}
+	void Logger::open(char const* path) {
+		assert(path);
 #ifdef _windows_
-		fd_ = CreateFileA(path_, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		fd_ = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == fd_) {
 			int err = GetLastError();
 			std::string errmsg = utils::str_error(err);
-			fprintf(stderr, "open %s error[%d:%s]\n", path_, err, errmsg.c_str());
+			fprintf(stderr, "open %s error[%d:%s]\n", path, err, errmsg.c_str());
 		}
 		else {
 			SetFilePointer(fd_, 0, NULL, FILE_END);
 		}
 #else
-		fd_ = open(path_, O_WRONLY | O_CREAT | O_APPEND | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		if (fd_ == INVALID_HANDLE_VALUE)
-			fprintf(stderr, "open %s error[%d:%s]\n", path_, errno, utils::str_error(errno).c_str());
+		fd_ = open(path, O_WRONLY | O_CREAT | O_APPEND | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		if (fd_ == INVALID_HANDLE_VALUE) {
+			std::string errmsg = utils::str_error(errno);
+			fprintf(stderr, "open %s error[%d:%s]\n", path, errno, errmsg.c_str());
+	    }
 #endif
 	}
 
@@ -241,28 +237,37 @@ namespace LOGGER {
 	
 	//shift
 	void Logger::shift(struct tm const& tm, struct timeval const& tv) {
-		struct stat stStat;
-		if (stat(path_, &stStat) < 0) {
-			return;
-		}
-		if (stStat.st_size < size_) {
+		if (tm.tm_mday != day_) {
+			close();
+			snprintf(path_, sizeof(path_), "%s.%d-%04d%02d%02d.log",
+				prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+			open(path_);
+			day_ = tm.tm_mday;
 		}
 		else {
-			close();
-			char tmp[512];
-			snprintf(tmp, sizeof(tmp), "%s.%d-%04d%02d%02d-%02d%02d%02d",
-				prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-
-			if (stat(tmp, &stStat) == 0) {
-				snprintf(tmp, sizeof(tmp), "%s.%d-%04d%02d%02d-%02d%02d%02d.%.6lu.log",
-					prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
-				printf("newFile: %s\n", tmp);
-			}
-			if (rename(path_, tmp) < 0) {
+			struct stat stStat;
+			if (stat(path_, &stStat) < 0) {
 				return;
 			}
-			open();
-			day_ = tm.tm_mday;
+			if (stStat.st_size < size_) {
+			}
+			else {
+				close();
+				char tmp[512];
+				snprintf(tmp, sizeof(tmp), "%s.%d-%04d%02d%02d-%02d%02d%02d",
+					prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+				if (stat(tmp, &stStat) == 0) {
+					snprintf(tmp, sizeof(tmp), "%s.%d-%04d%02d%02d-%02d%02d%02d.%.6lu.log",
+						prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
+					printf("newFile: %s\n", tmp);
+				}
+				if (rename(path_, tmp) < 0) {
+					return;
+				}
+				open(path_);
+				day_ = tm.tm_mday;
+			}
 		}
 	}
 
@@ -280,6 +285,7 @@ namespace LOGGER {
 						std::this_thread::yield();
 					}
 				}
+				close();
 				started_.clear();
 				}, this);
 			thread_.detach();
@@ -300,11 +306,7 @@ namespace LOGGER {
 	//consume
 	void Logger::consume(struct tm const& tm, struct timeval const& tv) {
 		if (!messages_.empty()) {
-			if (tm.tm_mday != day_) {
-				close();
-				open();
-				day_ = tm.tm_mday;
-			}
+			shift(tm, tv);
 			int level = level_.load();
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
@@ -323,7 +325,6 @@ namespace LOGGER {
 					printf(it->c_str());
 #endif
 				stdout_stream(level, it->c_str());
-				shift(tm, tv);
 			}
 			messages_.clear();
 		}
@@ -354,13 +355,10 @@ namespace LOGGER {
 }
 
 /*
-int main()
-{
-	Log::instance()->init_log (".", LVL_DEBUG, "conn");
-	while(1)
-	{
-		for(int i =0; i < 200000; i++)
-		{
+int main() {
+	LOG_INIT(".", LVL_DEBUG, "test");
+	while(1) {
+		for(int i =0; i < 200000; ++i) {
 			LOG_ERROR("Hi%d", i);
 		}
 	}

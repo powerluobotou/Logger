@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <errno.h>
+#include <assert.h>
 
 #include <vector>
 #include <list>

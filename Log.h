@@ -56,11 +56,11 @@ namespace LOGGER {
 		static Logger* instance();
 		void set_level(int level);
 		char const* get_level();
-		void init(char const* dir, int level, char const* pre_name = NULL, int log_size = 100000000);
+		void init(char const* dir, int level, char const* prename = NULL, int logsize = 100000000);
 		void write(int level, char const* file, int line, char const* func, char const* fmt, ...);
 		void write_s(int level, char const* file, int line, char const* func, std::string const& msg);
 	private:
-		void open();
+		void open(char const* path);
 		void close();
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
@@ -83,8 +83,8 @@ namespace LOGGER {
 		int size_ = 0;
 		std::atomic<int> level_ = LVL_FATAL;
 	private:
-		char path_[512] = { 0 };
 		char prefix_[256] = { 0 };
+		char path_[512] = { 0 };
 	private:
 		struct timeval tv_ = { 0 };
 		struct tm tm_ = { 0 };
