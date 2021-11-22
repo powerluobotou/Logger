@@ -45,7 +45,7 @@ namespace LOGGER {
 			}
 		}
 	}
-	
+
 	//get
 	void Logger::get(struct tm& tm, struct timeval& tv) {
 		{
@@ -55,7 +55,7 @@ namespace LOGGER {
 			}
 		}
 	}
-	
+
 	//set_level
 	void Logger::set_level(int level) {
 		if (level >= LVL_DEBUG) {
@@ -182,17 +182,6 @@ namespace LOGGER {
 		notify(msg);
 	}
 
-#if 0
-	void Logger::write(char const* msg) {
-#ifdef _windows_
-		long size = 0;
-		WriteFile(fd_, msg, strlen(msg), (LPDWORD)&size, NULL);
-#else
-		(void)write(fd_, msg, strlen(msg));
-#endif
-	}
-#endif
-	
 	//write_s
 	void Logger::write_s(int level, char const* file, int line, char const* func, std::string const& msg) {
 		write(level, file, line, func, "%s", msg.c_str());
@@ -220,6 +209,22 @@ namespace LOGGER {
 #endif
 	}
 
+	//write
+	void Logger::write(char const* msg, size_t len) {
+#ifdef _windows_
+		if (fd_ != INVALID_HANDLE_VALUE) {
+			long size = 0;
+			WriteFile(fd_, msg, len, (LPDWORD)&size, NULL);
+		}
+#else
+		if (fd_ != INVALID_HANDLE_VALUE) {
+			(void)write(fd_, msg, len);
+		}
+#endif
+		else
+			printf("%.*s", len, msg);
+	}
+
 	//close
 	void Logger::close() {
 #ifdef _windows_
@@ -234,7 +239,7 @@ namespace LOGGER {
 		}
 #endif
 	}
-	
+
 	//shift
 	void Logger::shift(struct tm const& tm, struct timeval const& tv) {
 		if (tm.tm_mday != day_) {
@@ -291,7 +296,7 @@ namespace LOGGER {
 			thread_.detach();
 		}
 	}
-	
+
 	//notify
 	void Logger::notify(char const* msg) {
 		{
@@ -310,20 +315,7 @@ namespace LOGGER {
 			int level = level_.load();
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-#ifdef _windows_
-				if (fd_ != INVALID_HANDLE_VALUE) {
-					long size = 0;
-					WriteFile(fd_, it->c_str(), it->length(), (LPDWORD)&size, NULL);
-				}
-				else
-					printf(it->c_str());
-#else
-				if (fd_ != INVALID_HANDLE_VALUE) {
-					(void)write(fd_, it->c_str(), it->length());
-				}
-				else
-					printf(it->c_str());
-#endif
+				write(it->c_str(), it->length());
 				stdout_stream(level, it->c_str());
 			}
 			messages_.clear();

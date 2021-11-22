@@ -61,6 +61,7 @@ namespace LOGGER {
 		void write_s(int level, char const* file, int line, char const* func, std::string const& msg);
 	private:
 		void open(char const* path);
+		void write(char const* msg, size_t len);
 		void close();
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
