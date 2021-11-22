@@ -66,7 +66,7 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		void stdout_stream(int level, char const* msg);
+		void stdout_stream(int level, char const* msg, size_t len);
 	private:
 		void start();
 		void notify(char const* msg);

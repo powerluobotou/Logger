@@ -221,8 +221,6 @@ namespace LOGGER {
 			(void)write(fd_, msg, len);
 		}
 #endif
-		else
-			printf("%.*s", len, msg);
 	}
 
 	//close
@@ -317,7 +315,7 @@ namespace LOGGER {
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
 				write(it->c_str(), it->length());
-				stdout_stream(level, it->c_str());
+				stdout_stream(level, it->c_str(), it->length());
 			}
 			messages_.clear();
 		}
@@ -333,7 +331,7 @@ namespace LOGGER {
 	}
 
 	//stdout_stream
-	void  Logger::stdout_stream(int level, char const* msg) {
+	void  Logger::stdout_stream(int level, char const* msg, size_t len) {
 #ifdef QT_SUPPORT
 		switch (level) {
 		case LVL_FATAL: qInfo/*qFatal*/() << msg;
@@ -343,6 +341,8 @@ namespace LOGGER {
 		case LVL_TRACE: qInfo() << msg;
 		case LVL_DEBUG: qDebug() << msg;
 		}
+#else
+		printf("%.*s", len, msg);
 #endif
 	}
 }
