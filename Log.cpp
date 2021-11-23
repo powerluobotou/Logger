@@ -88,8 +88,8 @@ namespace LOGGER {
 		level_.store(level);
 		size_ = logsize;
 		prename ?
-			snprintf(prefix_, sizeof(prefix_), "%s/%s.", dir, prename) :
-			snprintf(prefix_, sizeof(prefix_), "%s/", dir);
+			snprintf(prefix_, sizeof(prefix_), "%s/%s.", (dir ? dir : "."), prename) :
+			snprintf(prefix_, sizeof(prefix_), "%s/", (dir ? dir : "."));
 #if 1
 		struct stat stStat;
 		if (stat(dir, &stStat) < 0) {
