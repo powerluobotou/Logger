@@ -83,7 +83,7 @@ namespace LOGGER {
 	}
 
 	//init
-	void Logger::init(char const* dir, int level, char const* prename, int logsize) {
+	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
 		//打印level_及以下级别日志
 		level_.store(level);
 		size_ = logsize;
@@ -178,7 +178,12 @@ namespace LOGGER {
 		pos = strlen(msg);
 		msg[pos] = '\n';
 		msg[pos + 1] = 0;
-		notify(msg);
+		if (prefix_[0]) {
+			notify(msg);
+		}
+		else {
+			stdout_stream(level, msg, pos + 1);
+		}
 	}
 
 	//write_s
@@ -239,6 +244,7 @@ namespace LOGGER {
 
 	//shift
 	void Logger::shift(struct tm const& tm, struct timeval const& tv) {
+		assert(prefix_[0]);
 		if (tm.tm_mday != day_) {
 			close();
 			snprintf(path_, sizeof(path_), "%s%d.%04d%02d%02d.log",
@@ -350,9 +356,10 @@ namespace LOGGER {
 
 /*
 int main() {
-	LOG_INIT(".", LVL_DEBUG, "test");
-	while(1) {
-		for(int i =0; i < 200000; ++i) {
+	//LOG_INIT(".", LVL_DEBUG, "test");
+	LOG_SET_DEBUG;
+	while (1) {
+		for (int i = 0; i < 200000; ++i) {
 			LOG_ERROR("Hi%d", i);
 		}
 	}
