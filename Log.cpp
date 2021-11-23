@@ -256,7 +256,7 @@ namespace LOGGER {
 			else {
 				close();
 				char tmp[512];
-				snprintf(tmp, sizeof(tmp), "%s%d.%04d%02d%02d.%02d%02d%02d",
+				snprintf(tmp, sizeof(tmp), "%s%d.%04d%02d%02d.%02d%02d%02d.log",
 					prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 				if (stat(tmp, &stStat) == 0) {
