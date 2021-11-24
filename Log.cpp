@@ -84,12 +84,6 @@ namespace LOGGER {
 
 	//init
 	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
-		//打印level_及以下级别日志
-		level_.store(level);
-		size_ = logsize;
-		prename ?
-			snprintf(prefix_, sizeof(prefix_), "%s/%s.", (dir ? dir : "."), prename) :
-			snprintf(prefix_, sizeof(prefix_), "%s/", (dir ? dir : "."));
 #if 1
 		struct stat stStat;
 		if (stat(dir, &stStat) < 0) {
@@ -106,7 +100,14 @@ namespace LOGGER {
 			}
 #endif
 		}
-		start();
+		if (start()) {
+			//打印level_及以下级别日志
+			level_.store(level);
+			size_ = logsize;
+			prename ?
+				snprintf(prefix_, sizeof(prefix_), "%s/%s.", (dir ? dir : "."), prename) :
+				snprintf(prefix_, sizeof(prefix_), "%s/", (dir ? dir : "."));
+		}
 	}
 
 	//write
@@ -280,8 +281,8 @@ namespace LOGGER {
 	}
 
 	//start
-	void Logger::start() {
-		if (!started_.test_and_set()) {
+	bool Logger::start() {
+		if (!starting_.test_and_set() && !started_) {
 			thread_ = std::thread([this](Logger* logger) {
 				struct tm tm = { 0 };
 				struct timeval tv = { 0 };
@@ -297,10 +298,26 @@ namespace LOGGER {
 					std::this_thread::yield();
 				}
 				close();
-				started_.clear();
-			}, this);
-			thread_.detach();
+				started_ = false;
+				}, this);
+			if (started_ = valid()) {
+				thread_.detach();
+			}
+			starting_.clear();
 		}
+		return started_;
+	}
+
+	//valid
+	bool Logger::valid() {
+		//detach()后get_id()/joinable()无效
+#if 0
+		std::ostringstream oss;
+		oss << thread_.get_id();
+		return oss.str() != "0";
+#else
+		return thread_.joinable();
+#endif
 	}
 
 	//notify
@@ -330,7 +347,6 @@ namespace LOGGER {
 
 	//stop
 	void Logger::stop() {
-		started_.clear();
 		done_.store(true);
 		if (thread_.joinable()) {
 			thread_.join();

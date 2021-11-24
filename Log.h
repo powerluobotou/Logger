@@ -68,7 +68,8 @@ namespace LOGGER {
 		void get(struct tm& tm, struct timeval& tv);
 		void stdout_stream(int level, char const* msg, size_t len);
 	private:
-		void start();
+		bool start();
+		bool valid();
 		void notify(char const* msg);
 		void consume(struct tm const& tm, struct timeval const& tv);
 		void stop();
@@ -91,11 +92,12 @@ namespace LOGGER {
 		struct tm tm_ = { 0 };
 		mutable std::shared_mutex tm_mutex_;
 	private:
+		bool started_ = false;
 		std::mutex mutex_;
 		std::condition_variable cond_;
 		std::vector<std::string> messages_;
 		std::atomic_bool done_ = false;
-		std::atomic_flag started_ = ATOMIC_FLAG_INIT;
+		std::atomic_flag starting_ = ATOMIC_FLAG_INIT;
 		std::thread thread_;
 	};
 }
