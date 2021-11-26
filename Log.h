@@ -30,7 +30,7 @@
 
 #include "Atomic.h"
 
-#define __TRACE__       utils::stack_backtrace().c_str()
+#define __STACK__       utils::stack_backtrace().c_str()
 
 #define LVL_FATAL       0
 #define LVL_ERROR       1
@@ -39,7 +39,7 @@
 #define LVL_TRACE       4
 #define LVL_DEBUG       5
 
-#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__,__TRACE__
+#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__,__STACK__
 #define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__,NULL
 #define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__,NULL
 #define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__,NULL
@@ -59,8 +59,8 @@ namespace LOGGER {
 		void set_level(int level);
 		char const* get_level();
 		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
-		void write(int level, char const* file, int line, char const* func, char const* backtrace, char const* fmt, ...);
-		void write_s(int level, char const* file, int line, char const* func, char const* backtrace, std::string const& msg);
+		void write(int level, char const* file, int line, char const* func, char const* stack, char const* fmt, ...);
+		void write_s(int level, char const* file, int line, char const* func, char const* stack, std::string const& msg);
 	private:
 		void open(char const* path);
 		void write(char const* msg, size_t len);
@@ -72,9 +72,9 @@ namespace LOGGER {
 	private:
 		bool start();
 		bool valid();
-		void notify(char const* msg, char const* backtrace);
-		void consume(struct tm const& tm, struct timeval const& tv);
-		void abortF(char const* backtrace, size_t len);
+		void notify(char const* msg, char const* stack);
+		bool consume(struct tm const& tm, struct timeval const& tv);
+		bool backtraceF(char const* stack, size_t len, bool abort_ = false);
 		void stop();
 	private:
 #ifdef _windows_

@@ -111,7 +111,7 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(int level, char const* file, int line, char const* func, char const* backtrace, char const* fmt, ...) {
+	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, char const* fmt, ...) {
 		//打印level_及以下级别日志
 		if (level > level_.load()) {
 			return;
@@ -180,19 +180,19 @@ namespace LOGGER {
 		msg[pos] = '\n';
 		msg[pos + 1] = 0;
 		if (prefix_[0]) {
-			notify(msg, backtrace);
+			notify(msg, stack);
 		}
 		else {
 			stdout_stream(msg, pos + 1);
-			if (backtrace) {
-				abortF(backtrace, strlen(backtrace));
+			if (stack) {
+				backtraceF(stack, strlen(stack), true);
 			}
 		}
 	}
 
 	//write_s
-	void Logger::write_s(int level, char const* file, int line, char const* func, char const* backtrace, std::string const& msg) {
-		write(level, file, line, func, backtrace, "%s", msg.c_str());
+	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, std::string const& msg) {
+		write(level, file, line, func, stack, "%s", msg.c_str());
 	}
 
 	//open
@@ -289,12 +289,16 @@ namespace LOGGER {
 			thread_ = std::thread([this](Logger* logger) {
 				struct tm tm = { 0 };
 				struct timeval tv = { 0 };
+				bool abort_ = false;
 				while (!done_.load()) {
 					{
 						std::unique_lock<std::mutex> lock(mutex_); {
 							cond_.wait(lock); {
 								get(tm, tv);
-								consume(tm, tv);
+								if (abort_ = consume(tm, tv)) {
+									done_.store(true);
+									break;
+								}
 							}
 						}
 					}
@@ -302,6 +306,9 @@ namespace LOGGER {
 				}
 				close();
 				started_ = false;
+				if (abort_) {
+					abort();
+				}
 				}, this);
 			if (started_ = valid()) {
 				thread_.detach();
@@ -324,12 +331,12 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, char const* backtrace) {
+	void Logger::notify(char const* msg, char const* stack) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				messages_.emplace_back(msg);
-				if (backtrace) {
-					messages_.emplace_back(backtrace);
+				if (stack) {
+					messages_.emplace_back(stack);
 				}
 				cond_.notify_all();
 			}
@@ -352,19 +359,25 @@ namespace LOGGER {
 	}
 
 	//consume
-	void Logger::consume(struct tm const& tm, struct timeval const& tv) {
+	bool Logger::consume(struct tm const& tm, struct timeval const& tv) {
 		if (!messages_.empty()) {
 			shift(tm, tv);
+			bool abort_ = false;
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-				write(it->c_str(), it->length());
-				stdout_stream(it->c_str(), it->length());
-				if (getlevel(it->c_str()[0]) == -1) {
-					abortF(it->c_str(), it->length());
+				if (getlevel(it->c_str()[0]) == -1 &&
+					(abort_ = backtraceF(it->c_str(), it->length()))) {
+					break;
+				}
+				else {
+					write(it->c_str(), it->length());
+					stdout_stream(it->c_str(), it->length());
 				}
 			}
 			messages_.clear();
+			return abort_;
 		}
+		return false;
 	}
 
 	//stop
@@ -393,13 +406,17 @@ namespace LOGGER {
 #endif
 	}
 
-	//abortF
-	void Logger::abortF(char const* backtrace, size_t len) {
-		if (backtrace) {
-			write(backtrace, len);
-			stdout_stream(backtrace, len);
-			abort();
+	//backtraceF
+	bool Logger::backtraceF(char const* stack, size_t len, bool abort_) {
+		if (stack) {
+			write(stack, len);
+			stdout_stream(stack, len);
+			if (abort_) {
+				abort();
+			}
+			return true;
 		}
+		return false;
 	}
 }
 
