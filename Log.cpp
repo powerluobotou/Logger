@@ -429,6 +429,8 @@ int main() {
 			LOG_ERROR("Hi%d", i);
 		}
 	}
+	LOG_FATAL("崩溃吧");
+	xsleep(1000);
 	return 0;
 }
 */

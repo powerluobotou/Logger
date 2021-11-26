@@ -39,16 +39,18 @@
 //#define __FUNC__ __FUNCSIG__//__FUNCTION__
 #define __FUNC__ __FUNCTION__//__FUNCSIG__
 #define INVALID_HANDLE_VALUE ((HANDLE)(-1))
-//#define snprintf     _snprintf // _snprintf_s
+//#define snprintf     _snprintf //_snprintf_s
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
 #define strtoull     _strtoui64
+#define xsleep(t) Sleep(t) //milliseconds
 #elif defined(_linux_)
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #define __FUNC__ __func__
 #define INVALID_HANDLE_VALUE (-1)
+#define xsleep(t) usleep((t) * 1000)
 #endif
 
 #include <mutex>

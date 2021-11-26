@@ -26,20 +26,20 @@ namespace utils {
 
 	//trim_file
 	std::string const trim_file(char const* _FILE_) {
-		std::string _file_ = _FILE_;
+		std::string f = _FILE_;
 #ifdef _windows_
-		_file_ = _file_.substr(_file_.find_last_of('\\') + 1, -1);
+		f = f.substr(f.find_last_of('\\') + 1, -1);
 #else
-		_file_ = _file_.substr(_file_.find_last_of('/') + 1, -1);
+		f = f.substr(f.find_last_of('/') + 1, -1);
 #endif
-		return _file_;
+		return f;
 	}
 
 	//trim_func
 	std::string const trim_func(char const* _FUNC_) {
-		std::string _func_ = _FUNC_;
-		_func_ = _func_.substr(_func_.find_last_of(':') + 1, -1);
-		return _func_;
+		std::string f = _FUNC_;
+		f = f.substr(f.find_last_of(':') + 1, -1);
+		return f;
 	}
 
 	//str_error

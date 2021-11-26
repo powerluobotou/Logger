@@ -22,5 +22,6 @@ int main() {
 		}
 	}
 	LOG_FATAL("崩溃吧");
+	xsleep(1000);
 	return 0;
 }
