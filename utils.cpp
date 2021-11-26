@@ -77,7 +77,7 @@ namespace utils {
 #ifdef _windows_
 		HANDLE process = GetCurrentProcess();
 		SymInitialize(process, NULL, TRUE);
-#if 0
+#if 1
 		static const int MAX_STACK_FRAMES = 20;
 		void* pstack[MAX_STACK_FRAMES];
 		WORD frames = CaptureStackBackTrace(0, MAX_STACK_FRAMES, pstack, NULL);
