@@ -30,6 +30,8 @@
 
 #include "Atomic.h"
 
+#define __TRACE__       utils::stack_backtrace().c_str()
+
 #define LVL_FATAL       0
 #define LVL_ERROR       1
 #define LVL_WARN        2
@@ -37,12 +39,12 @@
 #define LVL_TRACE       4
 #define LVL_DEBUG       5
 
-#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__
-#define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__
-#define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__
-#define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__
-#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__
-#define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__
+#define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__,__TRACE__
+#define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__,NULL
+#define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__,NULL
+#define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__,NULL
+#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__,NULL
+#define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__,NULL
 
 typedef int pid_t;
 typedef int tid_t;
@@ -57,8 +59,8 @@ namespace LOGGER {
 		void set_level(int level);
 		char const* get_level();
 		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
-		void write(int level, char const* file, int line, char const* func, char const* fmt, ...);
-		void write_s(int level, char const* file, int line, char const* func, std::string const& msg);
+		void write(int level, char const* file, int line, char const* func, char const* backtrace, char const* fmt, ...);
+		void write_s(int level, char const* file, int line, char const* func, char const* backtrace, std::string const& msg);
 	private:
 		void open(char const* path);
 		void write(char const* msg, size_t len);
@@ -66,12 +68,13 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		void stdout_stream(int level, char const* msg, size_t len);
+		void stdout_stream(char const* msg, size_t len);
 	private:
 		bool start();
 		bool valid();
-		void notify(char const* msg);
+		void notify(char const* msg, char const* backtrace);
 		void consume(struct tm const& tm, struct timeval const& tv);
+		void abortF(char const* backtrace, size_t len);
 		void stop();
 	private:
 #ifdef _windows_

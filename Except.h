@@ -16,7 +16,7 @@
 
 //https://www.csdndocs.com/article/5961151
 //https://developer.aliyun.com/article/317590
-#ifdef _windows_// /EHa
+#ifdef _windows_// /EHa /EHsc
 #define _TRY_   __try
 #define _CATCH_ __except
 #else
@@ -104,17 +104,12 @@ namespace EXCEPT {
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
 		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
 		LOG_S_FATAL(oss.str()); \
-		LOG_S_ERROR(utils::stack_backtrace()); \
-		abort(); \
 	} \
 	catch (const std::exception& e) { \
-			LOG_S_ERROR(e.what()); \
-			LOG_S_ERROR(utils::stack_backtrace()); \
-			abort(); \
+			LOG_S_FATAL(std::string("EXCEPTION: ") + e.what()); \
 	} \
 	catch (...) { \
-		LOG_S_ERROR(utils::stack_backtrace()); \
-		abort(); \
+		LOG_S_FATAL("EXCEPTION: unknown error"); \
 	} \
 
 #endif

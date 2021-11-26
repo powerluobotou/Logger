@@ -111,7 +111,7 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(int level, char const* file, int line, char const* func, char const* fmt, ...) {
+	void Logger::write(int level, char const* file, int line, char const* func, char const* backtrace, char const* fmt, ...) {
 		//打印level_及以下级别日志
 		if (level > level_.load()) {
 			return;
@@ -180,16 +180,19 @@ namespace LOGGER {
 		msg[pos] = '\n';
 		msg[pos + 1] = 0;
 		if (prefix_[0]) {
-			notify(msg);
+			notify(msg, backtrace);
 		}
 		else {
-			stdout_stream(level, msg, pos + 1);
+			stdout_stream(msg, pos + 1);
+			if (backtrace) {
+				abortF(backtrace, strlen(backtrace));
+			}
 		}
 	}
 
 	//write_s
-	void Logger::write_s(int level, char const* file, int line, char const* func, std::string const& msg) {
-		write(level, file, line, func, "%s", msg.c_str());
+	void Logger::write_s(int level, char const* file, int line, char const* func, char const* backtrace, std::string const& msg) {
+		write(level, file, line, func, backtrace, "%s", msg.c_str());
 	}
 
 	//open
@@ -321,25 +324,44 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg) {
+	void Logger::notify(char const* msg, char const* backtrace) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
-				messages_.push_back(msg);
+				messages_.emplace_back(msg);
+				if (backtrace) {
+					messages_.emplace_back(backtrace);
+				}
 				cond_.notify_all();
 			}
 		}
 		std::this_thread::yield();
 	}
 
+	//getlevel
+	static int getlevel(char const c) {
+		switch (c) {
+		case 'F': return LVL_FATAL;
+		case 'E':return LVL_ERROR;
+		case 'W':return LVL_WARN;
+		case 'I':return LVL_INFO;
+		case 'T':return LVL_TRACE;
+		case 'D':return LVL_DEBUG;
+		default:
+			return -1;
+		}
+	}
+
 	//consume
 	void Logger::consume(struct tm const& tm, struct timeval const& tv) {
 		if (!messages_.empty()) {
 			shift(tm, tv);
-			int level = level_.load();
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
 				write(it->c_str(), it->length());
-				stdout_stream(level, it->c_str(), it->length());
+				stdout_stream(it->c_str(), it->length());
+				if (getlevel(it->c_str()[0]) == -1) {
+					abortF(it->c_str(), it->length());
+				}
 			}
 			messages_.clear();
 		}
@@ -354,19 +376,30 @@ namespace LOGGER {
 	}
 
 	//stdout_stream
-	void Logger::stdout_stream(int level, char const* msg, size_t len) {
+	void Logger::stdout_stream(char const* msg, size_t len) {
 #ifdef QT_SUPPORT
+		int level = getlevel(msg[0]);
 		switch (level) {
-		case LVL_FATAL: qInfo/*qFatal*/() << msg;
-		case LVL_ERROR: qCritical() << msg;
-		case LVL_WARN: qWarning() << msg;
-		case LVL_INFO: qInfo() << msg;
-		case LVL_TRACE: qInfo() << msg;
-		case LVL_DEBUG: qDebug() << msg;
+		default:
+		case LVL_FATAL: qInfo/*qFatal*/() << msg; break;
+		case LVL_ERROR: qCritical() << msg; break;
+		case LVL_WARN: qWarning() << msg; break;
+		case LVL_INFO: qInfo() << msg; break;
+		case LVL_TRACE: qInfo() << msg; break;
+		case LVL_DEBUG: qDebug() << msg; break;
 		}
 #else
 		printf("%.*s", len, msg);
 #endif
+	}
+
+	//abortF
+	void Logger::abortF(char const* backtrace, size_t len) {
+		if (backtrace) {
+			write(backtrace, len);
+			stdout_stream(backtrace, len);
+			abort();
+		}
 	}
 }
 
