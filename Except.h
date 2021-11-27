@@ -105,7 +105,7 @@ namespace EXCEPT {
 		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
 		LOG_S_FATAL(oss.str()); \
 	} \
-	catch (const std::exception& e) { \
+	catch (std::exception const& e) { \
 			LOG_S_FATAL(std::string("EXCEPTION: ") + e.what()); \
 	} \
 	catch (...) { \
