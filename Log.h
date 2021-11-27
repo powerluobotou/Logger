@@ -86,7 +86,7 @@ namespace LOGGER {
 	private:
 		int day_ = -1;
 		size_t size_ = 0;
-		std::atomic<int> level_ = LVL_DEBUG;
+        std::atomic<int> level_{LVL_DEBUG};
 	private:
 		char prefix_[256] = { 0 };
 		char path_[512] = { 0 };
@@ -99,8 +99,8 @@ namespace LOGGER {
 		std::mutex mutex_;
 		std::condition_variable cond_;
 		std::vector<std::string> messages_;
-		std::atomic_bool done_ = false;
-		std::atomic_flag starting_ = ATOMIC_FLAG_INIT;
+        std::atomic_bool done_{false};
+        std::atomic_flag starting_{ATOMIC_FLAG_INIT};
 		std::thread thread_;
 	};
 }

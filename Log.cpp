@@ -14,7 +14,7 @@
 namespace LOGGER {
 
 	//constructor
-	Logger::Logger() :pid_(getpid()) {
+    Logger::Logger() :pid_(_getpid()) {
 	};
 
 	//destructor
@@ -91,7 +91,7 @@ namespace LOGGER {
 		if (access(dir, 0) < 0) {
 #endif
 #ifdef _windows_
-			if (mkdir(dir) < 0) {
+            if (_mkdir(dir) < 0) {
 				return;
 			}
 #else
@@ -295,7 +295,7 @@ namespace LOGGER {
 						std::unique_lock<std::mutex> lock(mutex_); {
 							cond_.wait(lock); {
 								get(tm, tv);
-								if (abort_ = consume(tm, tv)) {
+                                if ((abort_ = consume(tm, tv))) {
 									done_.store(true);
 									break;
 								}
@@ -309,8 +309,8 @@ namespace LOGGER {
 				if (abort_) {
 					abort();
 				}
-				}, this);
-			if (started_ = valid()) {
+            }, this);
+            if ((started_ = valid())) {
 				thread_.detach();
 			}
 			starting_.clear();
