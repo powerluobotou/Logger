@@ -24,7 +24,7 @@
 #define _CATCH_ catch
 #endif
 
-namespace EXCEPT {
+namespace EXCPT {
 	//base_error
 	class base_error : public std::runtime_error {
 	public:
@@ -84,13 +84,13 @@ namespace EXCEPT {
 #define MY_TRY()	\
 	try { \
 
-#define MY_THROW_A(err_str) (throw function_error(__FILE__, __LINE__, __FUNC__, err_str))
-#define MY_THROW_C(fn_str, err_str) (throw function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
-#define MY_THROW_B(fn_str, err_no, err_str) (throw function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
+#define MY_THROW_A(err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, err_str))
+#define MY_THROW_C(fn_str, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
+#define MY_THROW_B(fn_str, err_no, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
 
 #define MY_CATCH() \
 	} \
-	catch (EXCEPT::function_error& e) { \
+	catch (EXCPT::function_error& e) { \
 		std::ostringstream oss; \
 		e.err_no_ == 0XFFFFFFFFL ? \
 		( \
