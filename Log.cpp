@@ -309,11 +309,11 @@ namespace LOGGER {
 				if (abort_) {
 					abort();
 				}
-		}, this);
-		if ((started_ = valid())) {
-			thread_.detach();
-		}
-		starting_.clear();
+			}, this);
+			if ((started_ = valid())) {
+				thread_.detach();
+			}
+			starting_.clear();
 		}
 		return started_;
 	}
