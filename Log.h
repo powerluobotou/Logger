@@ -86,7 +86,7 @@ namespace LOGGER {
 	private:
 		int day_ = -1;
 		size_t size_ = 0;
-        std::atomic<int> level_{LVL_DEBUG};
+		std::atomic<int> level_{LVL_DEBUG};
 	private:
 		char prefix_[256] = { 0 };
 		char path_[512] = { 0 };
