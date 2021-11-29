@@ -99,8 +99,8 @@ namespace LOGGER {
 		std::mutex mutex_;
 		std::condition_variable cond_;
 		std::vector<std::string> messages_;
-        std::atomic_bool done_{false};
-        std::atomic_flag starting_{ATOMIC_FLAG_INIT};
+		std::atomic_bool done_{false};
+		std::atomic_flag starting_{ATOMIC_FLAG_INIT};
 		std::thread thread_;
 	};
 }
