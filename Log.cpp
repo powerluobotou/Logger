@@ -121,7 +121,7 @@ namespace LOGGER {
 			level_.store(level);
 			size_ = logsize;
 			prename ?
-				snprintf(prefix_, sizeof(prefix_), "%s/%s.", (dir ? dir : "."), prename) :
+				snprintf(prefix_, sizeof(prefix_), "%s/%s_", (dir ? dir : "."), prename) :
 				snprintf(prefix_, sizeof(prefix_), "%s/", (dir ? dir : "."));
 		}
 	}
@@ -267,7 +267,7 @@ namespace LOGGER {
 		assert(prefix_[0]);
 		if (tm.tm_mday != day_) {
 			close();
-			snprintf(path_, sizeof(path_), "%s%d.%04d%02d%02d.log",
+			snprintf(path_, sizeof(path_), "%s%d_%04d-%02d-%02d.log",
 				prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 			open(path_);
 			day_ = tm.tm_mday;
@@ -282,11 +282,11 @@ namespace LOGGER {
 			else {
 				close();
 				char tmp[512];
-				snprintf(tmp, sizeof(tmp), "%s%d.%04d%02d%02d.%02d%02d%02d.log",
+				snprintf(tmp, sizeof(tmp), "%s%d_%04d-%02d-%02d.%02d%02d%02d.log",
 					prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 				if (stat(tmp, &stStat) == 0) {
-					snprintf(tmp, sizeof(tmp), "%s%d.%04d%02d%02d.%02d%02d%02d.%.6lu.log",
+					snprintf(tmp, sizeof(tmp), "%s%d_%04d-%02d-%02d.%02d%02d%02d.%.6lu.log",
 						prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 					printf("newFile: %s\n", tmp);
 				}
