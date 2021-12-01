@@ -34,12 +34,6 @@
 #include <set>
 #include <functional>
 
-#define MY_MST (-7)
-#define MY_BST (+1)
-#define MY_UTC (+0)
-//(UTC+08:00) Beijing(China)
-#define MY_CCT (+8)
-
 #ifdef _windows_
 #include <windows.h>
 #include <stdint.h>

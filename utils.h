@@ -9,6 +9,12 @@
 
 #include "Macro.h"
 
+#define MY_MST (-7)
+#define MY_BST (+1)
+#define MY_UTC (+0)//UTC/GMT
+//(UTC+08:00) Beijing(China)
+#define MY_CCT (+8)
+
 namespace utils {
 	//gettid
 	/*tid_t*/std::string gettid();
@@ -28,8 +34,8 @@ namespace utils {
 	//UTCTime
 	struct tm UTCTime(time_t const t);
 
-	//UTCToBeijing
-	struct tm UTCToBeijing(time_t const t);
+	//convertUTC
+	struct tm convertUTC(time_t const t, time_t* tp = NULL, int64_t timezone = MY_CCT);
 }
 
 #endif

@@ -309,32 +309,46 @@ namespace utils {
 	//https://www.cplusplus.com/reference/ctime/mktime/?kw=mktime
 	//https://www.runoob.com/cprogramming/c-standard-library-time-h.html
 	//UTCTime
-	struct tm  UTCTime(time_t const t) {
-		struct tm tm = { 0 };
-		errno_t errnum = gmtime_s(&tm, &t);//UTC
-		if (errnum == 0) {
-			//tm.tm_hour = (tm.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
-			//char msg[512];
-			//snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
-			//	tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			//LOG_DEBUG("Beijing (China) %s", msg);
-			//return mktime(&tm);
-		}
-		return tm;
+	struct tm UTCTime(time_t const t) {
+		struct tm tm_utc = { 0 };
+		gmtime_s(&tm_utc, &t);//UTC/GMT
+		return tm_utc;
 	}
 
-	//UTCToBeijing
-	struct tm UTCToBeijing(time_t const t) {
-		struct tm tm = { 0 };
-		errno_t errnum = gmtime_s(&tm, &t);//UTC
-		if (errnum == 0) {
-			tm.tm_hour = (tm.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
-			char msg[512];
-			snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
-				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			LOG_DEBUG("Beijing (China) %s", msg);
-			//return mktime(&tm);
+	//convertUTC
+	struct tm convertUTC(time_t const t, time_t* tp, int64_t timezone) {
+		struct tm tm_utc = { 0 };
+		gmtime_s(&tm_utc, &t);//UTC/GMT
+		time_t t_utc = mktime(&tm_utc);
+		switch (timezone) {
+		case MY_UTC: {
+			return tm_utc;
 		}
-		return tm;
+		case MY_MST:
+		case MY_BST:
+		case MY_CCT:
+		default: {
+			struct tm tm = { 0 };
+			//(UTC+08:00) Beijing(China) (tm_hour + MY_CCT) % 24
+			time_t t_zone = t_utc + timezone * 3600;
+			//time_t -> tm
+			localtime_s(&tm, &t_zone);
+			//tm -> time_t
+			assert(t_zone == mktime(&tm));
+			if (tp) {
+				*tp = t_zone;
+			}
+			if (t_zone != mktime(&tm)) {
+				LOG_S_FATAL("t_zone != mktime(&tm)");
+			}
+			if (timezone == MY_CCT) {
+				char msg[512];
+				snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
+					tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+				LOG_DEBUG("Beijing (China) %s", msg);
+			}
+			return tm;
+		}
+		}
 	}
 }
