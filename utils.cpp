@@ -14,6 +14,8 @@
 #include <execinfo.h>
 #endif
 
+#include "Log.h"
+
 #pragma execution_character_set("utf-8")
 
 namespace utils {
@@ -301,5 +303,38 @@ namespace utils {
 		}
 #endif
 		return stack;
+	}
+
+	//https://www.cplusplus.com/reference/ctime/gmtime/
+	//https://www.cplusplus.com/reference/ctime/mktime/?kw=mktime
+	//https://www.runoob.com/cprogramming/c-standard-library-time-h.html
+	//UTCTime
+	struct tm  UTCTime(time_t const t) {
+		struct tm tm = { 0 };
+		errno_t errnum = gmtime_s(&tm, &t);//UTC
+		if (errnum == 0) {
+			//tm.tm_hour = (tm.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
+			//char msg[512];
+			//snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
+			//	tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+			//LOG_DEBUG("Beijing (China) %s", msg);
+			//return mktime(&tm);
+		}
+		return tm;
+	}
+
+	//UTCToBeijing
+	struct tm UTCToBeijing(time_t const t) {
+		struct tm tm = { 0 };
+		errno_t errnum = gmtime_s(&tm, &t);//UTC
+		if (errnum == 0) {
+			tm.tm_hour = (tm.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
+			char msg[512];
+			snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
+				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+			LOG_DEBUG("Beijing (China) %s", msg);
+			//return mktime(&tm);
+		}
+		return tm;
 	}
 }

@@ -34,11 +34,15 @@ namespace LOGGER {
 			std::unique_lock<std::shared_mutex> lock(tm_mutex_); {
 #ifdef _windows_
 				gettimeofday(&tv_/*, NULL*/);
-				time_t time = tv_.tv_sec;
-				localtime_s(&tm_, &time);
+				time_t t = tv_.tv_sec;
+				//localtime_s(&tm_, &t);
+				errno_t errnum = gmtime_s(&tm_, &t);//UTC
+				tm_.tm_hour = (tm_.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
 #else
 				gettimeofday(&tv_, NULL);
-				localtime_r(&tv_.tv_sec, &tm_);
+				//localtime_r(&tv_.tv_sec, &tm_);
+				gmtime_s(&tv_.tv_sec, &tm_);//UTC
+				tm_.tm_hour = (tm_.tm_hour + MY_CCT) % 24;//(UTC+08:00) Beijing(China)
 #endif
 				tm = tm_;
 				tv = tv_;

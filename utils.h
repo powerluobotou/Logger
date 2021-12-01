@@ -24,6 +24,12 @@ namespace utils {
 
 	//stack_backtrace
 	std::string stack_backtrace();
+
+	//UTCTime
+	struct tm UTCTime(time_t const t);
+
+	//UTCToBeijing
+	struct tm UTCToBeijing(time_t const t);
 }
 
 #endif

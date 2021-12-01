@@ -12,7 +12,6 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <time.h>
 
 #ifdef _windows_
 #include <io.h>
