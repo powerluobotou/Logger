@@ -27,35 +27,19 @@ namespace LOGGER {
 		static Logger logger;
 		return &logger;
 	}
-
+	
+	//set_timezone
+	void Logger::set_timezone(int64_t timezone/* = MY_CCT*/) {
+		timezone_ = timezone;
+	}
+	
 	//update
 	void Logger::update(struct tm& tm, struct timeval& tv) {
 		{
 			std::unique_lock<std::shared_mutex> lock(tm_mutex_); {
-				struct tm tm_utc = { 0 };
-#ifdef _windows_
-				gettimeofday(&tv_/*, NULL*/);
-				time_t t = tv_.tv_sec;
-				gmtime_s(&tm_utc, &t);//UTC/GMT
-				time_t t_utc = mktime(&tm_utc);
-				//(UTC+08:00) Beijing(China) (tm_hour + MY_CCT) % 24
-				time_t t_zone = t_utc + MY_CCT * 3600;
-				//time_t -> tm
-				localtime_s(&tm_, &t_zone);
-				//tm -> time_t
-				assert(t_zone == mktime(&tm_));
-#else
 				gettimeofday(&tv_, NULL);
 				time_t t = tv_.tv_sec;
-				gmtime_s(&t, &tm_utc);//UTC/GMT
-				time_t t_utc = mktime(&tm_utc);
-				//(UTC+08:00) Beijing(China) (tm_hour + MY_CCT) % 24
-				time_t t_zone = t_utc + MY_CCT * 3600;
-				//time_t -> tm
-				localtime_r(&t_zone, &tm_);
-				//tm -> time_t
-				assert(t_zone == mktime(&tm_));
-#endif
+				utils::convertUTC(t, tm_, NULL, timezone_);
 				tm = tm_;
 				tv = tv_;
 			}
@@ -123,7 +107,15 @@ namespace LOGGER {
 			prename ?
 				snprintf(prefix_, sizeof(prefix_), "%s/%s_", (dir ? dir : "."), prename) :
 				snprintf(prefix_, sizeof(prefix_), "%s/", (dir ? dir : "."));
+			timezoneinfo();
 		}
+	}
+	
+	//timezoneinfo
+	void Logger::timezoneinfo() {
+		struct tm tm = { 0 };
+		utils::convertUTC(time(NULL), tm, NULL, timezone_);
+		utils::timezoneInfo(tm, timezone_);
 	}
 
 	//write

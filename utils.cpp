@@ -308,31 +308,48 @@ namespace utils {
 	//https://www.cplusplus.com/reference/ctime/gmtime/
 	//https://www.cplusplus.com/reference/ctime/mktime/?kw=mktime
 	//https://www.runoob.com/cprogramming/c-standard-library-time-h.html
-	//UTCTime
-	struct tm UTCTime(time_t const t) {
-		struct tm tm_utc = { 0 };
-		gmtime_s(&tm_utc, &t);//UTC/GMT
-		return tm_utc;
-	}
-
 	//convertUTC
-	struct tm convertUTC(time_t const t, time_t* tp, int64_t timezone) {
-		struct tm tm_utc = { 0 };
-		gmtime_s(&tm_utc, &t);//UTC/GMT
-		time_t t_utc = mktime(&tm_utc);
+	void convertUTC(time_t const t, struct tm& tm, time_t* tp, int64_t timezone) {
 		switch (timezone) {
 		case MY_UTC: {
-			return tm_utc;
+#ifdef _windows_
+			gmtime_s(&tm, &t);//UTC/GMT
+#else
+			gmtime_s(&t, &tm);//UTC/GMT
+#endif
+			if (tp) {
+				//tm -> time_t
+				time_t t_zone = mktime(&tm);
+				//tm -> time_t
+				assert(t_zone == mktime(&tm));
+				*tp = t_zone;
+				if (t_zone != mktime(&tm)) {
+					LOG_S_FATAL("t_zone != mktime(&tm)");
+				}
+			}
+			break;
 		}
 		case MY_MST:
 		case MY_BST:
 		case MY_CCT:
 		default: {
-			struct tm tm = { 0 };
+			struct tm tm_utc = { 0 };
+#ifdef _windows_
+			gmtime_s(&tm_utc, &t);//UTC/GMT
+#else
+			gmtime_s(&t, &tm_utc);//UTC/GMT
+#endif
+			//tm -> time_t
+			time_t t_utc = mktime(&tm_utc);
 			//(UTC+08:00) Beijing(China) (tm_hour + MY_CCT) % 24
 			time_t t_zone = t_utc + timezone * 3600;
+#ifdef _windows_
 			//time_t -> tm
 			localtime_s(&tm, &t_zone);
+#else
+			//time_t -> tm
+			localtime_r(&t_zone, &tm);
+#endif
 			//tm -> time_t
 			assert(t_zone == mktime(&tm));
 			if (tp) {
@@ -341,14 +358,20 @@ namespace utils {
 			if (t_zone != mktime(&tm)) {
 				LOG_S_FATAL("t_zone != mktime(&tm)");
 			}
-			if (timezone == MY_CCT) {
-				char msg[512];
-				snprintf(msg, sizeof msg, "%04d-%02d-%02d %02d:%02d:%02d",
-					tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-				LOG_DEBUG("Beijing (China) %s", msg);
-			}
-			return tm;
+			break;
 		}
+		}
+	}
+
+	//timezoneInfo
+	void timezoneInfo(struct tm const& tm, int64_t timezone) {
+		switch (timezone) {
+		case MY_CCT: {
+			LOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
+				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+		}
+		default:
+			break;
 		}
 	}
 }

@@ -55,6 +55,7 @@ namespace LOGGER {
 		Logger();
 		~Logger();
 		static Logger* instance();
+		void set_timezone(int64_t timezone = MY_CCT);
 		void set_level(int level);
 		char const* get_level();
 		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
@@ -75,6 +76,7 @@ namespace LOGGER {
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		bool backtraceF(char const* stack, size_t len, bool abort_ = false);
 		void stop();
+		void timezoneinfo();
 	private:
 #ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
@@ -90,6 +92,7 @@ namespace LOGGER {
 		char prefix_[256] = { 0 };
 		char path_[512] = { 0 };
 	private:
+		int64_t timezone_ = MY_CCT;
 		struct timeval tv_ = { 0 };
 		struct tm tm_ = { 0 };
 		mutable std::shared_mutex tm_mutex_;
@@ -108,6 +111,7 @@ namespace LOGGER {
 #define LOG LOGGER::Logger::instance()->write
 #define LOG_S LOGGER::Logger::instance()->write_s
 #define LOG_SET LOGGER::Logger::instance()->set_level
+#define LOG_TIMEZONE LOGGER::Logger::instance()->set_timezone
 
 #define LOG_SET_FATAL       LOG_SET(LVL_FATAL)
 #define LOG_SET_ERROR       LOG_SET(LVL_ERROR)

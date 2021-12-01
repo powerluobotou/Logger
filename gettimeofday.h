@@ -50,7 +50,7 @@ static double gettickcount() {
 }
 
 //gettimeofday
-static void gettimeofday(struct timeval* tv/*, struct timezone* tz*/) {
+static void gettimeofday(struct timeval* tv, struct timezone* tz) {
 #if 1
 	uint64_t  intervals;
 	FILETIME  filetime;
