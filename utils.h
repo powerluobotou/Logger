@@ -10,6 +10,12 @@
 #include "Macro.h"
 
 namespace utils {
+
+	namespace uuid {
+		//createUUID
+		std::string createUUID();
+	}
+
 	//gettid
 	/*tid_t*/std::string gettid();
 

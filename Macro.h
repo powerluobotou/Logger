@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <time.h>
+#include <random>
 
 #include <vector>
 #include <list>
