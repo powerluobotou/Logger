@@ -18,7 +18,7 @@
 namespace LOGGER {
 
 	//constructor
-    Logger::Logger() :pid_(_getpid()) {
+	Logger::Logger() :pid_(_getpid()) {
 	};
 
 	//destructor
