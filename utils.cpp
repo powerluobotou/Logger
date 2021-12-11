@@ -9,9 +9,13 @@
 
 #ifdef _windows_
 #include <ImageHlp.h>
+#include <comutil.h>
+#pragma comment(lib, "comsuppw.lib")
 #elif defined(_linux_)
 #include <cxxabi.h>
 #include <execinfo.h>
+#include <locale> 
+#include <codecvt>
 #endif
 
 #include "Log.h"
@@ -432,5 +436,31 @@ namespace utils {
 			};
 			return ss.str();
 		}
+	}
+
+	//ws2str
+	std::string ws2str(std::wstring const& ws) {
+#ifdef _windows_
+		_bstr_t t = ws.c_str();
+		char const*const pchar = (char const*)t;
+		std::string str = pchar;
+		return str;
+#else
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> cvt;
+		return cvt.to_bytes(ws);
+#endif
+
+	}
+
+	//str2ws
+	std::wstring str2ws(std::string const& str) {
+#ifdef _windows_
+		_bstr_t const t = str.c_str();
+		wchar_t const*const wchar = (wchar_t const*)t;
+		return wchar;
+#else
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> cvt;
+		return cvt.from_bytes(str);
+#endif
 	}
 }

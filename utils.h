@@ -36,6 +36,12 @@ namespace utils {
 
 	//timezoneInfo
 	void timezoneInfo(struct tm const& tm, int64_t timezone);
+
+	//ws2str
+	std::string ws2str(std::wstring const& ws);
+
+	//str2ws
+	std::wstring str2ws(std::string const& str);
 }
 
 #endif
