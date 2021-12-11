@@ -441,23 +441,19 @@ namespace utils {
 	//ws2str
 	std::string ws2str(std::wstring const& ws) {
 #ifdef _windows_
-		_bstr_t t = ws.c_str();
-		char const*const pchar = (char const*)t;
-		std::string str = pchar;
-		return str;
+		_bstr_t const t = ws.c_str();
+		return (char const*const)t;
 #else
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> cvt;
 		return cvt.to_bytes(ws);
 #endif
-
 	}
 
 	//str2ws
 	std::wstring str2ws(std::string const& str) {
 #ifdef _windows_
 		_bstr_t const t = str.c_str();
-		wchar_t const*const wchar = (wchar_t const*)t;
-		return wchar;
+		return (wchar_t const*const)t;
 #else
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> cvt;
 		return cvt.from_bytes(str);
