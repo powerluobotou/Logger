@@ -15,6 +15,9 @@ namespace utils {
 		//createUUID
 		std::string createUUID();
 	}
+	
+	//initConsole
+	void initConsole();
 
 	//gettid
 	/*tid_t*/std::string gettid();

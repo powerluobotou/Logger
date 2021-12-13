@@ -11,7 +11,7 @@
 #include <process.h>
 #endif
 
-#ifdef QT_SUPPORT
+#ifdef QT_SUPPORTS
 #include <QDebug>
 #endif
 
@@ -407,7 +407,7 @@ namespace LOGGER {
 
 	//stdout_stream
 	void Logger::stdout_stream(char const* msg, size_t len) {
-#ifdef QT_SUPPORT
+#ifdef QT_SUPPORTS
 		int level = getlevel(msg[0]);
 		switch (level) {
 		default:
@@ -419,6 +419,7 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug() << msg; break;
 		}
 #else
+		//需要调用utils::initConsole()初始化
 		printf("%.*s", len, msg);
 #endif
 	}

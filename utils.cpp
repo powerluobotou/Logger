@@ -23,6 +23,25 @@
 #pragma execution_character_set("utf-8")
 
 namespace utils {
+
+	//initConsole
+	void initConsole() {
+#if defined(_windows_) && !defined(QT_SUPPORTS)
+		AllocConsole();
+		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+#if _MSC_VER > 1920
+		freopen("CONOUT$", "w", stdout);
+#else
+		int tp = _open_osfhandle((long)h, _O_TEXT);
+		FILE* fp = _fdopen(tp, "w");
+		*stdout = *fp;
+		setvbuf(stdout, NULL, _IONBF, 0);
+#endif
+		SMALL_RECT rc = { 5,5,200,100 };
+		::SetConsoleWindowInfo(h, TRUE, &rc);
+#endif
+	}
+
 	//gettid
 	/*tid_t*/std::string gettid() {
 		std::ostringstream oss;
