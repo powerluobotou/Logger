@@ -8,6 +8,7 @@
 #include <errno.h>
 
 #ifdef _windows_
+#include <tchar.h>
 #include <ImageHlp.h>
 #include <comutil.h>
 #pragma comment(lib, "comsuppw.lib")
@@ -37,8 +38,16 @@ namespace utils {
 		*stdout = *fp;
 		setvbuf(stdout, NULL, _IONBF, 0);
 #endif
-		SMALL_RECT rc = { 5,5,200,100 };
+		SMALL_RECT rc = { 5,5,400,300 };
 		::SetConsoleWindowInfo(h, TRUE, &rc);
+		CONSOLE_FONT_INFOEX cfi;
+		ZeroMemory(&cfi, sizeof(cfi));
+		cfi.cbSize = sizeof(cfi);
+		cfi.dwFontSize = {0, 12};
+		cfi.FontFamily = FF_DONTCARE;
+		cfi.FontWeight = FW_LIGHT;
+		lstrcpy(cfi.FaceName, _T("Consolas"));
+		::SetCurrentConsoleFontEx(h, false, &cfi);
 #endif
 	}
 
