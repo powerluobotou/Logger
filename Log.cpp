@@ -75,7 +75,7 @@ namespace LOGGER {
 
 	//get_level
 	char const* Logger::get_level() {
-		switch (level_) {
+		switch (level_.load()) {
 		case LVL_FATAL: return "LVL_FATAL";
 		case LVL_ERROR: return "LVL_ERROR";
 		case LVL_WARN: return "LVL_WARN";
