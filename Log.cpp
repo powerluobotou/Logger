@@ -383,12 +383,12 @@ namespace LOGGER {
 			for (std::vector<std::string>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
 				if (getlevel(it->c_str()[0]) == -1 &&
-					(abort_ = backtraceF(it->c_str(), it->length()))) {
+					(abort_ = backtraceF(it->c_str(), it->size()))) {
 					break;
 				}
 				else {
-					write(it->c_str(), it->length());
-					stdout_stream(it->c_str(), it->length());
+					write(it->c_str(), it->size());
+					stdout_stream(it->c_str(), it->size());
 				}
 			}
 			messages_.clear();
