@@ -31,7 +31,8 @@ namespace utils {
 		AllocConsole();
 		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 #if _MSC_VER > 1920
-		freopen("CONOUT$", "w", stdout);
+		FILE* fp = NULL;
+		freopen_s(&fp, "CONOUT$", "w", stdout);
 #else
 		int tp = _open_osfhandle((long)h, _O_TEXT);
 		FILE* fp = _fdopen(tp, "w");
