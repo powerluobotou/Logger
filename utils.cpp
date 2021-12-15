@@ -505,4 +505,50 @@ namespace utils {
 #endif
 		return utf8;
 	}
+
+	//https://www.its404.com/article/sinolover/112461377
+	//is_utf8
+	bool is_utf8(char const* str, size_t len) {
+		bool isUTF8 = true;
+		unsigned char* start = (unsigned char*)str;
+		unsigned char* end = (unsigned char*)str + len;
+		while (start < end) {
+			if (*start < 0x80) {
+				//(10000000): 值小于0x80的为ASCII字符    
+				++start;
+			}
+			else if (*start < (0xC0)) {
+				//(11000000): 值介于0x80与0xC0之间的为无效UTF-8字符    
+				isUTF8 = false;
+				break;
+			}
+			else if (*start < (0xE0)) {
+				//(11100000): 此范围内为2字节UTF-8字符    
+				if (start >= end - 1) {
+					break;
+				}
+				if ((start[1] & (0xC0)) != 0x80) {
+					isUTF8 = false;
+					break;
+				}
+				start += 2;
+			}
+			else if (*start < (0xF0)) {
+				// (11110000): 此范围内为3字节UTF-8字符    
+				if (start >= end - 2) {
+					break;
+				}
+				if ((start[1] & (0xC0)) != 0x80 || (start[2] & (0xC0)) != 0x80) {
+					isUTF8 = false;
+					break;
+				}
+				start += 3;
+			}
+			else {
+				isUTF8 = false;
+				break;
+			}
+		}
+		return isUTF8;
+	}
 }

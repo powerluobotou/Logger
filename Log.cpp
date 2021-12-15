@@ -420,12 +420,13 @@ namespace LOGGER {
 		}
 #else
 		//需要调用utils::initConsole()初始化
-#if defined(UNICODE) || defined(_UNICODE)
-		std::string s(utils::utf82GBK(msg, len));
-		printf("%.*s", s.length(), s.c_str());
-#else
-		printf("%.*s", len, msg);
-#endif
+		if (utils::is_utf8(msg, len)) {
+			std::string s(utils::utf82GBK(msg, len));
+			printf("%.*s", s.length(), s.c_str());
+		}
+		else {
+			printf("%.*s", len, msg);
+		}
 #endif
 	}
 
