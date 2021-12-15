@@ -45,6 +45,9 @@ namespace utils {
 
 	//str2ws
 	std::wstring str2ws(std::string const& str);
+	
+	//utf82GBK
+	std::string utf82GBK(char const* utf8, size_t len);
 }
 
 #endif

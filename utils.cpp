@@ -484,4 +484,25 @@ namespace utils {
 		return cvt.from_bytes(str);
 #endif
 	}
+
+	//utf82GBK
+	std::string utf82GBK(char const* utf8, size_t len) {
+#ifdef _windows_
+		size_t length = ::MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+		wchar_t* wc = new wchar_t[length + 1];
+		memset(wc, 0, length + 1);
+		::MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wc, length);
+		length = ::WideCharToMultiByte(CP_ACP, 0, wc, -1, NULL, 0, NULL, NULL);
+		char* c = new char[length + 1];
+		memset(c, 0, length + 1);
+		::WideCharToMultiByte(CP_ACP, 0, wc, -1, c, length, NULL, NULL);
+		if (wc) delete[] wc;
+		if (c) {
+			std::string s(c, length + 1);
+			delete[] c;
+			return s;
+		}
+#endif
+		return utf8;
+	}
 }
