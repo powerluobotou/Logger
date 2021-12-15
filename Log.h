@@ -29,6 +29,8 @@
 
 #include "Atomic.h"
 
+#pragma execution_character_set("utf-8")
+
 #define __STACK__       utils::stack_backtrace().c_str()
 
 #define LVL_FATAL       0
