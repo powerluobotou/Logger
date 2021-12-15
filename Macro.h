@@ -50,6 +50,7 @@
 #ifdef _windows_
 #include <windows.h>
 #include <stdint.h>
+#include <tchar.h>
 //#define __FUNC__ __FUNCSIG__//__FUNCTION__
 #define __FUNC__ __FUNCTION__//__FUNCSIG__
 #define INVALID_HANDLE_VALUE ((HANDLE)(-1))
