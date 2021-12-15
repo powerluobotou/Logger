@@ -21,8 +21,6 @@
 
 #include "Log.h"
 
-#pragma execution_character_set("utf-8")
-
 namespace utils {
 
 	//initConsole
