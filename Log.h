@@ -53,13 +53,15 @@ typedef int tid_t;
 namespace LOGGER {
 
 	class Logger {
-	public:
+	private:
 		Logger();
 		~Logger();
+	public:
 		static Logger* instance();
 		void set_timezone(int64_t timezone = MY_CCT);
 		void set_level(int level);
 		char const* get_level();
+		void waitF();
 		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
 		void write(int level, char const* file, int line, char const* func, char const* stack, char const* fmt, ...);
 		void write_s(int level, char const* file, int line, char const* func, char const* stack, std::string const& msg);
@@ -77,6 +79,7 @@ namespace LOGGER {
 		void notify(char const* msg, char const* stack);
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		bool backtraceF(char const* stack, size_t len, bool abort_ = false);
+		void abortF();
 		void stop();
 		void timezoneinfo();
 	private:
@@ -106,6 +109,10 @@ namespace LOGGER {
 		std::atomic_bool done_{false};
 		std::atomic_flag starting_{ATOMIC_FLAG_INIT};
 		std::thread thread_;
+	private:
+		bool abortF_ = false;
+		std::mutex mutexF_;
+		std::condition_variable condF_;
 	};
 }
 
@@ -114,6 +121,7 @@ namespace LOGGER {
 #define LOG_S LOGGER::Logger::instance()->write_s
 #define LOG_SET LOGGER::Logger::instance()->set_level
 #define LOG_TIMEZONE LOGGER::Logger::instance()->set_timezone
+#define LOG_WAITF LOGGER::Logger::instance()->waitF
 
 #define LOG_SET_FATAL       LOG_SET(LVL_FATAL)
 #define LOG_SET_ERROR       LOG_SET(LVL_ERROR)
@@ -124,14 +132,14 @@ namespace LOGGER {
 
 //LOG_XXX("%s", msg)
 #ifdef _windows_
-#define LOG_FATAL(fmt,...)	LOG(PARAM_FATAL, fmt, ##__VA_ARGS__)
+#define LOG_FATAL(fmt,...)	LOG(PARAM_FATAL, fmt, ##__VA_ARGS__); LOG_WAITF(); abort();
 #define LOG_ERROR(fmt,...)	LOG(PARAM_ERROR, fmt, ##__VA_ARGS__)
 #define LOG_WARN(fmt,...)	LOG(PARAM_WARN,  fmt, ##__VA_ARGS__)
 #define LOG_INFO(fmt,...)	LOG(PARAM_INFO,  fmt, ##__VA_ARGS__)
 #define LOG_TRACE(fmt,...)	LOG(PARAM_TRACE, fmt, ##__VA_ARGS__)
 #define LOG_DEBUG(fmt,...)	LOG(PARAM_DEBUG, fmt, ##__VA_ARGS__)
 #else
-#define LOG_FATAL(args...) 	LOG(PARAM_FATAL, ##args)
+#define LOG_FATAL(args...) 	LOG(PARAM_FATAL, ##args); LOG_WAITF(); abort();
 #define LOG_ERROR(args...) 	LOG(PARAM_ERROR, ##args)
 #define LOG_WARN(args...) 	LOG(PARAM_WARN, ##args)
 #define LOG_INFO(args...)	LOG(PARAM_INFO, ##args)
@@ -140,7 +148,7 @@ namespace LOGGER {
 #endif
 
 //LOG_S_XXX(msg)
-#define LOG_S_FATAL(msg)    LOG_S(PARAM_FATAL, msg)
+#define LOG_S_FATAL(msg)    LOG_S(PARAM_FATAL, msg); LOG_WAITF(); abort();
 #define LOG_S_ERROR(msg)    LOG_S(PARAM_ERROR, msg)
 #define LOG_S_WARN(msg)     LOG_S(PARAM_WARN,  msg)
 #define LOG_S_INFO(msg)     LOG_S(PARAM_INFO,  msg)

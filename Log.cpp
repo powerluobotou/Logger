@@ -324,7 +324,7 @@ namespace LOGGER {
 				close();
 				started_ = false;
 				if (abort_) {
-					abort();
+					abortF();
 				}
 			}, this);
 			if ((started_ = valid())) {
@@ -436,11 +436,32 @@ namespace LOGGER {
 			write(stack, len);
 			stdout_stream(stack, len);
 			if (abort_) {
-				abort();
+				abortF();
 			}
 			return true;
 		}
 		return false;
+	}
+
+	//abortF
+	void Logger::abortF() {
+		{
+			std::unique_lock<std::mutex> lock(mutexF_); {
+				abortF_ = true;
+				condF_.notify_all();
+			}
+		}
+	}
+
+	//waitF
+	void Logger::waitF() {
+		{
+			std::unique_lock<std::mutex> lock(mutexF_); {
+				while (!abortF_) {
+					condF_.wait(lock);
+				}
+			}
+		}
 	}
 }
 
