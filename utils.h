@@ -49,6 +49,9 @@ namespace utils {
 	//is_utf8
 	bool is_utf8(char const* str, size_t len);
 	
+	//gbk2UTF8
+	std::string gbk2UTF8(const char* gbk, size_t len);
+
 	//utf82GBK
 	std::string utf82GBK(char const* utf8, size_t len);
 }

@@ -414,128 +414,86 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug() << msg; break;
 		}
 #elif defined(_windows_)
-		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+#define FOREGROUND_Red       (FOREGROUND_RED)
+#define FOREGROUND_Green     (FOREGROUND_GREEN)
+#define FOREGROUND_Blue      (FOREGROUND_INTENSITY|FOREGROUND_BLUE)
+#define FOREGROUND_Yellow    (FOREGROUND_RED|FOREGROUND_GREEN)
+#define FOREGROUND_Purple    (FOREGROUND_INTENSITY|FOREGROUND_RED|FOREGROUND_BLUE)
+#define FOREGROUND_Cyan      (FOREGROUND_INTENSITY|FOREGROUND_GREEN|FOREGROUND_BLUE)
+#define FOREGROUND_Gray      (FOREGROUND_INTENSITY)
+#define FOREGROUND_White     (FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE)
+#define FOREGROUND_HighWhite (FOREGROUND_INTENSITY|FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE)
+#define FOREGROUND_Pink      (FOREGROUND_RED|FOREGROUND_BLUE)
+#define FOREGROUND_Black     (0)
+
+#define BACKGROUND_Red       (BACKGROUND_INTENSITY|BACKGROUND_RED)
+#define BACKGROUND_Green     (BACKGROUND_INTENSITY|BACKGROUND_GREEN)
+#define BACKGROUND_Blue      (BACKGROUND_INTENSITY|BACKGROUND_BLUE)
+#define BACKGROUND_Yellow    (BACKGROUND_RED|BACKGROUND_GREEN)
+#define BACKGROUND_Purple    (BACKGROUND_INTENSITY|BACKGROUND_RED|BACKGROUND_BLUE)
+#define BACKGROUND_Cyan      (BACKGROUND_INTENSITY|BACKGROUND_GREEN|BACKGROUND_BLUE)
+#define BACKGROUND_Gray      (BACKGROUND_INTENSITY)
+#define BACKGROUND_White     (BACKGROUND_RED|BACKGROUND_GREEN|BACKGROUND_BLUE)
+#define BACKGROUND_HighWhite (BACKGROUND_INTENSITY|BACKGROUND_RED|BACKGROUND_GREEN|BACKGROUND_BLUE)
+#define BACKGROUND_Pink      (BACKGROUND_RED|BACKGROUND_BLUE)
+#define BACKGROUND_Black     (0)
+
+		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
 		int level = getlevel(msg[0]);
+		static int const color[][2] = {
+			{FOREGROUND_Red, FOREGROUND_White},//FATAL
+			{FOREGROUND_Pink, FOREGROUND_White},//ERROR
+			{FOREGROUND_Green/*FOREGROUND_Cyan*/, FOREGROUND_White},//WARN
+			{FOREGROUND_Purple, FOREGROUND_White},//INFO
+			{FOREGROUND_Yellow, BACKGROUND_White},//TRACE
+			{FOREGROUND_Blue, FOREGROUND_White},//DEBUG
+		};
 		switch (level) {
-		case LVL_FATAL: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
-			break;
-		}
-		case LVL_ERROR: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
-			break;
-		}
-		case LVL_WARN: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_BLUE);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
-			break;
-		}
-		case LVL_INFO: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
-			break;
-		}
-		case LVL_TRACE: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
-			break;
-		}
+		case LVL_FATAL:
+		case LVL_ERROR:
+		case LVL_WARN:
+		case LVL_INFO:
+		case LVL_TRACE:
 		case LVL_DEBUG: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_GREEN);
-				printf("%.*s", (int)pos, s.c_str());
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
-				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_GREEN);
+			//if (utils::is_utf8(msg, len)) {
+			//	std::string s(utils::utf82GBK(msg, len));
+			//	::SetConsoleTextAttribute(h, color[level][0]);
+			//	printf("%.*s", (int)pos, s.c_str());
+			//	::SetConsoleTextAttribute(h, color[level][1]);
+			//	printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			//}
+			//else {
+				::SetConsoleTextAttribute(h, color[level][0]);
 				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				::SetConsoleTextAttribute(h, color[level][1]);
 				printf("%.*s", (int)len - (int)pos, msg + pos);
-			}
+			//}
 			break;
 		}
 		default: {
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)s.length(), s.c_str());
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+			//if (utils::is_utf8(msg, len)) {
+			//	std::string s(utils::utf82GBK(msg, len));
+			//	::SetConsoleTextAttribute(h, color[LVL_FATAL][0]);
+			//	printf("%.*s", (int)s.length(), s.c_str());
+			//}
+			//else {
+				::SetConsoleTextAttribute(h, color[LVL_FATAL][1]);
 				printf("%.*s", (int)len, msg);
-			}
+			//}
 			break;
 		}
 		}
 		//::CloseHandle(h);
 #else
 		//需要调用utils::initConsole()初始化
-		if (utils::is_utf8(msg, len)) {
-			std::string s(utils::utf82GBK(msg, len));
-			printf("%.*s", (int)s.length(), s.c_str());
-		}
-		else {
+		//if (utils::is_utf8(msg, len)) {
+		//	std::string s(utils::utf82GBK(msg, len));
+		//	printf("%.*s", (int)s.length(), s.c_str());
+		//}
+		//else {
 			printf("%.*s", (int)len, msg);
-		}
+		//}
 #endif
 	}
 

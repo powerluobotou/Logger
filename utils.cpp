@@ -25,8 +25,10 @@ namespace utils {
 	//initConsole
 	void initConsole() {
 #if defined(_windows_) && !defined(QT_SUPPORTS)
-		AllocConsole();
-		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+		::AllocConsole();
+		::SetConsoleOutputCP(65001);
+		//setlocale(LC_ALL, "utf-8"/*"Chinese-simplified"*/);
+		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
 #if _MSC_VER > 1920
 		FILE* fp = NULL;
 		freopen_s(&fp, "CONOUT$", "w", stdout);
@@ -36,14 +38,14 @@ namespace utils {
 		*stdout = *fp;
 		setvbuf(stdout, NULL, _IONBF, 0);
 #endif
-		SMALL_RECT rc = { 5,5,400,300 };
+		SMALL_RECT rc = { 5,5,800,600 };
 		::SetConsoleWindowInfo(h, TRUE, &rc);
 		CONSOLE_FONT_INFOEX cfi = { 0 };
 		cfi.cbSize = sizeof(cfi);
 		cfi.dwFontSize = {0, 12};
 		cfi.FontFamily = FF_DONTCARE;
-		cfi.FontWeight = /*FW_NORMAL*/FW_LIGHT;
-		lstrcpy(cfi.FaceName, _T("Consolas"));
+		cfi.FontWeight = FW_NORMAL/*FW_LIGHT*/;
+		lstrcpy(cfi.FaceName, _T("SimSun"));
 		::SetCurrentConsoleFontEx(h, false, &cfi);
 		//::CloseHandle(h);
 #endif
@@ -485,13 +487,35 @@ namespace utils {
 		return cvt.from_bytes(str);
 #endif
 	}
+	
+	//https://blog.csdn.net/u012234115/article/details/83186386
+	//gbk2UTF8
+	std::string gbk2UTF8(const char* gbk, size_t len) {
+#ifdef _windows_
+		size_t length = MultiByteToWideChar(CP_ACP, 0, gbk, -1, NULL, 0);
+		wchar_t* wc = new wchar_t[length + 1];
+		memset(wc, 0, length * 2 + 2);
+		MultiByteToWideChar(CP_ACP, 0, gbk, -1, wc, length);
+		length = WideCharToMultiByte(CP_UTF8, 0, wc, -1, NULL, 0, NULL, NULL);
+		char* c = new char[length + 1];
+		memset(c, 0, length + 1);
+		WideCharToMultiByte(CP_UTF8, 0, wc, -1, c, length, NULL, NULL);
+		if (wc) delete[] wc;
+		if (c) {
+			std::string s(c, length + 1);
+			delete[] c;
+			return s;
+		}
+#endif
+		return gbk;
+	}
 
 	//utf82GBK
 	std::string utf82GBK(char const* utf8, size_t len) {
 #ifdef _windows_
 		size_t length = ::MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
 		wchar_t* wc = new wchar_t[length + 1];
-		memset(wc, 0, length + 1);
+		memset(wc, 0, length * 2 + 2);
 		::MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wc, length);
 		length = ::WideCharToMultiByte(CP_ACP, 0, wc, -1, NULL, 0, NULL, NULL);
 		char* c = new char[length + 1];
