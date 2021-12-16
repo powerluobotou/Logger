@@ -164,15 +164,15 @@ namespace LOGGER {
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
-		case LVL_DEBUG:
-			pos = snprintf(msg, PATHSZ, "D%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+		case LVL_TRACE:
+			pos = snprintf(msg, PATHSZ, "T%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
 				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 			break;
-		case LVL_TRACE:
-			pos = snprintf(msg, PATHSZ, "T%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+		case LVL_DEBUG:
+			pos = snprintf(msg, PATHSZ, "D%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::gettid().c_str(),
@@ -417,18 +417,6 @@ namespace LOGGER {
 		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 		int level = getlevel(msg[0]);
 		switch (level) {
-		default:{
-			if (utils::is_utf8(msg, len)) {
-				std::string s(utils::utf82GBK(msg, len));
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)s.length(), s.c_str());
-			}
-			else {
-				::SetConsoleTextAttribute(h, FOREGROUND_RED);
-				printf("%.*s", (int)len, msg);
-			}
-			break;
-		}
 		case LVL_FATAL: {
 			if (utils::is_utf8(msg, len)) {
 				std::string s(utils::utf82GBK(msg, len));
@@ -522,6 +510,18 @@ namespace LOGGER {
 				printf("%.*s", (int)pos, msg);
 				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
 				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		default: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)s.length(), s.c_str());
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)len, msg);
 			}
 			break;
 		}
