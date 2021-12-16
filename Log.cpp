@@ -446,7 +446,7 @@ namespace LOGGER {
 			{FOREGROUND_Pink, FOREGROUND_White},//ERROR
 			{FOREGROUND_Green/*FOREGROUND_Cyan*/, FOREGROUND_White},//WARN
 			{FOREGROUND_Purple, FOREGROUND_White},//INFO
-			{FOREGROUND_Yellow, BACKGROUND_White},//TRACE
+			{FOREGROUND_Yellow, FOREGROUND_White},//TRACE
 			{FOREGROUND_Blue, FOREGROUND_White},//DEBUG
 		};
 		switch (level) {
@@ -478,7 +478,7 @@ namespace LOGGER {
 			//	printf("%.*s", (int)s.length(), s.c_str());
 			//}
 			//else {
-				::SetConsoleTextAttribute(h, color[LVL_FATAL][1]);
+				::SetConsoleTextAttribute(h, color[LVL_FATAL][0]);
 				printf("%.*s", (int)len, msg);
 			//}
 			break;
