@@ -134,7 +134,7 @@ namespace LOGGER {
 		static size_t const PATHSZ = 512;
 		static size_t const MAXSZ = 81920;
 		char msg[PATHSZ + MAXSZ + 2];
-		size_t pos = 0, n;
+		size_t pos = 0;
 		switch (level) {
 		case LVL_FATAL:
 			pos = snprintf(msg, PATHSZ, "F%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
@@ -184,23 +184,18 @@ namespace LOGGER {
 		va_list ap;
 		va_start(ap, fmt);
 #ifdef _windows_
-		n = vsnprintf_s(msg + pos, MAXSZ, _TRUNCATE, fmt, ap);
+		size_t n = vsnprintf_s(msg + pos, MAXSZ, _TRUNCATE, fmt, ap);
 #else
-		n = vsnprintf(msg + pos, MAXSZ, fmt, ap);
+		size_t n = vsnprintf(msg + pos, MAXSZ, fmt, ap);
 #endif
 		va_end(ap);
-#if 0
-		pos = strlen(msg);
-#else
-		pos += n;
-#endif
-		msg[pos] = '\n';
-		msg[pos + 1] = '\0';
+		msg[pos + n] = '\n';
+		msg[pos + n + 1] = '\0';
 		if (prefix_[0]) {
-			notify(msg, stack);
+			notify(msg, pos + n + 1, pos, stack);
 		}
 		else {
-			stdout_stream(msg, pos + 1);
+			stdoutbuf(msg, pos + n + 1, pos);
 			if (stack) {
 				backtraceF(stack, strlen(stack), true);
 			}
@@ -348,12 +343,12 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, char const* stack) {
+	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
-				messages_.emplace_back(msg);
+				messages_.emplace_back(std::make_pair(pos, msg));
 				if (stack) {
-					messages_.emplace_back(stack);
+					messages_.emplace_back(std::make_pair(0, stack));
 				}
 				cond_.notify_all();
 			}
@@ -380,15 +375,15 @@ namespace LOGGER {
 		if (!messages_.empty()) {
 			shift(tm, tv);
 			bool abort_ = false;
-			for (std::vector<std::string>::const_iterator it = messages_.begin();
+			for (std::vector<Message>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-				if (getlevel(it->c_str()[0]) == -1 &&
-					(abort_ = backtraceF(it->c_str(), it->size()))) {
+				if (getlevel(it->second.c_str()[0]) == -1 &&
+					(abort_ = backtraceF(it->second.c_str(), it->second.size()))) {
 					break;
 				}
 				else {
-					write(it->c_str(), it->size());
-					stdout_stream(it->c_str(), it->size());
+					write(it->second.c_str(), it->second.size());
+					stdoutbuf(it->second.c_str(), it->second.size(), it->first);
 				}
 			}
 			messages_.clear();
@@ -405,8 +400,8 @@ namespace LOGGER {
 		}
 	}
 
-	//stdout_stream
-	void Logger::stdout_stream(char const* msg, size_t len) {
+	//stdoutbuf
+	void Logger::stdoutbuf(char const* msg, size_t len, size_t pos) {
 #ifdef QT_SUPPORTS
 		int level = getlevel(msg[0]);
 		switch (level) {
@@ -418,14 +413,128 @@ namespace LOGGER {
 		case LVL_TRACE: qInfo() << msg; break;
 		case LVL_DEBUG: qDebug() << msg; break;
 		}
+#elif defined(_windows_)
+		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+		int level = getlevel(msg[0]);
+		switch (level) {
+		default:{
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)s.length(), s.c_str());
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)len, msg);
+			}
+			break;
+		}
+		case LVL_FATAL: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		case LVL_ERROR: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_RED);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		case LVL_WARN: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_BLUE);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		case LVL_INFO: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		case LVL_TRACE: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		case LVL_DEBUG: {
+			if (utils::is_utf8(msg, len)) {
+				std::string s(utils::utf82GBK(msg, len));
+				::SetConsoleTextAttribute(h, FOREGROUND_GREEN);
+				printf("%.*s", (int)pos, s.c_str());
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, FOREGROUND_GREEN);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, FOREGROUND_INTENSITY);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			break;
+		}
+		}
+		//::CloseHandle(h);
 #else
 		//需要调用utils::initConsole()初始化
 		if (utils::is_utf8(msg, len)) {
 			std::string s(utils::utf82GBK(msg, len));
-			printf("%.*s", s.length(), s.c_str());
+			printf("%.*s", (int)s.length(), s.c_str());
 		}
 		else {
-			printf("%.*s", len, msg);
+			printf("%.*s", (int)len, msg);
 		}
 #endif
 	}
@@ -434,7 +543,7 @@ namespace LOGGER {
 	bool Logger::backtraceF(char const* stack, size_t len, bool abort_) {
 		if (stack) {
 			write(stack, len);
-			stdout_stream(stack, len);
+			stdoutbuf(stack, len, 0);
 			if (abort_) {
 				abortF();
 			}

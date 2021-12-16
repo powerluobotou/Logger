@@ -45,6 +45,7 @@ namespace utils {
 		cfi.FontWeight = /*FW_NORMAL*/FW_LIGHT;
 		lstrcpy(cfi.FaceName, _T("Consolas"));
 		::SetCurrentConsoleFontEx(h, false, &cfi);
+		//::CloseHandle(h);
 #endif
 	}
 

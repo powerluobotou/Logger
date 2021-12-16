@@ -72,11 +72,11 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		void stdout_stream(char const* msg, size_t len);
+		void stdoutbuf(char const* msg, size_t len, size_t pos);
 	private:
 		bool start();
 		bool valid();
-		void notify(char const* msg, char const* stack);
+		void notify(char const* msg, size_t len, size_t pos, char const* stack);
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		bool backtraceF(char const* stack, size_t len, bool abort_ = false);
 		void abortF();
@@ -102,13 +102,15 @@ namespace LOGGER {
 		struct tm tm_ = { 0 };
 		mutable std::shared_mutex tm_mutex_;
 	private:
+		std::thread thread_;
 		bool started_ = false;
-		std::mutex mutex_;
-		std::condition_variable cond_;
-		std::vector<std::string> messages_;
 		std::atomic_bool done_{false};
 		std::atomic_flag starting_{ATOMIC_FLAG_INIT};
-		std::thread thread_;
+	private:
+		std::mutex mutex_;
+		std::condition_variable cond_;
+		typedef std::pair<size_t, std::string> Message;
+		std::vector<Message> messages_;
 	private:
 		bool abortF_ = false;
 		std::mutex mutexF_;
