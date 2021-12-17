@@ -199,9 +199,8 @@ namespace LOGGER {
 			notify(msg, pos + n + 1, pos, stack);
 		}
 		else {
-			stdoutbuf(msg, pos + n + 1, pos);
-			if (stack) {
-				stdoutbuf(stack, strlen(stack), 0);
+			stdoutbuf(level, msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
+			if (level == LVL_FATAL) {
 				abortF();
 			}
 		}
@@ -351,10 +350,9 @@ namespace LOGGER {
 	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
-				messages_.emplace_back(std::make_pair(pos, msg));
-				if (stack) {
-					messages_.emplace_back(std::make_pair(0, stack));
-				}
+				messages_.emplace_back(
+					std::make_pair(pos,
+						std::make_pair(msg, stack ? stack : "")));
 				cond_.notify_all();
 			}
 		}
@@ -380,17 +378,34 @@ namespace LOGGER {
 		if (!messages_.empty()) {
 			shift(tm, tv);
 			bool abort_ = false;
-			for (std::vector<Message>::const_iterator it = messages_.begin();
+			for (std::vector<MessageT>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-				abort_ = (getlevel(it->second.c_str()[0]) == -1);
-				if (abort_) {
-					write(it->second.c_str(), it->second.size());
-					stdoutbuf(it->second.c_str(), it->second.size(), 0);
+#define Msg(it) ((it)->second.first)
+#define Stack(it) ((it)->second.second)
+#define Pos(it) ((it)->first)
+				int level = getlevel(Msg(it).c_str()[0]);
+				abort_ = (level == LVL_FATAL);
+				switch (level) {
+				case LVL_FATAL:
+				case LVL_TRACE: {
+					write(Msg(it).c_str(), Msg(it).size());
+					write(Stack(it).c_str(), Stack(it).size());
+					stdoutbuf(level,
+						Msg(it).c_str(), Msg(it).size(), Pos(it),
+						Stack(it).c_str(), Stack(it).size());
 					break;
 				}
-				else {
-					write(it->second.c_str(), it->second.size());
-					stdoutbuf(it->second.c_str(), it->second.size(), it->first);
+				case LVL_ERROR:
+				case LVL_WARN:
+				case LVL_INFO:
+				case LVL_DEBUG: {
+					write(Msg(it).c_str(), Msg(it).size());
+					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it));
+					break;
+				}
+				}
+				if (abort_) {
+					break;
 				}
 			}
 			messages_.clear();
@@ -398,7 +413,7 @@ namespace LOGGER {
 		}
 		return false;
 	}
-
+	
 	//stop
 	void Logger::stop() {
 		done_.store(true);
@@ -408,9 +423,9 @@ namespace LOGGER {
 	}
 
 	//stdoutbuf
-	void Logger::stdoutbuf(char const* msg, size_t len, size_t pos) {
+	//需要调用utils::initConsole()初始化
+	void Logger::stdoutbuf(int level, char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen) {
 #ifdef QT_SUPPORTS
-		int level = getlevel(msg[0]);
 		switch (level) {
 		default:
 		case LVL_FATAL: qInfo/*qFatal*/() << msg; break;
@@ -455,52 +470,45 @@ namespace LOGGER {
 			{FOREGROUND_Blue, FOREGROUND_White},//DEBUG
 		};
 		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
-		int level = getlevel(msg[0]);
 		switch (level) {
 		case LVL_FATAL:
+		case LVL_TRACE: {
+			::SetConsoleTextAttribute(h, color[level][0]);
+			printf("%.*s", (int)pos, msg);
+			::SetConsoleTextAttribute(h, color[level][1]);
+			printf("%.*s", (int)len - (int)pos, msg + pos);
+			::SetConsoleTextAttribute(h, color[level][0]);
+			printf("%.*s", (int)stacklen, stack);//stack
+			break;
+		}
 		case LVL_ERROR:
 		case LVL_WARN:
 		case LVL_INFO:
-		case LVL_TRACE:
 		case LVL_DEBUG: {
-			//if (utils::is_utf8(msg, len)) {
-			//	std::string s(utils::utf82GBK(msg, len));
-			//	::SetConsoleTextAttribute(h, color[level][0]);
-			//	printf("%.*s", (int)pos, s.c_str());
-			//	::SetConsoleTextAttribute(h, color[level][1]);
-			//	printf("%.*s", (int)s.length() - (int)pos, s.c_str() + pos);
-			//}
-			//else {
-				::SetConsoleTextAttribute(h, color[level][0]);
-				printf("%.*s", (int)pos, msg);
-				::SetConsoleTextAttribute(h, color[level][1]);
-				printf("%.*s", (int)len - (int)pos, msg + pos);
-			//}
-			break;
-		}
-		default: {
-			//if (utils::is_utf8(msg, len)) {
-			//	std::string s(utils::utf82GBK(msg, len));
-			//	::SetConsoleTextAttribute(h, color[LVL_FATAL][0]);
-			//	printf("%.*s", (int)s.length(), s.c_str());
-			//}
-			//else {
-				::SetConsoleTextAttribute(h, color[LVL_FATAL][0]);
-				printf("%.*s", (int)len, msg);
-			//}
+			::SetConsoleTextAttribute(h, color[level][0]);
+			printf("%.*s", (int)pos, msg);
+			::SetConsoleTextAttribute(h, color[level][1]);
+			printf("%.*s", (int)len - (int)pos, msg + pos);
 			break;
 		}
 		}
 		//::CloseHandle(h);
 #else
-		//需要调用utils::initConsole()初始化
-		//if (utils::is_utf8(msg, len)) {
-		//	std::string s(utils::utf82GBK(msg, len));
-		//	printf("%.*s", (int)s.length(), s.c_str());
-		//}
-		//else {
+		switch (level) {
+		case LVL_FATAL:
+		case LVL_TRACE: {
 			printf("%.*s", (int)len, msg);
-		//}
+			printf("%.*s", (int)stacklen, stack);//stack
+			break;
+		}
+		case LVL_ERROR:
+		case LVL_WARN:
+		case LVL_INFO:
+		case LVL_DEBUG: {
+			printf("%.*s", (int)len, msg);
+			break;
+		}
+		}
 #endif
 	}
 

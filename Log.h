@@ -44,7 +44,7 @@
 #define PARAM_ERROR     1,__FILE__,__LINE__,__FUNC__,NULL
 #define PARAM_WARN      2,__FILE__,__LINE__,__FUNC__,NULL
 #define PARAM_INFO      3,__FILE__,__LINE__,__FUNC__,NULL
-#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__,NULL
+#define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__,__STACK__
 #define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__,NULL
 
 typedef int pid_t;
@@ -73,7 +73,7 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		void stdoutbuf(char const* msg, size_t len, size_t pos);
+		void stdoutbuf(int level, char const* msg, size_t len, size_t pos, char const* stack = NULL, size_t stacklen = 0);
 	private:
 		bool start();
 		bool valid();
@@ -109,8 +109,9 @@ namespace LOGGER {
 	private:
 		std::mutex mutex_;
 		std::condition_variable cond_;
-		typedef std::pair<size_t, std::string> Message;
-		std::vector<Message> messages_;
+		typedef std::pair<std::string, std::string> Message;
+		typedef std::pair<size_t, Message> MessageT;
+		std::vector<MessageT> messages_;
 	private:
 		bool abortF_ = false;
 		std::mutex mutexF_;
