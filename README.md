@@ -13,6 +13,9 @@ Async Logger  c++
 
 * 同步输出控制台及日志文件
 
+### 预览
+![image](https://github.com/chengwuloo/Logger/blob/main/example.png)
+
 ### 例子
 
 ```c++
