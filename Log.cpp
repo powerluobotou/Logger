@@ -476,7 +476,7 @@ namespace LOGGER {
 			{FOREGROUND_Cyan, FOREGROUND_HighCyan},//WARN
 			{FOREGROUND_Pink, FOREGROUND_White},//INFO
 			{FOREGROUND_Yellow, FOREGROUND_LightYellow},//TRACE
-			{FOREGROUND_Blue, FOREGROUND_LightBlue},//DEBUG
+			{FOREGROUND_HighGreen, FOREGROUND_Gray},//DEBUG
 		};
 		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
 		switch (level) {
