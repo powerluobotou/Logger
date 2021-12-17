@@ -13,7 +13,7 @@ Log.h Log.cpp 日志系统 LOG_FATAL 配合MY_TRY()，MY_CATCH()使用，程序�
 
 例子
 
-```
+```c++
 int main() {
 	//LOG_INIT(".", LVL_DEBUG, "test");
 	LOG_SET_DEBUG;
