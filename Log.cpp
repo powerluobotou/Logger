@@ -196,7 +196,7 @@ namespace LOGGER {
 		msg[pos + n] = '\n';
 		msg[pos + n + 1] = '\0';
 		if (prefix_[0]) {
-			notify(msg, pos + n + 1, pos, stack);
+			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
 		}
 		else {
 			stdoutbuf(level, msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
@@ -347,7 +347,7 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack) {
+	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				messages_.emplace_back(
@@ -384,7 +384,6 @@ namespace LOGGER {
 #define Stack(it) ((it)->second.second)
 #define Pos(it) ((it)->first)
 				int level = getlevel(Msg(it).c_str()[0]);
-				abort_ = (level == LVL_FATAL);
 				switch (level) {
 				case LVL_FATAL:
 				case LVL_TRACE: {
@@ -404,7 +403,7 @@ namespace LOGGER {
 					break;
 				}
 				}
-				if (abort_) {
+				if ((abort_ = (level == LVL_FATAL))) {
 					break;
 				}
 			}

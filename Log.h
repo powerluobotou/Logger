@@ -77,7 +77,7 @@ namespace LOGGER {
 	private:
 		bool start();
 		bool valid();
-		void notify(char const* msg, size_t len, size_t pos, char const* stack);
+		void notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen);
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		void abortF();
 		void stop();
