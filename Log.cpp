@@ -197,7 +197,8 @@ namespace LOGGER {
 		else {
 			stdoutbuf(msg, pos + n + 1, pos);
 			if (stack) {
-				backtraceF(stack, strlen(stack), true);
+				stdoutbuf(stack, strlen(stack), 0);
+				abortF();
 			}
 		}
 	}
@@ -377,8 +378,10 @@ namespace LOGGER {
 			bool abort_ = false;
 			for (std::vector<Message>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-				if (getlevel(it->second.c_str()[0]) == -1 &&
-					(abort_ = backtraceF(it->second.c_str(), it->second.size()))) {
+				abort_ = (getlevel(it->second.c_str()[0]) == -1);
+				if (abort_) {
+					write(it->second.c_str(), it->second.size());
+					stdoutbuf(it->second.c_str(), it->second.size(), 0);
 					break;
 				}
 				else {
@@ -439,16 +442,16 @@ namespace LOGGER {
 #define BACKGROUND_Pink      (BACKGROUND_RED|BACKGROUND_BLUE)
 #define BACKGROUND_Black     (0)
 
-		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
-		int level = getlevel(msg[0]);
 		static int const color[][2] = {
 			{FOREGROUND_Red, FOREGROUND_White},//FATAL
 			{FOREGROUND_Pink, FOREGROUND_White},//ERROR
-			{FOREGROUND_Green/*FOREGROUND_Cyan*/, FOREGROUND_White},//WARN
+			{FOREGROUND_Green, FOREGROUND_White},//WARN FOREGROUND_Cyan
 			{FOREGROUND_Purple, FOREGROUND_White},//INFO
 			{FOREGROUND_Yellow, FOREGROUND_White},//TRACE
 			{FOREGROUND_Blue, FOREGROUND_White},//DEBUG
 		};
+		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		int level = getlevel(msg[0]);
 		switch (level) {
 		case LVL_FATAL:
 		case LVL_ERROR:
@@ -495,19 +498,6 @@ namespace LOGGER {
 			printf("%.*s", (int)len, msg);
 		//}
 #endif
-	}
-
-	//backtraceF
-	bool Logger::backtraceF(char const* stack, size_t len, bool abort_) {
-		if (stack) {
-			write(stack, len);
-			stdoutbuf(stack, len, 0);
-			if (abort_) {
-				abortF();
-			}
-			return true;
-		}
-		return false;
 	}
 
 	//abortF

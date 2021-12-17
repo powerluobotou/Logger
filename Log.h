@@ -78,7 +78,6 @@ namespace LOGGER {
 		bool valid();
 		void notify(char const* msg, size_t len, size_t pos, char const* stack);
 		bool consume(struct tm const& tm, struct timeval const& tv);
-		bool backtraceF(char const* stack, size_t len, bool abort_ = false);
 		void abortF();
 		void stop();
 		void timezoneinfo();
