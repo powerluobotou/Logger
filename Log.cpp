@@ -86,6 +86,10 @@ namespace LOGGER {
 		return "";
 	}
 
+	//set_color
+	void Logger::set_color(int level, int clrtitle, int clrtext) {
+	}
+
 	//init
 	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
 #if 1
