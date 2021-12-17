@@ -2,16 +2,16 @@
 
 Async Logger  c++
 
+### 异步日志系统
+* 支持日志前缀，日志内容 按不同颜色显示
 
-异步日志系统
+* 支持异常处理，异常捕获 TRY THROW CATCH
 
-Atomic.h 原子操作相关
+* 支持 LOG_FATAL 跟踪及断点打印堆栈信息
 
-Except.h Except.cpp 异常处理模块 try catch throw
+* 同步输出控制台及日志文件
 
-Log.h Log.cpp 日志系统 LOG_FATAL 配合MY_TRY()，MY_CATCH()使用，程序崩溃捕获跟踪调用堆栈
-
-例子
+### 例子
 
 ```c++
 int main() {
