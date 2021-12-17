@@ -2,7 +2,7 @@
 
 Async Logger  c++
 
-### 异步日志系统
+### 异步日志系统 windows/Linux
 * 支持日志前缀，日志内容 按不同颜色显示
 
 * 支持异常处理，异常捕获 TRY THROW CATCH
