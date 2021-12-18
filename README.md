@@ -7,7 +7,7 @@ Async Logger  c++
 
 * 支持异常处理，异常捕获 TRY THROW CATCH
 
-* 支持 LOG_TACE 跟踪日志堆栈信息
+* 支持 LOG_TRACE 跟踪日志堆栈信息
 
 * 支持 LOG_FATAL 跟踪日志堆栈信息，同时崩溃断点定位
 
