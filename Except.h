@@ -132,9 +132,8 @@ namespace EXCPT {
 		LOG_S_FATAL("EXCEPTION: unknown error"); \
 	}
 
-#ifdef QT_SUPPORT
-
 //PLAT_CATCH
+#ifdef QT_SUPPORT
 #define PLAT_CATCH() \
 	catch (QException const& e) { \
 		LOG_S_FATAL(std::string("QT EXCEPTION: ") + e.what()); \
