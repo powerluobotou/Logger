@@ -11,14 +11,14 @@
 #include <process.h>
 #endif
 
-#ifdef QT_SUPPORTS
+#ifdef QT_SUPPORT
 #include <QDebug>
 #endif
 
 namespace LOGGER {
 
 	//constructor
-	Logger::Logger() :pid_(_getpid()) {
+	Logger::Logger() :pid_(getpid()) {
 	};
 
 	//destructor
@@ -99,7 +99,7 @@ namespace LOGGER {
 		if (access(dir, 0) < 0) {
 #endif
 #ifdef _windows_
-			if (_mkdir(dir) < 0) {
+			if (mkdir(dir) < 0) {
 				return;
 			}
 #else
@@ -424,7 +424,7 @@ namespace LOGGER {
 	//stdoutbuf
 	//需要调用utils::initConsole()初始化
 	void Logger::stdoutbuf(int level, char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen) {
-#ifdef QT_SUPPORTS
+#ifdef QT_CONSOLE
 		switch (level) {
 		default:
 		case LVL_FATAL: qInfo/*qFatal*/() << msg; break;

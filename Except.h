@@ -14,6 +14,11 @@
 #include "utils.h"
 #include "Log.h"
 
+#ifdef QT_SUPPORT
+#include <QException>
+#include <QUnhandledException>
+#endif
+
 //https://www.csdndocs.com/article/5961151
 //https://developer.aliyun.com/article/317590
 #ifdef _windows_// /EHa /EHsc
@@ -47,6 +52,15 @@ namespace EXCPT {
 	public:
 		std::string const fn_str_;
 	};
+
+	//http://qt6.digitser.net/6.2/zh-CN/qexception.html
+#ifdef QT_SUPPORT
+	class plat_error : public QException {
+	public:
+		void raise() const override { throw* this; }
+		plat_error* clone() const override { return new plat_error(*this); }
+	};
+#endif
 }
 
 // TRACE[ __NAME__ ] __STRERR__ __FILE__(__LINE__) __FUNC__
@@ -88,8 +102,8 @@ namespace EXCPT {
 #define MY_THROW_C(fn_str, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
 #define MY_THROW_B(fn_str, err_no, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
 
-#define MY_CATCH() \
-	} \
+//FUNC_CATCH
+#define FUNC_CATCH() \
 	catch (EXCPT::function_error& e) { \
 		std::ostringstream oss; \
 		e.err_no_ == 0XFFFFFFFFL ? \
@@ -104,12 +118,39 @@ namespace EXCPT {
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
 		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
 		LOG_S_FATAL(oss.str()); \
-	} \
+	}
+
+//STD_CATCH
+#define STD_CATCH() \
 	catch (std::exception const& e) { \
-			LOG_S_FATAL(std::string("EXCEPTION: ") + e.what()); \
-	} \
+		LOG_S_FATAL(std::string("EXCEPTION: ") + e.what()); \
+	}
+
+//ANY_CATCH
+#define ANY_CATCH() \
 	catch (...) { \
 		LOG_S_FATAL("EXCEPTION: unknown error"); \
+	}
+
+#ifdef QT_SUPPORT
+
+//PLAT_CATCH
+#define PLAT_CATCH() \
+	catch (QException const& e) { \
+		LOG_S_FATAL(std::string("QT EXCEPTION: ") + e.what()); \
 	} \
+	catch(QUnhandledException const& e) { \
+		LOG_S_FATAL(std::string("QT EXCEPTION: ") + e.what()); \
+	}
+#else
+#define PLAT_CATCH()
+#endif
+
+#define MY_CATCH() \
+	} \
+	STD_CATCH() \
+	FUNC_CATCH() \
+	PLAT_CATCH() \
+	ANY_CATCH() \
 
 #endif
