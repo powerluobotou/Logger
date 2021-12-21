@@ -24,7 +24,7 @@ namespace utils {
 
 	//initConsole
 	void initConsole() {
-#if defined(_windows_) && !defined(QT_SUPPORTS)
+#if defined(_windows_)
 		::AllocConsole();
 		::SetConsoleOutputCP(65001);
 		//setlocale(LC_ALL, "utf-8"/*"Chinese-simplified"*/);
