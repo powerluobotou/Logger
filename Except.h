@@ -147,9 +147,9 @@ namespace EXCPT {
 
 #define MY_CATCH() \
 	} \
-	PLAT_CATCH() \	
-	FUNC_CATCH() \
 	STD_CATCH() \
+	FUNC_CATCH() \
+	PLAT_CATCH() \
 	ANY_CATCH() \
 
 #endif
