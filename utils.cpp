@@ -8,7 +8,7 @@
 #include <errno.h>
 
 #ifdef _windows_
-#include <DbgHelp.h>
+//#include <DbgHelp.h>
 #include <ImageHlp.h>
 #include <comutil.h>
 #pragma comment(lib, "comsuppw.lib")
@@ -583,7 +583,11 @@ namespace utils {
 	//crashCallback
 	static long _stdcall crashCallback(EXCEPTION_POINTERS* excp) {
 		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
-		LOG_ERROR("code:%d\naddress:%#x\nflags:%d\nnum_params:%d",
+		LOG_ERROR(
+			"ExceptionCode:%d\n" \
+			"ExceptionAddress:%#x\n" \
+			"ExceptionFlags:%d\n" \
+			"NumberParameters:%d",
 			rec->ExceptionCode,
 			rec->ExceptionAddress,
 			rec->ExceptionFlags,
