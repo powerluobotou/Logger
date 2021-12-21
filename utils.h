@@ -54,6 +54,9 @@ namespace utils {
 
 	//utf82GBK
 	std::string utf82GBK(char const* utf8, size_t len);
+
+	//enableCrashDump
+	void enableCrashDump();
 }
 
 #endif

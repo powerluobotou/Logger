@@ -8,9 +8,11 @@
 #include <errno.h>
 
 #ifdef _windows_
+#include <DbgHelp.h>
 #include <ImageHlp.h>
 #include <comutil.h>
 #pragma comment(lib, "comsuppw.lib")
+#pragma comment(lib, "Dbghelp.lib")
 #elif defined(_linux_)
 #include <cxxabi.h>
 #include <execinfo.h>
@@ -575,5 +577,63 @@ namespace utils {
 			}
 		}
 		return isUTF8;
+	}
+
+#ifdef _windows_
+	//crashCallback
+	static long _stdcall crashCallback(EXCEPTION_POINTERS* excp) {
+		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
+		LOG_ERROR("code:%d\naddress:%#x\nflags:%d\nnum_params:%d",
+			rec->ExceptionCode,
+			rec->ExceptionAddress,
+			rec->ExceptionFlags,
+			rec->NumberParameters);
+		struct tm tm = { 0 };
+		utils::convertUTC(time(NULL), tm, NULL, MY_CCT);
+		char date[256];
+		snprintf(date, sizeof(date), "_%04d-%02d-%02d_%02d_%02d_%02d",
+			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+		char chr[512];
+		::GetModuleFileNameA((HMODULE)GetModuleHandle(NULL), chr, sizeof(chr));
+		std::string s(chr);
+		std::string::size_type pos = s.find_last_of('\\');
+		std::string path = s.substr(0, pos);
+		std::string filename = s.substr(pos + 1, -1);
+		std::string prefix = filename.substr(0, filename.find_last_of('.'));
+		std::string df(path);
+		df += "\\" + prefix + date;
+		df += ".DMP";
+		HANDLE h = ::CreateFileA(
+			df.c_str(),
+			GENERIC_WRITE,
+			0,
+			NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+		if (INVALID_HANDLE_VALUE != h) {
+			MINIDUMP_EXCEPTION_INFORMATION di;
+			di.ExceptionPointers = excp;
+			di.ThreadId = ::GetCurrentThreadId();
+			di.ClientPointers = TRUE;
+			::MiniDumpWriteDump(
+				::GetCurrentProcess(),
+				::GetCurrentProcessId(),
+				h,
+				MiniDumpNormal,
+				&di,
+				NULL,
+				NULL);
+			::CloseHandle(h);
+		}
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+#endif
+
+	//enableCrashDump
+	void enableCrashDump() {
+#ifdef _windows_
+		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)crashCallback);
+#endif
 	}
 }
