@@ -127,7 +127,7 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, char const* fmt, ...) {
+	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, bool bv, char const* fmt, ...) {
 		//打印level_及以下级别日志
 		if (level > level_.load()) {
 			return;
@@ -196,19 +196,19 @@ namespace LOGGER {
 		msg[pos + n] = '\n';
 		msg[pos + n + 1] = '\0';
 		if (prefix_[0]) {
-			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
+			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0, bv);
 		}
 		else {
 			stdoutbuf(level, msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
-			if (level == LVL_FATAL) {
+			if (level == LVL_FATAL || bv) {
 				abortF();
 			}
 		}
 	}
 
 	//write_s
-	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, std::string const& msg) {
-		write(level, file, line, func, stack, "%s", msg.c_str());
+	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, bool bv, std::string const& msg) {
+		write(level, file, line, func, stack, bv, "%s", msg.c_str());
 	}
 
 	//open
@@ -347,11 +347,12 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen) {
+	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen, bool bv) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				messages_.emplace_back(
-					std::make_pair(pos,
+					std::make_pair(
+						std::make_pair(pos, bv),
 						std::make_pair(msg, stack ? stack : "")));
 				cond_.notify_all();
 			}
@@ -382,7 +383,8 @@ namespace LOGGER {
 				it != messages_.end(); ++it) {
 #define Msg(it) ((it)->second.first)
 #define Stack(it) ((it)->second.second)
-#define Pos(it) ((it)->first)
+#define Pos(it) ((it)->first.first)
+#define Tag(it)((it)->first.second)
 				int level = getlevel(Msg(it).c_str()[0]);
 				switch (level) {
 				case LVL_FATAL:
@@ -403,7 +405,7 @@ namespace LOGGER {
 					break;
 				}
 				}
-				if ((abort_ = (level == LVL_FATAL))) {
+				if ((abort_ = ((level == LVL_FATAL) || Tag(it)))) {
 					break;
 				}
 			}
@@ -537,6 +539,7 @@ namespace LOGGER {
 			std::unique_lock<std::mutex> lock(mutexF_); {
 				while (!abortF_) {
 					condF_.wait(lock);
+					abortF_ = false;
 				}
 			}
 		}

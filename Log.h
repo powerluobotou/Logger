@@ -63,8 +63,8 @@ namespace LOGGER {
 		char const* get_level();
 		void set_color(int level, int title, int text);
 		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
-		void write(int level, char const* file, int line, char const* func, char const* stack, char const* fmt, ...);
-		void write_s(int level, char const* file, int line, char const* func, char const* stack, std::string const& msg);
+		void write(int level, char const* file, int line, char const* func, char const* stack, bool bv, char const* fmt, ...);
+		void write_s(int level, char const* file, int line, char const* func, char const* stack, bool bv, std::string const& msg);
 		void waitF();
 	private:
 		void open(char const* path);
@@ -77,7 +77,7 @@ namespace LOGGER {
 	private:
 		bool start();
 		bool valid();
-		void notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen);
+		void notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen, bool bv = false);
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		void abortF();
 		void stop();
@@ -109,8 +109,9 @@ namespace LOGGER {
 	private:
 		std::mutex mutex_;
 		std::condition_variable cond_;
+		typedef std::pair<size_t, bool> Flags;
 		typedef std::pair<std::string, std::string> Message;
-		typedef std::pair<size_t, Message> MessageT;
+		typedef std::pair<Flags, Message> MessageT;
 		std::vector<MessageT> messages_;
 	private:
 		bool abortF_ = false;
@@ -127,31 +128,6 @@ namespace LOGGER {
 #define LOG_WAITF LOGGER::Logger::instance()->waitF
 #define LOG_COLOR LOGGER::Logger::instance()->set_color
 
-//LOG_XXX("%s", msg)
-#ifdef _windows_
-#define LOG_FATAL(fmt,...)	 LOG(PARAM_FATAL, fmt, ##__VA_ARGS__); LOG_WAITF(); abort();
-#define LOG_ERROR(fmt,...)	 LOG(PARAM_ERROR, fmt, ##__VA_ARGS__)
-#define LOG_WARN(fmt,...)	 LOG(PARAM_WARN,  fmt, ##__VA_ARGS__)
-#define LOG_INFO(fmt,...)	 LOG(PARAM_INFO,  fmt, ##__VA_ARGS__)
-#define LOG_TRACE(fmt,...)	 LOG(PARAM_TRACE, fmt, ##__VA_ARGS__)
-#define LOG_DEBUG(fmt,...)	 LOG(PARAM_DEBUG, fmt, ##__VA_ARGS__)
-#else
-#define LOG_FATAL(args...) 	 LOG(PARAM_FATAL, ##args); LOG_WAITF(); abort();
-#define LOG_ERROR(args...) 	 LOG(PARAM_ERROR, ##args)
-#define LOG_WARN(args...) 	 LOG(PARAM_WARN,  ##args)
-#define LOG_INFO(args...)	 LOG(PARAM_INFO,  ##args)
-#define LOG_TRACE(args...)	 LOG(PARAM_TRACE, ##args)
-#define LOG_DEBUG(args...) 	 LOG(PARAM_DEBUG, ##args)
-#endif
-
-//LOG_S_XXX(msg)
-#define LOG_S_FATAL(msg)     LOG_S(PARAM_FATAL, msg); LOG_WAITF(); abort();
-#define LOG_S_ERROR(msg)     LOG_S(PARAM_ERROR, msg)
-#define LOG_S_WARN(msg)      LOG_S(PARAM_WARN,  msg)
-#define LOG_S_INFO(msg)      LOG_S(PARAM_INFO,  msg)
-#define LOG_S_TRACE(msg)     LOG_S(PARAM_TRACE, msg)
-#define LOG_S_DEBUG(msg)     LOG_S(PARAM_DEBUG, msg)
-
 #define LOG_SET_FATAL        LOG_SET(LVL_FATAL)
 #define LOG_SET_ERROR        LOG_SET(LVL_ERROR)
 #define LOG_SET_WARN         LOG_SET(LVL_WARN)
@@ -165,5 +141,51 @@ namespace LOGGER {
 #define LOG_COLOR_INFO(a,b)  LOG_COLOR(LVL_INFO,  a, b)
 #define LOG_COLOR_TRACE(a,b) LOG_COLOR(LVL_TRACE, a, b)
 #define LOG_COLOR_DEBUG(a,b) LOG_COLOR(LVL_DEBUG, a, b)
+
+//LOG_XXX("%s", msg)
+#ifdef _windows_
+#define LOG_FATAL(fmt,...)	 LOG(PARAM_FATAL, false, fmt, ##__VA_ARGS__); LOG_WAITF(); abort();
+#define LOG_ERROR(fmt,...)	 LOG(PARAM_ERROR, false, fmt, ##__VA_ARGS__)
+#define LOG_WARN(fmt,...)	 LOG(PARAM_WARN,  false, fmt, ##__VA_ARGS__)
+#define LOG_INFO(fmt,...)	 LOG(PARAM_INFO,  false, fmt, ##__VA_ARGS__)
+#define LOG_TRACE(fmt,...)	 LOG(PARAM_TRACE, false, fmt, ##__VA_ARGS__)
+#define LOG_DEBUG(fmt,...)	 LOG(PARAM_DEBUG, false, fmt, ##__VA_ARGS__)
+#else
+#define LOG_FATAL(args...) 	 LOG(PARAM_FATAL, false, ##args); LOG_WAITF(); abort();
+#define LOG_ERROR(args...) 	 LOG(PARAM_ERROR, false, ##args)
+#define LOG_WARN(args...) 	 LOG(PARAM_WARN,  false, ##args)
+#define LOG_INFO(args...)	 LOG(PARAM_INFO,  false, ##args)
+#define LOG_TRACE(args...)	 LOG(PARAM_TRACE, false, ##args)
+#define LOG_DEBUG(args...) 	 LOG(PARAM_DEBUG, false, ##args)
+#endif
+
+//LOG_S_XXX(msg)
+#define LOG_S_FATAL(msg)     LOG_S(PARAM_FATAL, false, msg); LOG_WAITF(); abort();
+#define LOG_S_ERROR(msg)     LOG_S(PARAM_ERROR, false, msg)
+#define LOG_S_WARN(msg)      LOG_S(PARAM_WARN,  false, msg)
+#define LOG_S_INFO(msg)      LOG_S(PARAM_INFO,  false, msg)
+#define LOG_S_TRACE(msg)     LOG_S(PARAM_TRACE, false, msg)
+#define LOG_S_DEBUG(msg)     LOG_S(PARAM_DEBUG, false, msg)
+
+//LOG_XXX("%s", msg)
+#ifdef _windows_
+#define LOG_ERROR_SYN(fmt,...)	 LOG(PARAM_ERROR, true, fmt, ##__VA_ARGS__); LOG_WAITF();
+#define LOG_WARN_SYN(fmt,...)	 LOG(PARAM_WARN,  true, fmt, ##__VA_ARGS__); LOG_WAITF();
+#define LOG_INFO_SYN(fmt,...)	 LOG(PARAM_INFO,  true, fmt, ##__VA_ARGS__); LOG_WAITF();
+#define LOG_TRACE_SYN(fmt,...)	 LOG(PARAM_TRACE, true, fmt, ##__VA_ARGS__); LOG_WAITF();
+#define LOG_DEBUG_SYN(fmt,...)	 LOG(PARAM_DEBUG, true, fmt, ##__VA_ARGS__); LOG_WAITF();
+#else
+#define LOG_ERROR_SYN(args...) 	 LOG(PARAM_ERROR, true, ##args); LOG_WAITF();
+#define LOG_WARN_SYN(args...) 	 LOG(PARAM_WARN,  true, ##args); LOG_WAITF();
+#define LOG_INFO_SYN(args...)	 LOG(PARAM_INFO,  true, ##args); LOG_WAITF();
+#define LOG_TRACE_SYN(args...)	 LOG(PARAM_TRACE, true, ##args); LOG_WAITF();
+#define LOG_DEBUG_SYN(args...) 	 LOG(PARAM_DEBUG, true, ##args); LOG_WAITF();
+#endif
+
+#define LOG_S_ERROR_SYN(msg)     LOG_S(PARAM_ERROR, true, msg); LOG_WAITF();
+#define LOG_S_WARN_SYN(msg)      LOG_S(PARAM_WARN,  true, msg); LOG_WAITF();
+#define LOG_S_INFO_SYN(msg)      LOG_S(PARAM_INFO,  true, msg); LOG_WAITF();
+#define LOG_S_TRACE_SYN(msg)     LOG_S(PARAM_TRACE, true, msg); LOG_WAITF();
+#define LOG_S_DEBUG_SYN(msg)     LOG_S(PARAM_DEBUG, true, msg); LOG_WAITF();
 
 #endif
