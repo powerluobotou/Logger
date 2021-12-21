@@ -182,6 +182,7 @@ namespace LOGGER {
 #define LOG_DEBUG_SYN(args...) 	 LOG(PARAM_DEBUG, true, ##args); LOG_WAITF();
 #endif
 
+//LOG_S_XXX(msg)
 #define LOG_S_ERROR_SYN(msg)     LOG_S(PARAM_ERROR, true, msg); LOG_WAITF();
 #define LOG_S_WARN_SYN(msg)      LOG_S(PARAM_WARN,  true, msg); LOG_WAITF();
 #define LOG_S_INFO_SYN(msg)      LOG_S(PARAM_INFO,  true, msg); LOG_WAITF();
