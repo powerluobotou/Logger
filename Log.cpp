@@ -273,7 +273,6 @@ namespace LOGGER {
 			if (stat(path_, &stStat) < 0) {
 				open(path_);
 				day_ = tm.tm_mday;
-				return;
 			}
 		}
 		else {
