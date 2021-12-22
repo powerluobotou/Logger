@@ -274,6 +274,9 @@ namespace LOGGER {
 				open(path_);
 				day_ = tm.tm_mday;
 			}
+			else {
+				abort();
+			}
 		}
 		else {
 			struct stat stStat;
@@ -294,7 +297,7 @@ namespace LOGGER {
 					//day_ = tm.tm_mday;
 				}
 				else {//0 existed
-					snprintf(path_, sizeof(path_), "%s%d %04d-%02d-%02d %02d.%02d.%02d %.6lu.log",
+					snprintf(path_, sizeof(path_), "%s%d %04d-%02d-%02d %02d.%02d.%02d.%.6lu.log",
 						prefix_, pid_, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 					if (stat(path_, &stStat) < 0) {
 						//if (rename(path_, tmp) < 0) {
@@ -302,6 +305,9 @@ namespace LOGGER {
 						//}
 						open(path_);
 						//day_ = tm.tm_mday;
+					}
+					else {
+						abort();
 					}
 				}
 			}
