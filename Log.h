@@ -162,12 +162,14 @@ namespace LOGGER {
 
 //LOG_XXX("%s", msg)
 #ifdef _windows_
+#define LOG_FATAL_SYN(fmt,...)	 LOG(PARAM_FATAL, true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #define LOG_ERROR_SYN(fmt,...)	 LOG(PARAM_ERROR, true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #define LOG_WARN_SYN(fmt,...)	 LOG(PARAM_WARN,  true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #define LOG_INFO_SYN(fmt,...)	 LOG(PARAM_INFO,  true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #define LOG_TRACE_SYN(fmt,...)	 LOG(PARAM_TRACE, true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #define LOG_DEBUG_SYN(fmt,...)	 LOG(PARAM_DEBUG, true, fmt, ##__VA_ARGS__); LOG_WAIT();
 #else
+#define LOG_FATAL_SYN(args...) 	 LOG(PARAM_FATAL, true, ##args); LOG_WAIT();
 #define LOG_ERROR_SYN(args...) 	 LOG(PARAM_ERROR, true, ##args); LOG_WAIT();
 #define LOG_WARN_SYN(args...) 	 LOG(PARAM_WARN,  true, ##args); LOG_WAIT();
 #define LOG_INFO_SYN(args...)	 LOG(PARAM_INFO,  true, ##args); LOG_WAIT();
@@ -176,6 +178,7 @@ namespace LOGGER {
 #endif
 
 //LOG_S_XXX(msg)
+#define LOG_S_FATAL_SYN(msg)     LOG_S(PARAM_FATAL, true, msg); LOG_WAIT();
 #define LOG_S_ERROR_SYN(msg)     LOG_S(PARAM_ERROR, true, msg); LOG_WAIT();
 #define LOG_S_WARN_SYN(msg)      LOG_S(PARAM_WARN,  true, msg); LOG_WAIT();
 #define LOG_S_INFO_SYN(msg)      LOG_S(PARAM_INFO,  true, msg); LOG_WAIT();
