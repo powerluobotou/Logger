@@ -127,7 +127,7 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, bool bv, char const* fmt, ...) {
+	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, bool syn, char const* fmt, ...) {
 		//打印level_及以下级别日志
 		if (level > level_.load()) {
 			return;
@@ -196,19 +196,19 @@ namespace LOGGER {
 		msg[pos + n] = '\n';
 		msg[pos + n + 1] = '\0';
 		if (prefix_[0]) {
-			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0, bv);
+			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0, syn);
 		}
 		else {
 			stdoutbuf(level, msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
-			if (level == LVL_FATAL || bv) {
-				abortF();
+			if (syn) {
+				sync();
 			}
 		}
 	}
 
 	//write_s
-	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, bool bv, std::string const& msg) {
-		write(level, file, line, func, stack, bv, "%s", msg.c_str());
+	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, bool syn, std::string const& msg) {
+		write(level, file, line, func, stack, syn, "%s", msg.c_str());
 	}
 
 	//open
@@ -305,13 +305,13 @@ namespace LOGGER {
 			thread_ = std::thread([this](Logger* logger) {
 				struct tm tm = { 0 };
 				struct timeval tv = { 0 };
-				bool abort_ = false;
+				bool syn = false;
 				while (!done_.load()) {
 					{
 						std::unique_lock<std::mutex> lock(mutex_); {
 							cond_.wait(lock); {
 								get(tm, tv);
-								if ((abort_ = consume(tm, tv))) {
+								if ((syn = consume(tm, tv))) {
 									done_.store(true);
 									break;
 								}
@@ -322,8 +322,8 @@ namespace LOGGER {
 				}
 				close();
 				started_ = false;
-				if (abort_) {
-					abortF();
+				if (syn) {
+					sync();
 				}
 			}, this);
 			if ((started_ = valid())) {
@@ -347,13 +347,13 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen, bool bv) {
+	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen, bool syn) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				messages_.emplace_back(
 					std::make_pair(
-						std::make_pair(pos, bv),
-						std::make_pair(msg, stack ? stack : "")));
+						std::make_pair(msg, stack ? stack : ""),
+						std::make_pair(pos, syn)));
 				cond_.notify_all();
 			}
 		}
@@ -378,13 +378,13 @@ namespace LOGGER {
 	bool Logger::consume(struct tm const& tm, struct timeval const& tv) {
 		if (!messages_.empty()) {
 			shift(tm, tv);
-			bool abort_ = false;
+			bool syn = false;
 			for (std::vector<MessageT>::const_iterator it = messages_.begin();
 				it != messages_.end(); ++it) {
-#define Msg(it) ((it)->second.first)
-#define Stack(it) ((it)->second.second)
-#define Pos(it) ((it)->first.first)
-#define Tag(it)((it)->first.second)
+#define Msg(it) ((it)->first.first)
+#define Stack(it) ((it)->first.second)
+#define Pos(it) ((it)->second.first)
+#define Syn(it)((it)->second.second)
 				int level = getlevel(Msg(it).c_str()[0]);
 				switch (level) {
 				case LVL_FATAL:
@@ -405,12 +405,12 @@ namespace LOGGER {
 					break;
 				}
 				}
-				if ((abort_ = ((level == LVL_FATAL) || Tag(it)))) {
+				if ((syn = Syn(it))) {
 					break;
 				}
 			}
 			messages_.clear();
-			return abort_;
+			return syn;
 		}
 		return false;
 	}
@@ -523,24 +523,24 @@ namespace LOGGER {
 #endif
 	}
 
-	//abortF
-	void Logger::abortF() {
+	//sync
+	void Logger::sync() {
 		{
-			std::unique_lock<std::mutex> lock(mutexF_); {
-				abortF_ = true;
-				condF_.notify_all();
+			std::unique_lock<std::mutex> lock(sync_mutex_); {
+				sync_ = true;
+				sync_cond_.notify_all();
 			}
 		}
 	}
 
-	//waitF
-	void Logger::waitF() {
+	//wait
+	void Logger::wait() {
 		{
-			std::unique_lock<std::mutex> lock(mutexF_); {
-				while (!abortF_) {
-					condF_.wait(lock);
-					abortF_ = false;
+			std::unique_lock<std::mutex> lock(sync_mutex_); {
+				while (!sync_) {
+					sync_cond_.wait(lock);
 				}
+				sync_ = false;
 			}
 		}
 	}
