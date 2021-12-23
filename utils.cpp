@@ -583,7 +583,7 @@ namespace utils {
 	//crashCallback
 	static long _stdcall crashCallback(EXCEPTION_POINTERS* excp) {
 		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
-		LOG_S_FATAL_SYN(
+		LOG_FATAL_SYN(
 			"ExceptionCode:%d\n" \
 			"ExceptionAddress:%#x\n" \
 			"ExceptionFlags:%d\n" \
