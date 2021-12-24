@@ -75,15 +75,8 @@ namespace LOGGER {
 
 	//get_level
 	char const* Logger::get_level() {
-		switch (level_.load()) {
-		case LVL_FATAL: return "LVL_FATAL";
-		case LVL_ERROR: return "LVL_ERROR";
-		case LVL_WARN: return "LVL_WARN";
-		case LVL_INFO: return "LVL_INFO";
-		case LVL_TRACE: return "LVL_TRACE";
-		case LVL_DEBUG: return "LVL_DEBUG";
-		}
-		return "";
+		static char const* s[] = { "FATAL","ERROR","WARNING","INFO","TRACE","DEBUG" };
+		return s[level_.load()];
 	}
 
 	//set_color
@@ -115,12 +108,12 @@ namespace LOGGER {
 			(prename && prename[0]) ?
 				snprintf(prefix_, sizeof(prefix_), "%s/%s ", ((dir && dir[0]) ? dir : "."), prename) :
 				snprintf(prefix_, sizeof(prefix_), "%s/", ((dir && dir[0]) ? dir : "."));
-			timezoneinfo();
+			timezoneInfo();
 		}
 	}
 	
-	//timezoneinfo
-	void Logger::timezoneinfo() {
+	//timezoneInfo
+	void Logger::timezoneInfo() {
 		struct tm tm = { 0 };
 		utils::convertUTC(time(NULL), tm, NULL, timezone_);
 		utils::timezoneInfo(tm, timezone_);
@@ -138,53 +131,13 @@ namespace LOGGER {
 		static size_t const PATHSZ = 512;
 		static size_t const MAXSZ = 81920;
 		char msg[PATHSZ + MAXSZ + 2];
-		size_t pos = 0;
-		switch (level) {
-		case LVL_FATAL:
-			pos = snprintf(msg, PATHSZ, "F%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		case LVL_ERROR:
-			pos = snprintf(msg, PATHSZ, "E%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		case LVL_WARN:
-			pos = snprintf(msg, PATHSZ, "W%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		case LVL_INFO:
-			pos = snprintf(msg, PATHSZ, "I%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		case LVL_TRACE:
-			pos = snprintf(msg, PATHSZ, "T%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		case LVL_DEBUG:
-			pos = snprintf(msg, PATHSZ, "D%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-				pid_,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
-			break;
-		default:
-			return;
-		}
+		static char const chr[] = { 'F','E','W','I','T','D' };
+		size_t pos = snprintf(msg, PATHSZ, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			chr[level],
+			pid_,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
+			utils::gettid().c_str(),
+			utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
 		va_list ap;
 		va_start(ap, fmt);
 #ifdef _windows_
@@ -275,7 +228,7 @@ namespace LOGGER {
 				day_ = tm.tm_mday;
 			}
 			else {
-				abort();
+				std::abort();
 			}
 		}
 		else {
@@ -307,7 +260,7 @@ namespace LOGGER {
 						//day_ = tm.tm_mday;
 					}
 					else {
-						abort();
+						std::abort();
 					}
 				}
 			}
@@ -444,12 +397,12 @@ namespace LOGGER {
 #ifdef QT_CONSOLE
 		switch (level) {
 		default:
-		case LVL_FATAL: qInfo/*qFatal*/() << msg; break;
-		case LVL_ERROR: qCritical() << msg; break;
-		case LVL_WARN: qWarning() << msg; break;
-		case LVL_INFO: qInfo() << msg; break;
-		case LVL_TRACE: qInfo() << msg; break;
-		case LVL_DEBUG: qDebug() << msg; break;
+		case LVL_FATAL: qFatal(msg); break;
+		case LVL_ERROR: qCritical(msg); break;
+		case LVL_WARN: qWarning(msg); break;
+		case LVL_INFO: qInfo(msg); break;
+		case LVL_TRACE: qInfo(msg); break;
+		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
 //foreground color

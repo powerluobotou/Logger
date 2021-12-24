@@ -80,7 +80,7 @@ namespace LOGGER {
 		bool consume(struct tm const& tm, struct timeval const& tv);
 		void sync();
 		void stop();
-		void timezoneinfo();
+		void timezoneInfo();
 	private:
 #ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
@@ -117,6 +117,7 @@ namespace LOGGER {
 #define LOG LOGGER::Logger::instance()->write
 #define LOG_S LOGGER::Logger::instance()->write_s
 #define LOG_SET LOGGER::Logger::instance()->set_level
+#define LOG_LVL LOGGER::Logger::instance()->get_level
 #define LOG_TIMEZONE LOGGER::Logger::instance()->set_timezone
 #define LOG_WAIT LOGGER::Logger::instance()->wait
 #define LOG_COLOR LOGGER::Logger::instance()->set_color
@@ -137,14 +138,14 @@ namespace LOGGER {
 
 //LOG_XXX("%s", msg)
 #ifdef _windows_
-#define LOG_FATAL(fmt,...)	 LOG(PARAM_FATAL, true,  fmt, ##__VA_ARGS__); LOG_WAIT(); abort();
+#define LOG_FATAL(fmt,...)	 LOG(PARAM_FATAL, true,  fmt, ##__VA_ARGS__); LOG_WAIT(); std::abort();
 #define LOG_ERROR(fmt,...)	 LOG(PARAM_ERROR, false, fmt, ##__VA_ARGS__)
 #define LOG_WARN(fmt,...)	 LOG(PARAM_WARN,  false, fmt, ##__VA_ARGS__)
 #define LOG_INFO(fmt,...)	 LOG(PARAM_INFO,  false, fmt, ##__VA_ARGS__)
 #define LOG_TRACE(fmt,...)	 LOG(PARAM_TRACE, false, fmt, ##__VA_ARGS__)
 #define LOG_DEBUG(fmt,...)	 LOG(PARAM_DEBUG, false, fmt, ##__VA_ARGS__)
 #else
-#define LOG_FATAL(args...) 	 LOG(PARAM_FATAL, true,  ##args); LOG_WAIT(); abort();
+#define LOG_FATAL(args...) 	 LOG(PARAM_FATAL, true,  ##args); LOG_WAIT(); std::abort();
 #define LOG_ERROR(args...) 	 LOG(PARAM_ERROR, false, ##args)
 #define LOG_WARN(args...) 	 LOG(PARAM_WARN,  false, ##args)
 #define LOG_INFO(args...)	 LOG(PARAM_INFO,  false, ##args)
@@ -153,7 +154,7 @@ namespace LOGGER {
 #endif
 
 //LOG_S_XXX(msg)
-#define LOG_S_FATAL(msg)     LOG_S(PARAM_FATAL, true,  msg); LOG_WAIT(); abort();
+#define LOG_S_FATAL(msg)     LOG_S(PARAM_FATAL, true,  msg); LOG_WAIT(); std::abort();
 #define LOG_S_ERROR(msg)     LOG_S(PARAM_ERROR, false, msg)
 #define LOG_S_WARN(msg)      LOG_S(PARAM_WARN,  false, msg)
 #define LOG_S_INFO(msg)      LOG_S(PARAM_INFO,  false, msg)
