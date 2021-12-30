@@ -26,8 +26,8 @@ namespace LOGGER {
 	}
 
 	//set_color
-	void Logger::set_color(int level, int clrtitle, int clrtext) {
-		LOGGER::Log::instance()->set_color(level, clrtitle, clrtext);
+	void Logger::set_color(int level, int title, int text) {
+		LOGGER::Log::instance()->set_color(level, title, text);
 	}
 
 	//init
