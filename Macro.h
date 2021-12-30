@@ -60,7 +60,7 @@
 #define F_TMSTMP        0x04
 
 #ifdef _windows_
-#include <WinSock2.h>//timeval
+//#include <WinSock2.h>//timeval
 #include <windows.h>
 #include <stdint.h>
 #include <tchar.h>

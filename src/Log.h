@@ -29,6 +29,8 @@
 
 #include "Atomic.h"
 
+#pragma execution_character_set("utf-8")
+
 typedef int pid_t;
 typedef int tid_t;
 
