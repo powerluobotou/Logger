@@ -19,6 +19,12 @@ namespace utils {
 	//initConsole
 	void initConsole();
 
+	//closeConsole
+	void closeConsole();
+
+	//readIni
+	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
+
 	//gettid
 	/*tid_t*/std::string gettid();
 

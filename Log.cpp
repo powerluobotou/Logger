@@ -120,7 +120,7 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, bool syn, char const* fmt, ...) {
+	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...) {
 		//打印level_及以下级别日志
 		if (level > level_.load()) {
 			return;
@@ -132,12 +132,16 @@ namespace LOGGER {
 		static size_t const MAXSZ = 81920;
 		char msg[PATHSZ + MAXSZ + 2];
 		static char const chr[] = { 'F','E','W','I','T','D' };
-		size_t pos = snprintf(msg, PATHSZ, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
-			chr[level],
-			pid_,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-			utils::gettid().c_str(),
-			utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str());
+		size_t pos = (flag & F_DETAIL) ?
+			snprintf(msg, PATHSZ, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+				chr[level],
+				pid_,
+				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
+				utils::gettid().c_str(),
+				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str()) :
+			snprintf(msg, PATHSZ, "%c%02d:%02d:%02d.%.6lu] ",
+				chr[level],
+				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 		va_list ap;
 		va_start(ap, fmt);
 #ifdef _windows_
@@ -149,19 +153,19 @@ namespace LOGGER {
 		msg[pos + n] = '\n';
 		msg[pos + n + 1] = '\0';
 		if (prefix_[0]) {
-			notify(msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0, syn);
+			notify(msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
 		}
 		else {
-			stdoutbuf(level, msg, pos + n + 1, pos, stack, stack ? strlen(stack) : 0);
-			if (syn) {
+			stdoutbuf(level, msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
+			if ((flag & F_SYNC)) {
 				sync();
 			}
 		}
 	}
 
 	//write_s
-	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, bool syn, std::string const& msg) {
-		write(level, file, line, func, stack, syn, "%s", msg.c_str());
+	void Logger::write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg) {
+		write(level, file, line, func, stack, flag, "%s", msg.c_str());
 	}
 
 	//open
@@ -187,15 +191,40 @@ namespace LOGGER {
 	}
 
 	//write
-	void Logger::write(char const* msg, size_t len) {
+	void Logger::write(char const* msg, size_t len, size_t pos, uint8_t flag) {
 #ifdef _windows_
 		if (fd_ != INVALID_HANDLE_VALUE) {
-			long size = 0;
-			WriteFile(fd_, msg, len, (LPDWORD)&size, NULL);
+			if (pos == 0) {
+				long size = 0;
+				WriteFile(fd_, msg, len, (LPDWORD)&size, NULL);
+			}
+			else if ((flag & F_TMSTMP)) {
+				long size = 0;
+				WriteFile(fd_, msg + 1, len - 1, (LPDWORD)&size, NULL);
+			}
+			else if ((flag & F_DETAIL)) {
+				long size = 0;
+				WriteFile(fd_, msg, len, (LPDWORD)&size, NULL);
+			}
+			else {
+				long size = 0;
+				WriteFile(fd_, msg + pos, len - pos, (LPDWORD)&size, NULL);
+			}
 		}
 #else
 		if (fd_ != INVALID_HANDLE_VALUE) {
-			(void)write(fd_, msg, len);
+			if (pos == 0) {
+				(void)write(fd_, msg, len);
+			}
+			else if ((flag & F_TMSTMP)) {
+				(void)write(fd_, msg + 1, len - 1);
+			}
+			else if ((flag & F_DETAIL)) {
+				(void)write(fd_, msg, len);
+			}
+			else {
+				(void)write(fd_, msg + pos, len - pos);
+			}
 		}
 #endif
 	}
@@ -315,13 +344,13 @@ namespace LOGGER {
 	}
 
 	//notify
-	void Logger::notify(char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen, bool syn) {
+	void Logger::notify(char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				messages_.emplace_back(
 					std::make_pair(
 						std::make_pair(msg, stack ? stack : ""),
-						std::make_pair(pos, syn)));
+						std::make_pair(pos, flag)));
 				cond_.notify_all();
 			}
 		}
@@ -352,28 +381,26 @@ namespace LOGGER {
 #define Msg(it) ((it)->first.first)
 #define Stack(it) ((it)->first.second)
 #define Pos(it) ((it)->second.first)
-#define Syn(it)((it)->second.second)
+#define Flag(it) ((it)->second.second)
 				int level = getlevel(Msg(it).c_str()[0]);
 				switch (level) {
 				case LVL_FATAL:
 				case LVL_TRACE: {
-					write(Msg(it).c_str(), Msg(it).size());
-					write(Stack(it).c_str(), Stack(it).size());
-					stdoutbuf(level,
-						Msg(it).c_str(), Msg(it).size(), Pos(it),
-						Stack(it).c_str(), Stack(it).size());
+					write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+					write(Stack(it).c_str(), Stack(it).size(), 0, 0);
+					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it), Stack(it).c_str(), Stack(it).size());
 					break;
 				}
 				case LVL_ERROR:
 				case LVL_WARN:
 				case LVL_INFO:
 				case LVL_DEBUG: {
-					write(Msg(it).c_str(), Msg(it).size());
-					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it));
+					write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
 					break;
 				}
 				}
-				if ((syn = Syn(it))) {
+				if ((syn = (Flag(it) & F_SYNC))) {
 					break;
 				}
 			}
@@ -393,7 +420,7 @@ namespace LOGGER {
 
 	//stdoutbuf
 	//需要调用utils::initConsole()初始化
-	void Logger::stdoutbuf(int level, char const* msg, size_t len, size_t pos, char const* stack, size_t stacklen) {
+	void Logger::stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen) {
 #ifdef QT_CONSOLE
 		switch (level) {
 		default:
@@ -405,7 +432,14 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
-//foreground color
+		if (enable_ && !isConsoleOpen_) {
+			utils::initConsole();
+			isConsoleOpen_ = true;
+		}
+		if (!isConsoleOpen_) {
+			return;
+		}
+		//foreground color
 #define FOREGROUND_Red         (FOREGROUND_RED)//红
 #define FOREGROUND_Green       (FOREGROUND_GREEN)//绿
 #define FOREGROUND_Blue        (FOREGROUND_BLUE)//蓝
@@ -452,26 +486,58 @@ namespace LOGGER {
 		switch (level) {
 		case LVL_FATAL:
 		case LVL_TRACE: {
-			::SetConsoleTextAttribute(h, color[level][0]);
-			printf("%.*s", (int)pos, msg);
-			::SetConsoleTextAttribute(h, color[level][1]);
-			printf("%.*s", (int)len - (int)pos, msg + pos);
-			::SetConsoleTextAttribute(h, color[level][0]);
-			printf("%.*s", (int)stacklen, stack);//stack
+			if ((flag & F_TMSTMP)) {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)pos - 1, msg + 1);
+				::SetConsoleTextAttribute(h, color[level][1]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)stacklen, stack);//stack
+			}
+			else if ((flag & F_DETAIL)) {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, color[level][1]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)stacklen, stack);//stack
+			}
+			else {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)stacklen, stack);//stack
+			}
 			break;
 		}
 		case LVL_ERROR:
 		case LVL_WARN:
 		case LVL_INFO:
 		case LVL_DEBUG: {
-			::SetConsoleTextAttribute(h, color[level][0]);
-			printf("%.*s", (int)pos, msg);
-			::SetConsoleTextAttribute(h, color[level][1]);
-			printf("%.*s", (int)len - (int)pos, msg + pos);
+			if ((flag & F_TMSTMP)) {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)pos - 1, msg + 1);
+				::SetConsoleTextAttribute(h, color[level][1]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			else if ((flag & F_DETAIL)) {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)pos, msg);
+				::SetConsoleTextAttribute(h, color[level][1]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
+			else {
+				::SetConsoleTextAttribute(h, color[level][0]);
+				printf("%.*s", (int)len - (int)pos, msg + pos);
+			}
 			break;
 		}
 		}
 		//::CloseHandle(h);
+		if (!enable_ && isConsoleOpen_) {
+			utils::closeConsole();
+			isConsoleOpen_ = false;
+		}
 #else
 		switch (level) {
 		case LVL_FATAL:
@@ -511,6 +577,16 @@ namespace LOGGER {
 				sync_ = false;
 			}
 		}
+	}
+
+	//enable
+	void Logger::enable() {
+		enable_ = true;
+	}
+
+	//disable
+	void Logger::disable() {
+		enable_ = false;
 	}
 }
 

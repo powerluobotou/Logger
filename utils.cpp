@@ -23,6 +23,57 @@
 #include "Log.h"
 
 namespace utils {
+	
+	//readIni
+	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini) {
+		ini.clear();
+		std::string st(buf);
+		std::string field;
+		while (!st.empty()) {
+			std::string::size_type pos = st.find_first_of("\r\n");
+			if (pos == -1) {
+				if (!st.empty()) {
+					std::string s = st.substr(0, pos);
+					if (!s.empty()) {
+						if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
+							field = s.substr(1, s.length() - 2);
+							std::map<std::string, std::string>& m = ini[field];
+						}
+						else if (!field.empty()) {
+							std::string::size_type pos = s.find_first_of('=');
+							if (pos != -1) {
+								std::map<std::string, std::string>& m = ini[field];
+								std::string key = s.substr(0, pos);
+								std::string val = s.substr(pos + 1, -1);
+								m[key] = val;
+							}
+						}
+					}
+				}
+				break;
+			}
+			std::string s = st.substr(0, pos);
+			if (!s.empty()) {
+				if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
+					field = s.substr(1, s.length() - 2);
+					std::map<std::string, std::string>& m = ini[field];
+				}
+				else if (!field.empty()) {
+					std::string::size_type pos = s.find_first_of('=');
+					if (pos != -1) {
+						std::map<std::string, std::string>& m = ini[field];
+						std::string key = s.substr(0, pos);
+						std::string val = s.substr(pos + 1, -1);
+						m[key] = val;
+					}
+				}
+			}
+			else {
+				break;
+			}
+			st = st.substr(pos + 2, -1);
+		};
+	}
 
 	//initConsole
 	void initConsole() {
@@ -50,6 +101,15 @@ namespace utils {
 		lstrcpy(cfi.FaceName, _T("SimSun"));
 		::SetCurrentConsoleFontEx(h, false, &cfi);
 		//::CloseHandle(h);
+		//::AttachConsole(GetCurrentProcessId());
+#endif
+	}
+
+	//closeConsole
+	void closeConsole() {
+#if defined(_windows_)
+		::fclose(stdout);
+		::FreeConsole();
 #endif
 	}
 
@@ -405,27 +465,27 @@ namespace utils {
 	void timezoneInfo(struct tm const& tm, int64_t timezone) {
 		switch (timezone) {
 		case MY_EST: {
-			LOG_INFO("America/New_York %04d-%02d-%02d %02d:%02d:%02d",
+			TLOG_INFO("America/New_York %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_BST: {
-			LOG_INFO("Europe/London %04d-%02d-%02d %02d:%02d:%02d",
+			TLOG_INFO("Europe/London %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_GST: {
-			LOG_INFO("Asia/Dubai %04d-%02d-%02d %02d:%02d:%02d",
+			TLOG_INFO("Asia/Dubai %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_CCT: {
-			LOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
+			TLOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_JST: {
-			LOG_INFO("Asia/Tokyo %04d-%02d-%02d %02d:%02d:%02d",
+			TLOG_INFO("Asia/Tokyo %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
