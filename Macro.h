@@ -47,7 +47,20 @@
 #define MY_CCT (+8)
 #define MY_JST (+9)
 
+#define LVL_FATAL       0
+#define LVL_ERROR       1
+#define LVL_WARN        2
+#define LVL_INFO        3
+#define LVL_TRACE       4
+#define LVL_DEBUG       5
+
+#define F_PURE          0x00
+#define F_SYNC          0x01
+#define F_DETAIL        0x02
+#define F_TMSTMP        0x04
+
 #ifdef _windows_
+#include <WinSock2.h>//timeval
 #include <windows.h>
 #include <stdint.h>
 #include <tchar.h>
