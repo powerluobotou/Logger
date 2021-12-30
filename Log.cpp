@@ -101,9 +101,9 @@ namespace LOGGER {
 			}
 #endif
 		}
+		//打印level_及以下级别日志
+		level_.store(level);
 		if (start()) {
-			//打印level_及以下级别日志
-			level_.store(level);
 			size_ = logsize;
 			(prename && prename[0]) ?
 				snprintf(prefix_, sizeof(prefix_), "%s/%s ", ((dir && dir[0]) ? dir : "."), prename) :

@@ -47,10 +47,10 @@
 #define PARAM_TRACE     4,__FILE__,__LINE__,__FUNC__,__STACK__
 #define PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__,NULL
 
-#define F_PURE   0x00
-#define F_SYNC   0x01
-#define F_DETAIL 0x02
-#define F_TMSTMP 0x04
+#define F_PURE          0x00
+#define F_SYNC          0x01
+#define F_DETAIL        0x02
+#define F_TMSTMP        0x04
 
 typedef int pid_t;
 typedef int tid_t;
