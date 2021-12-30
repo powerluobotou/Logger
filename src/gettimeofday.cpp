@@ -101,8 +101,12 @@ double gettime() {
  	//clock_gettime(CLOCK_MONOTONIC, &ts);
  	//return (double)ts.tv_sec + ts.tv_nsec * kSecsPerNanosecond;
 
+	//ts.tv_sec * 1000 + ts.tv_nsec * 0.000001;//纳秒级
+
 	timeval tv;
 	gettimeofday(&tv, NULL);
 	return (double)tv.tv_sec + tv.tv_usec * kSecsPerMicrosecond;
+
+	//tv.tv_sec * 1000 + tv.tv_usec * 0.001;//微秒级
 #endif
 }

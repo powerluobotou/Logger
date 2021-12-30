@@ -5,6 +5,7 @@
 *
 */
 #include "../utils.h"
+#include "gettimeofday.h"
 #include <errno.h>
 
 #ifdef _windows_
@@ -675,6 +676,7 @@ namespace utils {
 			CREATE_ALWAYS,
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
+		MINIDUMP_TYPE ty = static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithDataSegs | MiniDumpWithHandleData);
 		if (INVALID_HANDLE_VALUE != h) {
 			MINIDUMP_EXCEPTION_INFORMATION di;
 			di.ExceptionPointers = excp;
@@ -684,12 +686,13 @@ namespace utils {
 				::GetCurrentProcess(),
 				::GetCurrentProcessId(),
 				h,
-				MiniDumpNormal,
+				ty,
 				&di,
 				NULL,
 				NULL);
 			::CloseHandle(h);
 		}
+		//EXCEPTION_CONTINUE_SEARCH
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 #endif
@@ -699,5 +702,11 @@ namespace utils {
 #ifdef _windows_
 		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)crashCallback);
 #endif
+	}
+
+	//now_ms
+	unsigned int now_ms() {
+		//自开机经过的毫秒数
+		return gettime() * 1000;
 	}
 }

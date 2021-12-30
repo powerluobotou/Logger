@@ -63,6 +63,9 @@ namespace utils {
 
 	//enableCrashDump
 	void enableCrashDump();
+
+	//now_ms
+	unsigned int now_ms();
 }
 
 #endif
