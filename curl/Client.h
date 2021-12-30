@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma comment(lib, "ws2_32.lib")
+
 #include "Easy.h"
 #include "Multi.h"
 

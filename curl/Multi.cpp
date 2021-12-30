@@ -81,8 +81,7 @@ namespace Curl {
 
 	int Multi::select() {
 		REQState rc = eFailed;
-		do 
-		{
+		do  {
 			CHECKPTR_BREAK(curlm_);
 
 			timeval timeout;
@@ -160,7 +159,7 @@ namespace Curl {
 // 				pFMop->Open();
 
 			do {
-				if( 0 != (rc = select())) {
+				if( 0 != (rc = this->select())) {
 					break;
 				}
 
