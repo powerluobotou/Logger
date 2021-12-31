@@ -815,7 +815,6 @@ namespace utils {
 					cb(0);//成功，退出进程
 				}
 			}
-			f.MFClose();
 			TLOG_DEBUG("校验失败，重新下载安装包... %s", url.c_str());
 		}
 		else {
