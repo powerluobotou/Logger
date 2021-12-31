@@ -2,17 +2,17 @@
 
 #include <string>
 #include <vector>
-#include "IMemFileOperation.h"
+#include "IOperation.h"
 
 typedef struct _FMParam_ {
 	std::string strkey;
-    ToolsInterface::LPIMemFileOperation value;
+    ToolsInterface::LPIOperation value;
     bool postasfile;
     struct FileInfo {
         char szfilename[128];
     };
 
-    struct MemInfo{
+    struct MemInfo {
         bool bMulti;
     };
 

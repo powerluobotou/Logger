@@ -1,8 +1,8 @@
 #pragma once
 
-#include "IMemFileOperation.h"
+#include "IOperation.h"
 
-namespace ToolsInterface{
+namespace ToolsInterface {
 
 	class CSetOperation {
 	public:
@@ -41,9 +41,9 @@ namespace ToolsInterface{
 				return m_pFMOp->MFBuffer(s);
 			}
 		}
-		void SetOperation(IMemFileOperation* pFMop){m_pFMOp = pFMop;};
-		IMemFileOperation* GetOperation() { return m_pFMOp; }
+		void SetOperation(IOperation* pFMop){m_pFMOp = pFMop;};
+		IOperation* GetOperation() { return m_pFMOp; }
     private:
-		IMemFileOperation* m_pFMOp;
+		IOperation* m_pFMOp;
 	};
 }

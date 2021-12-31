@@ -86,7 +86,7 @@ namespace Curl {
 			fread(buffer, size, nmemb, (FILE *)stream) : 0;
 #else
 		return stream ? 
-			((ToolsInterface::IMemFileOperation *)stream)->MFRead(buffer, size, nmemb) : 0;
+			((ToolsInterface::IOperation *)stream)->MFRead(buffer, size, nmemb) : 0;
 #endif
 	}
 

@@ -1,28 +1,29 @@
 #include "MemOperation.h"
 #include <string.h>
 
-namespace MemFileOperation{
-	CMemOperation::CMemOperation() {
+namespace MemFileOperation {
+
+	CMemory::CMemory() {
 		m_ulCurrentPos = 0;
 		m_buffer.clear();
 	}
 
-	CMemOperation::~CMemOperation() {
+	CMemory::~CMemory() {
 	}
     
-    bool CMemOperation::IsFile() {
+    bool CMemory::IsFile() {
         return false;
     }
 
-	bool CMemOperation::MFClose() {
+	bool CMemory::MFClose() {
 		return true;
 	}
 
-	int CMemOperation::MFEof() {
+	int CMemory::MFEof() {
 		return m_ulCurrentPos == m_buffer.size() ?  -1 : 0 ;
 	}
 
-	int CMemOperation::MFGetc() {
+	int CMemory::MFGetc() {
 		int nget = 0;
 		if ( 0 == MFRead( &nget, sizeof(char), 1) ) {
 			return EOF;
@@ -30,7 +31,7 @@ namespace MemFileOperation{
 		return nget;
 	}
 
-	int CMemOperation::MFGetPos( fpos_t * pos ) {
+	int CMemory::MFGetPos( fpos_t * pos ) {
 		#if WIN32
 		*pos = m_ulCurrentPos;
 		#else
@@ -39,7 +40,7 @@ namespace MemFileOperation{
 		return 0;
 	}
 
-	char * CMemOperation::MFGets( char * str, int num ) {
+	char * CMemory::MFGets( char * str, int num ) {
 		char * szReadBuffer = 0;
 		do {
 			if (!str || m_ulCurrentPos >= m_buffer.size()) {
@@ -73,24 +74,24 @@ namespace MemFileOperation{
 		return szReadBuffer;
 	}
 
-	bool CMemOperation::MFOpen() {
+	bool CMemory::MFOpen() {
 		m_ulCurrentPos = 0;
 		return true;
 	}
 
-	int CMemOperation::MFPutc( int character ) {
+	int CMemory::MFPutc( int character ) {
 		size_t unCount = sizeof(character);
 		MFWrite( &character, sizeof(char), unCount );
 		return 0;
 	}
 
-	int CMemOperation::MFPuts( const char * str ) {
+	int CMemory::MFPuts( const char * str ) {
 		size_t unCount = strlen(str);
 		MFWrite( str, sizeof(char), unCount );
 		return 0;
 	}
 
-	size_t CMemOperation::MFRead( void * ptr, size_t size, size_t count ) {
+	size_t CMemory::MFRead( void * ptr, size_t size, size_t count ) {
 
 		unsigned int unReaded = 0;
 		do {
@@ -117,7 +118,7 @@ namespace MemFileOperation{
 		return unReaded;
 	}
 
-	int CMemOperation::MFSeek( long offset, int origin ) {
+	int CMemory::MFSeek( long offset, int origin ) {
 		
 		int nRet = EOF;
 		if ( offset >= 0 ) {
@@ -169,7 +170,7 @@ namespace MemFileOperation{
 
 	}
 
-	int CMemOperation::MFSetpos( const fpos_t * pos ) {
+	int CMemory::MFSetpos( const fpos_t * pos ) {
 		
 #ifdef WIN32			
 #pragma warning(push)
@@ -188,11 +189,11 @@ namespace MemFileOperation{
 		return 0;
 	}
 
-	long CMemOperation::MFTell() {
+	long CMemory::MFTell() {
 		return m_ulCurrentPos;
 	}
 
-	size_t CMemOperation::MFWrite( const void * ptr, size_t size, size_t count ) {
+	size_t CMemory::MFWrite( const void * ptr, size_t size, size_t count ) {
 		
 		size_t unWritten = 0;
 		do {
@@ -224,23 +225,23 @@ namespace MemFileOperation{
 		return unWritten;
 	}
 
-	void CMemOperation::MFRewind() {
+	void CMemory::MFRewind() {
 		m_ulCurrentPos = 0;
 	}
 
-	void CMemOperation::MFBuffer(char *buffer, size_t size)
+	void CMemory::MFBuffer(char *buffer, size_t size)
 	{
 		memset(buffer, 0, size);
 		memcpy(buffer, m_buffer.data(), MFTell());
 	}
 
-	void CMemOperation::MFBuffer(std::string & s)
+	void CMemory::MFBuffer(std::string & s)
 	{
 		s.clear();
 		s.append((char *)m_buffer.data(), (long)MFTell());
 	}
 
-	CMemOperation::CMemOperation( void* lpBuffer, unsigned long ulLength ) : m_ulCurrentPos(0)
+	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : m_ulCurrentPos(0)
 	{
 		m_buffer.resize(ulLength);
 		memcpy(m_buffer.data(), lpBuffer, ulLength);
@@ -248,11 +249,11 @@ namespace MemFileOperation{
 
 // 
 // 
-// 	bool CMemOperation::MFOpen() {
+// 	bool CMemory::MFOpen() {
 // 		return true;
 // 	}
 // 
-// 	bool CMemOperation::MFRead( void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead ) {
+// 	bool CMemory::MFRead( void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead ) {
 // 		bool bRet = false;
 // 		unsigned long dwReaded;
 // 
@@ -285,7 +286,7 @@ namespace MemFileOperation{
 // 		return bRet;
 // 	}
 // 
-// 	bool CMemOperation::MFWrite( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
+// 	bool CMemory::MFWrite( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
 // 	{
 // 		bool bRet = false;
 // 		unsigned long dwWritten = ulNumberOfBytesToWrite;
@@ -312,7 +313,7 @@ namespace MemFileOperation{
 // 		return bRet;
 // 	}
 // 
-// 	unsigned long CMemOperation::MFSeek( long offset, int origin )
+// 	unsigned long CMemory::MFSeek( long offset, int origin )
 // 	{
 // 		unsigned long retval = INVALID_SET_FILE_POINTER;
 // 
@@ -361,11 +362,11 @@ namespace MemFileOperation{
 // 		return m_ulCurrentPos;
 // 	}
 // 
-// 	bool CMemOperation::MFClose() {
+// 	bool CMemory::MFClose() {
 // 		return true;
 // 	}
 // 
-// 	bool CMemOperation::IsEmpty() {
+// 	bool CMemory::IsEmpty() {
 // 		return m_buffer.GetCount() == 0 ? true : false;
 // 	}
 
