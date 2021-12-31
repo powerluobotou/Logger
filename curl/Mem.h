@@ -29,6 +29,7 @@ namespace Operation {
 		virtual void MFRewind();
 		virtual void MFBuffer(char *buffer, size_t size);
 		virtual void MFBuffer(std::string & s);
+		virtual void MFBuffer(std::vector<char>& buffer);
  		CMemory(void* lpBuffer, unsigned long ulLength);
 		//bool MFOpen();
 		//bool MFRead(void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead);

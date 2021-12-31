@@ -1,4 +1,5 @@
 #include "../utils.h"
+#include "../Logger.h"
 #include "Easy.h"
 #include <assert.h>
 #include <string.h>
@@ -95,9 +96,9 @@ namespace Curl {
 			((Easy *)stream)->writeCallback(buffer, size, nmemb) : 0;
 	}
 
-	int Easy::progressCallback_(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow, void* args) {
+	int Easy::progressCallback_(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
 		return clientp ?
-			((Easy *)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow, args) : 0;
+			((Easy *)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow) : 0;
 	}
 
 	size_t Easy::readCallback(void *buffer, size_t size, size_t nmemb) {
@@ -118,13 +119,15 @@ namespace Curl {
 			return 0;
 		}
 
-		// 上传模式, 则写内存
-		// 下载模式, 则写文件
-		return Write(buffer, size, nmemb);
+		//上传模式, 则写内存
+		//下载模式, 则写文件
+		return this->buffer_cb_ ?
+			this->buffer_cb_(this, buffer, size, nmemb) :
+			this->Write(buffer, size, nmemb);
 	}
 
-	int Easy::progressCallback(double dltotal, double dlnow, double ultotal, double ulnow, void* args) {
-		if (this->progresscbk_) {
+	int Easy::progressCallback(double dltotal, double dlnow, double ultotal, double ulnow) {
+		if (this->progress_cb_) {
 
 			const unsigned int elapseTime = 500;
 			unsigned long tickcount_ = utils::now_ms();
@@ -134,7 +137,7 @@ namespace Curl {
 				this->lasttime_ = tickcount_;
 				
 				if (!this->finished_)
-					this->progresscbk_(this, ultotal, ulnow, args);
+					this->progress_cb_(this, ultotal, ulnow);
 
 				if (ultotal == ulnow)
 					this->finished_ = true;
@@ -144,7 +147,7 @@ namespace Curl {
 				this->lasttime_ = tickcount_;
 				
 				if (!this->finished_)
-					this->progresscbk_(this, dltotal, dlnow, args);
+					this->progress_cb_(this, dltotal, dlnow);
 
 				if (dltotal == dlnow)
 					this->finished_ = true;
@@ -160,7 +163,7 @@ namespace Curl {
 		lastptr_ = NULL;
 		curl_ = NULL;
 		lasttime_ = 0;
-		progresscbk_ = NULL;
+		progress_cb_ = NULL;
 		mode_ = EDownload;
 		finished_ = false;
 		memset(&debug_data_, 0, sizeof(debug_data_));
@@ -257,7 +260,7 @@ namespace Curl {
 	int Easy::buildUpload(
 		char const* url,
 		std::list<FMParam> const* params,
-		Functor callback,
+		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE *fd) {
 #if 0
@@ -294,7 +297,7 @@ namespace Curl {
 #endif
 			this->finished_ = false;
 			this->mode_ = EUpload;
-			this->progresscbk_ = callback;
+			this->progress_cb_ = onProgress;
 			rc = 0;
 		} while (0);
 #if 0
@@ -304,12 +307,14 @@ namespace Curl {
 	}
 
 	int Easy::buildDownload(char const* url,
-		Functor callback,
+		OnBuffer onBuffer,
+		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE *fd) {
 		this->finished_ = false;
 		this->mode_ = EDownload;
-		this->progresscbk_ = callback;
+		this->buffer_cb_ = onBuffer;
+		this->progress_cb_ = onProgress;
 		return this->buildGet(url, NULL, spath, dump, fd);
 	}
 
@@ -424,26 +429,26 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setCallback(void *readcbk, void *writecbk, void *progresscbk) {
+	int Easy::setCallback(void *readcb, void *writecb, void *progresscb) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
-			if (readcbk) {
-				easycode = curl_easy_setopt(curl_, CURLOPT_READFUNCTION, readcbk/*readCallback_*/);
+			if (readcb) {
+				easycode = curl_easy_setopt(curl_, CURLOPT_READFUNCTION, readcb/*readCallback_*/);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_READDATA, this);
 				CHECKCURLE_BREAK(easycode);
 			}
-			if (writecbk){
-				easycode = curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, writecbk/*writeCallback_*/);
+			if (writecb){
+				easycode = curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, writecb/*writeCallback_*/);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_WRITEDATA, this);
 				CHECKCURLE_BREAK(easycode);
 			}
-			if (progresscbk) {
+			if (progresscb) {
 				easycode = curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 0L);
 				CHECKCURLE_BREAK(easycode);
-				easycode = curl_easy_setopt(curl_, CURLOPT_PROGRESSFUNCTION, progresscbk/*progressCallback_*/);
+				easycode = curl_easy_setopt(curl_, CURLOPT_PROGRESSFUNCTION, progresscb/*progressCallback_*/);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_PROGRESSDATA, this);
 				CHECKCURLE_BREAK(easycode);

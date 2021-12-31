@@ -25,9 +25,12 @@
 #include <iostream>
 #include <sstream>
 #include <errno.h>
+#include <fcntl.h>
 #include <assert.h>
 #include <time.h>
 #include <random>
+
+#include <stdarg.h>
 
 #include <vector>
 #include <list>
@@ -64,6 +67,8 @@
 #include <windows.h>
 #include <stdint.h>
 #include <tchar.h>
+#include <io.h>
+#include <direct.h>
 //#define __FUNC__ __FUNCSIG__//__FUNCTION__
 #define __FUNC__ __FUNCTION__//__FUNCSIG__
 #define INVALID_HANDLE_VALUE ((HANDLE)(-1))
@@ -76,6 +81,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#include <dirent.h>
 #define __FUNC__ __func__
 #define INVALID_HANDLE_VALUE (-1)
 #define xsleep(t) usleep((t) * 1000)

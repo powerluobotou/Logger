@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 namespace Operation {
 
@@ -49,6 +50,7 @@ namespace Operation {
 		virtual void MFRewind() = 0;
 		virtual void MFBuffer(char *buffer, size_t size) = 0;
 		virtual void MFBuffer(std::string & s) = 0;
+		virtual void MFBuffer(std::vector<char>& buffer) = 0;
 		/* UnSuport
 		int putc ( int character, FILE * stream ); use MFPutc
 		int getc ( FILE * stream ); use MFGetc

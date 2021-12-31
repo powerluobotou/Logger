@@ -9,6 +9,7 @@
 
 #ifdef _windows_
 #include <process.h>
+#include "gettimeofday.h"
 #endif
 
 #ifdef QT_SUPPORT
@@ -85,22 +86,7 @@ namespace LOGGER {
 
 	//init
 	void Log::init(char const* dir, int level, char const* prename, size_t logsize) {
-#if 1
-		struct stat stStat;
-		if (stat(dir, &stStat) < 0) {
-#else
-		if (access(dir, 0) < 0) {
-#endif
-#ifdef _windows_
-			if (mkdir(dir) < 0) {
-				return;
-			}
-#else
-			if (mkdir(dir, /*0777*/S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
-				return;
-			}
-#endif
-		}
+		utils::mkDir(dir);
 		//打印level_及以下级别日志
 		level_.store(level);
 		if (start()) {

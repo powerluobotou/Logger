@@ -25,6 +25,15 @@ namespace utils {
 	//readIni
 	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
 
+	//replaceAll
+	void replaceAll(std::string& s, std::string const& a, std::string const& b);
+
+	//getModuleFilePath
+	std::string getModuleFilePath(std::string* filename = NULL);
+
+	//mkDir
+	bool mkDir(char const* dir);
+
 	//gettid
 	/*tid_t*/std::string gettid();
 
@@ -66,6 +75,10 @@ namespace utils {
 
 	//now_ms
 	unsigned int now_ms();
+
+	//CURLCheckVersion
+	//-1失败，退出进程 0成功，退出进程 1失败，登陆旧版
+	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb);
 }
 
 #endif

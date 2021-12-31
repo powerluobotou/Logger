@@ -54,13 +54,14 @@ namespace Curl {
 			char const* url,
 			std::list<FMParam> const* params,
 			std::string* resp,
-			Functor callback,
+			OnProgress onProgress,
 			char const* spath = NULL,
 			bool dump = true, FILE* fd = stderr);
 		int download(
 			char const* url,
 			char const* savepath,
-			Functor callback,
+			OnBuffer onBuffer,
+			OnProgress onProgress,
 			char const* spath = NULL,
 			bool dump = true, FILE* fd = stderr);
 		int perform();

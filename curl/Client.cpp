@@ -94,7 +94,7 @@ namespace Curl{
 		char const* url,
 		std::list<FMParam> const* params,
 		std::string *resp,
-		Functor callback,
+		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE *fd) {
 		int rc = -1;
@@ -104,7 +104,7 @@ namespace Curl{
 			Operation::CMemory m;
 			easy.SetOperation(&m);
 
-			if (0 != easy.buildUpload(url, params, callback, spath, dump, fd)) {
+			if (0 != easy.buildUpload(url, params, onProgress, spath, dump, fd)) {
 				break;
 			}
 			if (!multi_) {
@@ -140,7 +140,8 @@ namespace Curl{
 		char const* url,
 		std::list<FMParam> const* params,
 		std::string *resp,
-		callback_t callback,
+		OnBuffer onBuffer,
+		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE *fd) {
 		int rc = -1;
@@ -163,7 +164,8 @@ namespace Curl{
 	int Client::download(
 		char const* url,
 		char const* savepath,
-		Functor callback,
+		OnBuffer onBuffer,
+		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE *fd) {
 		int rc = -1;
@@ -173,7 +175,7 @@ namespace Curl{
 			Operation::CFile f(savepath);
 			easy.SetOperation(&f);
 
-			if (0 != easy.buildDownload(url, callback, spath, dump, fd)) {
+			if (0 != easy.buildDownload(url, onBuffer, onProgress, spath, dump, fd)) {
 				break;
 			}
 			if (!multi_) {

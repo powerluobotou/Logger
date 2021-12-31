@@ -9,19 +9,6 @@
 
 #include "../Macro.h"
 
-#include <stdarg.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#ifdef _windows_
-#include <io.h>
-#include <direct.h>
-#include "gettimeofday.h"
-#else
-#include <sys/time.h>
-#include <dirent.h>
-#endif
-
 #include <mutex>
 #include <shared_mutex>
 #include <thread>

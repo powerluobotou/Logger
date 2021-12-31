@@ -245,12 +245,14 @@ namespace Operation {
 		s.append((char *)m_buffer.data(), (long)MFTell());
 	}
 
+	void CMemory::MFBuffer(std::vector<char>& buffer) {
+	}
+
 	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : m_ulCurrentPos(0)
 	{
 		m_buffer.resize(ulLength);
 		memcpy(m_buffer.data(), lpBuffer, ulLength);
 	}
-
 // 
 // 
 // 	bool CMemory::MFOpen() {

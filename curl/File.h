@@ -48,6 +48,7 @@ namespace Operation {
 		virtual void MFRewind();
 		virtual void MFBuffer(char *buffer, size_t size);
 		virtual void MFBuffer(std::string & s);
+		virtual void MFBuffer(std::vector<char>& buffer);
 		/* UnSuport
 		int putc ( int character, FILE * stream ); use MFPutc
 		int getc ( FILE * stream ); use MFGetc

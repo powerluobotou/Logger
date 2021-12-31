@@ -122,6 +122,7 @@ namespace Operation {
 
 	size_t CFile::MFRead(void* ptr, size_t size, size_t count) {
 		if (m_stream) {
+			//fread(ptr, 1, length, m_stream);
 			return fread(ptr, size, count, m_stream);
 		}
 		return 0;
@@ -129,6 +130,7 @@ namespace Operation {
 
 	int CFile::MFSeek(long offset, int origin) {
 		if (m_stream) {
+			//SEEK_SET/SEEK_CUR/SEEK_END
 			return fseek(m_stream, offset, origin);
 		}
 		return EOF;
@@ -143,6 +145,7 @@ namespace Operation {
 
 	long CFile::MFTell() {
 		if (m_stream) {
+			//fseek(m_stream, 0L, SEEK_END);
 			return ftell(m_stream);
 		}
 		return EOF;
@@ -192,5 +195,19 @@ namespace Operation {
 	}
 
 	void CFile::MFBuffer(std::string& s) {
+	}
+
+	void CFile::MFBuffer(std::vector<char>& buffer) {
+		buffer.clear();
+		if (m_stream) {
+			fseek(m_stream, 0L, SEEK_END);
+			size_t length = ftell(m_stream);
+			if (length > 0) {
+				buffer.resize(length);
+				fseek(m_stream, 0L, SEEK_SET);
+				size_t n = fread(&buffer.front(), 1, length, m_stream);
+				(void)n;
+			}
+		}
 	}
 };
