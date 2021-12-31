@@ -9,10 +9,11 @@ namespace Operation {
 		CSetOperation(){ m_pFMOp = NULL; };
 		virtual ~CSetOperation(){};
 	public:
-        void Open() {
+        bool Open(Mode mode = Mode::M_READ) {
             if (m_pFMOp) {
-                m_pFMOp->MFOpen();
+                return m_pFMOp->MFOpen(mode);
             }
+			return false;
         }
 		void Flush() {
 			if (m_pFMOp) {

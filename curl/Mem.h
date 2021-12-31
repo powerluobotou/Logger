@@ -11,13 +11,14 @@ namespace Operation {
 		CMemory();
 		~CMemory();
 	public:
+		virtual bool isValid();
         virtual bool IsFile();
 		virtual bool MFClose();
 		virtual int MFEof();
 		virtual int MFGetc();
 		virtual int MFGetPos( fpos_t * pos );
 		virtual char * MFGets( char * str, int num );
-		virtual bool MFOpen();
+		virtual bool MFOpen(Mode mode = Mode::M_READ);
 		virtual int MFPutc( int character );
 		virtual int MFPuts( const char * str );
 		virtual size_t MFRead(void * ptr, size_t size, size_t count);

@@ -5,11 +5,14 @@
 
 namespace Operation {
 
+	enum class Mode { M_READ, M_WRITE };
+
 	class IOperation {
 	public:
 		IOperation(){};
 		virtual ~IOperation(){};
 	public:
+		virtual bool isValid() = 0;
         virtual bool IsFile() = 0;
 		virtual void MFClearErr() {};
 		//int fclose ( FILE * stream );
@@ -27,7 +30,7 @@ namespace Operation {
 		//char * fgets ( char * str, int num, FILE * stream );
 		virtual char * MFGets( char * str, int num ) = 0;
 		//FILE * fopen ( const char * filename, const char * mode );
-		virtual bool MFOpen() = 0;
+		virtual bool MFOpen(Mode mode = Mode::M_READ) = 0;
 		// int fputc ( int character, FILE * stream );
 		virtual int MFPutc( int character ) = 0;
 		// int fputs ( const char * str, FILE * stream );

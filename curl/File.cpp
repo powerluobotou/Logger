@@ -1,17 +1,22 @@
 #include "File.h"
+#include "../Logger.h"
 
 namespace Operation {
 
-	CFile::CFile(const char* pFilePath) {
-		m_stream = NULL;
-		m_strFilePath = std::string(pFilePath);
+	CFile::CFile(const char* pFilePath)
+		: m_stream(NULL)
+		, m_strFilePath(pFilePath) {
 		MFOpen();
 	}
 
 	CFile::~CFile() {
 		MFClose();
 	}
-
+	
+	bool CFile::isValid() {
+		return m_stream != NULL;
+	}
+	
 	bool CFile::IsFile() {
 		return true;
 	}
@@ -22,6 +27,7 @@ namespace Operation {
 	bool CFile::MFClose() {
 		if (m_stream) {
 			fclose(m_stream);
+			m_stream = NULL;
 		}
 		return true;
 	}
@@ -69,11 +75,19 @@ namespace Operation {
 		return 0;
 	}
 
-	bool CFile::MFOpen() {
+	bool CFile::MFOpen(Mode mode) {
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4996)
 #endif
+		MFClose();
+		if (mode == Mode::M_WRITE) {
+			m_stream = fopen(m_strFilePath.c_str(), "wb+");
+			//if (!m_stream) {
+			//	PLOG_ERROR("文件可能被占用，写方式打开失败");
+			//}
+			return m_stream != NULL;
+		}
 		m_stream = fopen(m_strFilePath.c_str(), "rb");
 
 #ifdef WIN32
@@ -89,7 +103,7 @@ namespace Operation {
 #pragma warning(pop)
 #endif
 		}
-		return 0 == m_stream ? false : true;
+		return m_stream != NULL;
 	}
 
 	int CFile::MFPutc(int character) {
@@ -140,6 +154,7 @@ namespace Operation {
 			if (n != 0) {
 				return n;
 			}
+			//写失败，可能读方式打开
 #ifdef WIN32
 #else
 			int nerror = ferror(m_stream);
@@ -153,11 +168,15 @@ namespace Operation {
 #pragma warning(push)
 #pragma warning(disable:4996)
 #endif
+				//写方式重新打开
 				m_stream = freopen(m_strFilePath.c_str(), "wb+", m_stream);
 #ifdef WIN32
 #pragma warning(pop)
 #endif
-				return fwrite(ptr, size, count, m_stream);
+				//if (!m_stream) {
+				//	PLOG_ERROR("文件可能被占用，写方式打开失败");
+				//}
+				return m_stream ? fwrite(ptr, size, count, m_stream) : 0;
 			}
 		}
 		return 0;

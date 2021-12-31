@@ -8,9 +8,10 @@ namespace Operation {
 
 	class CFile : public IOperation {
 	public:
-		explicit CFile( const char* pFilePath );
+		explicit CFile(const char* pFilePath);
 		~CFile();
 	public:
+		virtual bool isValid();
         virtual bool IsFile();
 		virtual void MFClearErr();
 		//int fclose ( FILE * stream );
@@ -28,7 +29,7 @@ namespace Operation {
 		//char * fgets ( char * str, int num, FILE * stream );
 		virtual char * MFGets( char * str, int num );
 		//FILE * fopen ( const char * filename, const char * mode );
-		virtual bool MFOpen();
+		virtual bool MFOpen(Mode mode = Mode::M_READ);
 		// int fputc ( int character, FILE * stream );
 		virtual int MFPutc( int character );
 		// int fputs ( const char * str, FILE * stream );

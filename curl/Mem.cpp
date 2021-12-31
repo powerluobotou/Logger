@@ -10,7 +10,11 @@ namespace Operation {
 
 	CMemory::~CMemory() {
 	}
-    
+
+	bool CMemory::isValid() {
+		return m_buffer.size() > 0;
+	}
+
     bool CMemory::IsFile() {
         return false;
     }
@@ -74,7 +78,7 @@ namespace Operation {
 		return szReadBuffer;
 	}
 
-	bool CMemory::MFOpen() {
+	bool CMemory::MFOpen(Mode mode) {
 		m_ulCurrentPos = 0;
 		return true;
 	}

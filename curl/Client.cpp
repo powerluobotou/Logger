@@ -177,18 +177,22 @@ namespace Curl{
 				break;
 			}
 			if (!multi_) {
-				//easy.Open();
-				if (0 != easy.perform()) {
-					//easy.Close();
+				if (!easy.Open(Operation::Mode::M_WRITE)) {
 					break;
 				}
-				//easy.Close();
+				if (0 != easy.perform()) {
+					easy.Close();
+					break;
+				}
+				easy.Close();
 			}
 			else {
 				if (0 != multi_->add_handle(easy.curl_)) {
 					break;
 				}
-				easy.Open();
+				if (!easy.Open(Operation::Mode::M_WRITE)) {
+					break;
+				}
 				if (0 != multi_->perform()) {
 					easy.Close();
 					break;
