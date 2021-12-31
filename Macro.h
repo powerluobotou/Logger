@@ -81,6 +81,9 @@
 #define xsleep(t) usleep((t) * 1000)
 #endif
 
+typedef int pid_t;
+typedef int tid_t;
+
 #include <mutex>
 #include <shared_mutex>
 #include <thread>

@@ -31,9 +31,6 @@
 
 #pragma execution_character_set("utf-8")
 
-typedef int pid_t;
-typedef int tid_t;
-
 namespace LOGGER {
 
 	class Log {
@@ -51,8 +48,12 @@ namespace LOGGER {
 		bool started();
 		bool check(int level);
 		void wait();
-		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
-		size_t format(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char* msg, size_t size);
+		void init(char const* dir, int level, char const* prename, size_t logsize);
+		size_t format(int level, char const* file, int line, char const* func, uint8_t flag, char* msg, size_t size);
+		void notify(char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen);
+		void stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack = NULL, size_t stacklen = 0);
+		void checkSync(uint8_t flag);
+		void stop();
 	private:
 		void open(char const* path);
 		void write(char const* msg, size_t len, size_t pos, uint8_t flag);
@@ -60,18 +61,10 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-	public:
-		void stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack = NULL, size_t stacklen = 0);
-		void checkSync(uint8_t flag);
-	private:
+		bool consume(struct tm const& tm, struct timeval const& tv);
 		bool start();
 		bool valid();
-	public:
-		void notify(char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen);
-	private:
-		bool consume(struct tm const& tm, struct timeval const& tv);
 		void sync();
-		void stop();
 		void timezoneInfo();
 	private:
 #ifdef _windows_

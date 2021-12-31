@@ -34,6 +34,7 @@ namespace LOGGER {
 		static void wait();
 		static void enable();
 		static void disable();
+		static void cleanup();
 	};
 }
 
@@ -47,6 +48,7 @@ namespace LOGGER {
 #define LOG_COLOR LOGGER::Logger::set_color
 #define LOG_CONSOLE_OPEN LOGGER::Logger::enable
 #define LOG_CONSOLE_CLOSE LOGGER::Logger::disable
+#define LOG_CLEANUP LOGGER::Logger::cleanup
 
 #define LOG_SET_FATAL        LOG_SET(LVL_FATAL)
 #define LOG_SET_ERROR        LOG_SET(LVL_ERROR)

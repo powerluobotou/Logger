@@ -121,7 +121,7 @@ namespace LOGGER {
 
 	//started
 	bool Log::started() {
-		return started_;//prefix_[0]
+		return started_;
 	}
 
 	//check
@@ -131,7 +131,7 @@ namespace LOGGER {
 	}
 
 	//format
-	size_t Log::format(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char* msg, size_t size) {
+	size_t Log::format(int level, char const* file, int line, char const* func, uint8_t flag, char* msg, size_t size) {
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);

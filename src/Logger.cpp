@@ -41,7 +41,7 @@ namespace LOGGER {
 			static size_t const PATHSZ = 512;
 			static size_t const MAXSZ = 81920;
 			char msg[PATHSZ + MAXSZ + 2];
-			size_t pos = LOGGER::Log::instance()->format(level, file, line, func, stack, flag, msg, PATHSZ);
+			size_t pos = LOGGER::Log::instance()->format(level, file, line, func, flag, msg, PATHSZ);
 			va_list ap;
 			va_start(ap, fmt);
 #ifdef _windows_
@@ -80,6 +80,11 @@ namespace LOGGER {
 	//disable
 	void Logger::disable() {
 		LOGGER::Log::instance()->disable();
+	}
+
+	//cleanup
+	void Logger::cleanup() {
+		LOGGER::Log::instance()->stop();
 	}
 }
 
