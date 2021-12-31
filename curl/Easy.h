@@ -17,7 +17,7 @@ namespace Curl {
 
 	typedef std::function<int(Easy* easy, double ftotal, double fnow, void* args)> Functor;
 
-	class Easy : public ToolsInterface::CSetOperation {
+	class Easy : public Operation::CSetOperation {
 		friend class Client;
 		enum { EUpload, EDownload };
 	public:

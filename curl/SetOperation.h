@@ -2,7 +2,7 @@
 
 #include "IOperation.h"
 
-namespace ToolsInterface {
+namespace Operation {
 
 	class CSetOperation {
 	public:

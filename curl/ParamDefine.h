@@ -6,7 +6,7 @@
 
 typedef struct _FMParam_ {
 	std::string strkey;
-    ToolsInterface::LPIOperation value;
+    Operation::LPIOperation value;
     bool postasfile;
     struct FileInfo {
         char szfilename[128];

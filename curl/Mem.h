@@ -4,10 +4,8 @@
 #include<vector>
 #include <string>
 
-namespace MemFileOperation {
+namespace Operation {
 	
-	using namespace ToolsInterface;
-
 	class CMemory : public IOperation {
 	public:
 		CMemory();

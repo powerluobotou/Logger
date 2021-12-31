@@ -1,7 +1,7 @@
-#include "MemOperation.h"
+#include "Mem.h"
 #include <string.h>
 
-namespace MemFileOperation {
+namespace Operation {
 
 	CMemory::CMemory() {
 		m_ulCurrentPos = 0;

@@ -1,6 +1,6 @@
 #include "Client.h"
-#include "MemOperation.h"
-#include "FileOperation.h"
+#include "Mem.h"
+#include "File.h"
 #include <assert.h>
 //#include <list>
 //#include <string>
@@ -45,7 +45,7 @@ namespace Curl{
 		do {
 			Easy easy;
 			// 上传模式, 则写内存
-			MemFileOperation::CMemory m;
+			Operation::CMemory m;
 			easy.SetOperation(&m);
 
 			if (0 != easy.buildGet(url, headers, spath, dump, fd)) {
@@ -74,7 +74,7 @@ namespace Curl{
 		do {
 			Easy easy;
 			// 上传模式, 则写内存
-			MemFileOperation::CMemory m;
+			Operation::CMemory m;
 			easy.SetOperation(&m);
 
 			if (0 != easy.buildPost(url, headers, spost, spath, dump, fd)) {
@@ -101,7 +101,7 @@ namespace Curl{
 		do {
 			Easy easy;
 			// 上传模式, 则写内存
-			MemFileOperation::CMemory m;
+			Operation::CMemory m;
 			easy.SetOperation(&m);
 
 			if (0 != easy.buildUpload(url, params, callback, spath, dump, fd)) {
@@ -170,7 +170,7 @@ namespace Curl{
 		do {
 			Easy easy;
 			// 下载模式, 则写文件
-			MemFileOperation::CFile f(savepath);
+			Operation::CFile f(savepath);
 			easy.SetOperation(&f);
 
 			if (0 != easy.buildDownload(url, callback, spath, dump, fd)) {
@@ -261,7 +261,7 @@ void testUpload()
 	std::list<FMParam> slist;
 	FMParam param;
 // 	param.strkey = "file1";
-// 	MemFileOperation::CFile file1("C:/Users/Administrator/Desktop/abc.png"); // 待上传文件
+// 	Operation::CFile file1("C:/Users/Administrator/Desktop/abc.png"); // 待上传文件
 // 	param.value = &file1;
 // 	sprintf(param.fileinfo.szfilename, "*.png");
 // 	slist.push_back(param);
@@ -277,7 +277,7 @@ void testUpload()
 //	printf("返回数据1:\n%s\n", resp.c_str());
 
 // 	param.strkey = "file2";
-// 	MemFileOperation::CFile file2("E:/svn/setup/acl-v3.1.3.zip"); // 待上传文件
+// 	Operation::CFile file2("E:/svn/setup/acl-v3.1.3.zip"); // 待上传文件
 // 	param.value = &file2;
 // 	sprintf(param.fileinfo.szfilename, "*.zip");
 // 	slist.push_back(param);
@@ -291,7 +291,7 @@ void testUpload()
 #endif
 
 	param.strkey = "file1";
-	MemFileOperation::CFile file1("F:/Office Professional Plus 2007_cn.7z"); // 待上传文件
+	Operation::CFile file1("F:/Office Professional Plus 2007_cn.7z"); // 待上传文件
 	param.value = &file1;
 	sprintf(param.fileinfo.szfilename, "*.rar");
 	slist.push_back(param);
@@ -311,7 +311,7 @@ void testUpload()
 
 void onDownload(Curl::Easy * easy, double ftotal, double fnow)
 {
-	MemFileOperation::CFile* f = (MemFileOperation::CFile *)easy->GetOperation();
+	Operation::CFile* f = (Operation::CFile *)easy->GetOperation();
 	std::string path = f->MFPath();
 	int pos;
 	pos = path.find_last_of('\\');

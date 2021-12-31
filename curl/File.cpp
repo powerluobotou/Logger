@@ -1,6 +1,6 @@
-#include "FileOperation.h"
+#include "File.h"
 
-namespace MemFileOperation {
+namespace Operation {
 
 	CFile::CFile(const char* pFilePath) {
 		m_stream = NULL;
