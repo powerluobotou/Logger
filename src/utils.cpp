@@ -28,7 +28,7 @@
 #include "../curl/Mem.h"
 #include "../curl/File.h"
 
-#include "../mymd5.h"
+#include "mymd5.h"
 
 namespace utils {
 	
