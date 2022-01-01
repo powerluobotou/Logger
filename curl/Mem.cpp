@@ -15,37 +15,37 @@ namespace Operation {
 		return buffer_.size() > 0;
 	}
 
-    bool CMemory::IsFile() {
-        return false;
-    }
+	bool CMemory::IsFile() {
+		return false;
+	}
 
 	bool CMemory::Close() {
 		return true;
 	}
 
 	int CMemory::Eof() {
-		return pos_ == buffer_.size() ?  -1 : 0 ;
+		return pos_ == buffer_.size() ? -1 : 0;
 	}
 
 	int CMemory::Getc() {
 		int nget = 0;
-		if ( 0 == Read( &nget, sizeof(char), 1) ) {
+		if (0 == Read(&nget, sizeof(char), 1)) {
 			return EOF;
 		}
 		return nget;
 	}
 
-	int CMemory::GetPos( fpos_t * pos ) {
-		#if WIN32
-		*pos = pos_;
-		#else
-		 pos->__pos = pos_;
-		#endif
+	int CMemory::GetPos(fpos_t* pos) {
+#if WIN32
+		* pos = pos_;
+#else
+		pos->__pos = pos_;
+#endif
 		return 0;
 	}
 
-	char * CMemory::Gets( char * str, int num ) {
-		char * szReadBuffer = 0;
+	char* CMemory::Gets(char* str, int num) {
+		char* szReadBuffer = 0;
 		do {
 			if (!str || pos_ >= buffer_.size()) {
 				break;
@@ -59,19 +59,19 @@ namespace Operation {
 				unReaded = buffer_.size() - pos_;
 			}
 
-			if ( 0 == unReaded ) {
+			if (0 == unReaded) {
 				break;
 			}
 
 			size_t index = 0;
 			szReadBuffer = str;
-			for (;index < unReaded; index++) {
+			for (; index < unReaded; index++) {
 				memcpy(szReadBuffer + index, buffer_.data() + pos_ + index, 1);
-				if ( '\n' == *(buffer_.data() + pos_ + index) ) {
-					break; 
+				if ('\n' == *(buffer_.data() + pos_ + index)) {
+					break;
 				}
 			}
-			
+
 			pos_ += index;
 		} while (0);
 
@@ -83,69 +83,69 @@ namespace Operation {
 		return true;
 	}
 
-	int CMemory::Putc( int character ) {
+	int CMemory::Putc(int character) {
 		size_t unCount = sizeof(character);
-		Write( &character, sizeof(char), unCount );
+		Write(&character, sizeof(char), unCount);
 		return 0;
 	}
 
-	int CMemory::Puts( const char * str ) {
+	int CMemory::Puts(const char* str) {
 		size_t unCount = strlen(str);
-		Write( str, sizeof(char), unCount );
+		Write(str, sizeof(char), unCount);
 		return 0;
 	}
 
-	size_t CMemory::Read( void * ptr, size_t size, size_t count ) {
+	size_t CMemory::Read(void* ptr, size_t size, size_t count) {
 
 		unsigned int unReaded = 0;
 		do {
-			if ( !ptr || pos_ >= buffer_.size() ) {
+			if (!ptr || pos_ >= buffer_.size()) {
 				break;
 			}
 
 			unsigned int unNeedRead = size * count;
-			if ( pos_ + unNeedRead <= buffer_.size() ) {
+			if (pos_ + unNeedRead <= buffer_.size()) {
 				unReaded = unNeedRead;
 			}
 			else {
 				unReaded = buffer_.size() - pos_;
 			}
 
-			if ( 0 == unReaded ) {
+			if (0 == unReaded) {
 				break;
 			}
 
 			memcpy(ptr, buffer_.data() + pos_, unReaded);
 			pos_ += unReaded;
 		} while (0);
-		
+
 		return unReaded;
 	}
 
-	int CMemory::Seek( long offset, int origin ) {
-		
+	int CMemory::Seek(long offset, int origin) {
+
 		int nRet = EOF;
-		if ( offset >= 0 ) {
-			if ( SEEK_CUR == origin ) {
+		if (offset >= 0) {
+			if (SEEK_CUR == origin) {
 				pos_ = pos_ + offset;
 				nRet = 0;
 			}
-			else if ( SEEK_SET == origin ) {
+			else if (SEEK_SET == origin) {
 				pos_ = offset;
 				nRet = 0;
 			}
-            else if (SEEK_END == origin) {
-                pos_ =  buffer_.size() + offset;
-                nRet = 0;
-            }
+			else if (SEEK_END == origin) {
+				pos_ = buffer_.size() + offset;
+				nRet = 0;
+			}
 		}
 		else {
-			if ( SEEK_CUR == origin) {
+			if (SEEK_CUR == origin) {
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4018)
 #endif
-				if ( pos_ > abs(offset) ) {
+				if (pos_ > abs(offset)) {
 					pos_ = pos_ - abs(offset);
 					nRet = 0;
 				}
@@ -153,29 +153,29 @@ namespace Operation {
 #pragma warning(pop) 
 #endif
 			}
-            else if ( SEEK_CUR == origin || SEEK_END == origin ) {
+			else if (SEEK_CUR == origin || SEEK_END == origin) {
 #ifdef WIN32				
 #pragma warning(push)
 #pragma warning(disable:4018)
 #endif
-                if ( buffer_.size() > abs(offset) ) {
-                    pos_ = buffer_.size() - abs(offset);
-                    nRet = 0;
-                }
-                else {
-                    pos_ = 0;
-                }
+				if (buffer_.size() > abs(offset)) {
+					pos_ = buffer_.size() - abs(offset);
+					nRet = 0;
+				}
+				else {
+					pos_ = 0;
+				}
 #ifdef WIN32				
 #pragma warning(pop) 
 #endif
-            }
+			}
 		}
 		return nRet;
 
 	}
 
-	int CMemory::Setpos( const fpos_t * pos ) {
-		
+	int CMemory::Setpos(const fpos_t* pos) {
+
 #ifdef WIN32			
 #pragma warning(push)
 #pragma warning(disable:4244)
@@ -184,9 +184,9 @@ namespace Operation {
 #ifdef WIN32
 		pos_ = *pos;
 #else
-	   pos_ =pos->__pos; 
+		pos_ = pos->__pos;
 #endif
-		
+
 #ifdef WIN32			
 #pragma warning(pop) 
 #endif
@@ -197,28 +197,28 @@ namespace Operation {
 		return pos_;
 	}
 
-	size_t CMemory::Write( const void * ptr, size_t size, size_t count ) {
-		
+	size_t CMemory::Write(const void* ptr, size_t size, size_t count) {
+
 		size_t unWritten = 0;
 		do {
 			size_t unNeedWrite = size * count;
-			if ( 0 == unNeedWrite ) {
+			if (0 == unNeedWrite) {
 				break;
 			}
 
 			size_t unRealPos = pos_;
-			if ( unRealPos > buffer_.size() ) {
+			if (unRealPos > buffer_.size()) {
 				unRealPos = buffer_.size();
 			}
 
-			size_t unOriCount = buffer_.size(); 
-			if ( unRealPos + unNeedWrite > unOriCount ) {
-				buffer_.resize( unRealPos + unNeedWrite );
+			size_t unOriCount = buffer_.size();
+			if (unRealPos + unNeedWrite > unOriCount) {
+				buffer_.resize(unRealPos + unNeedWrite);
 			}
 
-			void* pDest = (void *)memcpy(buffer_.data() + unRealPos, (char*)ptr, unNeedWrite );
-			if ( (void *)-1 == pDest ) {
-				buffer_.resize( unOriCount );
+			void* pDest = (void*)memcpy(buffer_.data() + unRealPos, (char*)ptr, unNeedWrite);
+			if ((void*)-1 == pDest) {
+				buffer_.resize(unOriCount);
 			}
 			else {
 				unWritten = unNeedWrite;
@@ -233,25 +233,24 @@ namespace Operation {
 		pos_ = 0;
 	}
 
-	void CMemory::Buffer(char *buffer, size_t size)
+	void CMemory::Buffer(char* buffer, size_t size)
 	{
 		memset(buffer, 0, size);
 		memcpy(buffer, buffer_.data(), Tell());
 	}
 
-	void CMemory::Buffer(std::string & s)
+	void CMemory::Buffer(std::string& s)
 	{
 		s.clear();
-		s.append((char *)buffer_.data(), (long)Tell());
+		s.append((char*)buffer_.data(), (long)Tell());
 	}
 
 	void CMemory::Buffer(std::vector<char>& buffer) {
 	}
 
-	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : pos_(0)
-	{
-		buffer_.resize(ulLength);
-		memcpy(buffer_.data(), lpBuffer, ulLength);
+	CMemory::CMemory(void* buffer, unsigned long length) : pos_(0) {
+		buffer_.resize(length);
+		memcpy(buffer_.data(), buffer, length);
 	}
 // 
 // 

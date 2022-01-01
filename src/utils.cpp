@@ -669,6 +669,9 @@ namespace utils {
 			}
 #endif
 		}
+#ifdef WIN32			
+#pragma warning(pop) 
+#endif
 		return true;
 	}
 	

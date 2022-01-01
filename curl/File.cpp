@@ -12,11 +12,11 @@ namespace Operation {
 	CFile::~CFile() {
 		Close();
 	}
-	
+
 	bool CFile::Valid() {
 		return stream_ != NULL;
 	}
-	
+
 	bool CFile::IsFile() {
 		return true;
 	}
