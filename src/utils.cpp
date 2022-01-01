@@ -6,7 +6,7 @@
 */
 #include "../utils.h"
 #include "gettimeofday.h"
-#include <errno.h>
+#include "auth.h"
 
 #ifdef _windows_
 //#include <DbgHelp.h>
@@ -81,44 +81,6 @@ namespace utils {
 			}
 			st = st.substr(pos + 2, -1);
 		};
-	}
-
-	//initConsole
-	void initConsole() {
-#if defined(_windows_)
-		::AllocConsole();
-		::SetConsoleOutputCP(65001);
-		//setlocale(LC_ALL, "utf-8"/*"Chinese-simplified"*/);
-		HANDLE h = ::GetStdHandle(STD_OUTPUT_HANDLE);
-#if _MSC_VER > 1920
-		FILE* fp = NULL;
-		freopen_s(&fp, "CONOUT$", "w", stdout);
-#else
-		int tp = _open_osfhandle((long)h, _O_TEXT);
-		FILE* fp = _fdopen(tp, "w");
-		*stdout = *fp;
-		setvbuf(stdout, NULL, _IONBF, 0);
-#endif
-		SMALL_RECT rc = { 5,5,800,600 };
-		::SetConsoleWindowInfo(h, TRUE, &rc);
-		CONSOLE_FONT_INFOEX cfi = { 0 };
-		cfi.cbSize = sizeof(cfi);
-		cfi.dwFontSize = {0, 12};
-		cfi.FontFamily = FF_DONTCARE;
-		cfi.FontWeight = FW_NORMAL/*FW_LIGHT*/;
-		lstrcpy(cfi.FaceName, _T("SimSun"));
-		::SetCurrentConsoleFontEx(h, false, &cfi);
-		//::CloseHandle(h);
-		//::AttachConsole(GetCurrentProcessId());
-#endif
-	}
-
-	//closeConsole
-	void closeConsole() {
-#if defined(_windows_)
-		::fclose(stdout);
-		::FreeConsole();
-#endif
 	}
 
 	//gettid
@@ -412,6 +374,7 @@ namespace utils {
 	//https://www.runoob.com/cprogramming/c-standard-library-time-h.html
 	//convertUTC
 	void convertUTC(time_t const t, struct tm& tm, time_t* tp, int64_t timezone) {
+		AUTHORIZATION_CHECK;
 		switch (timezone) {
 		case MY_UTC: {
 #ifdef _windows_
@@ -500,6 +463,47 @@ namespace utils {
 		default:
 			break;
 		}
+	}
+
+	//strfTime 2021-12-31 23:59:59
+	std::string strfTime(time_t const t, int64_t timezone) {
+		struct tm tm = { 0 };
+		utils::convertUTC(t, tm, NULL, timezone);
+		char chr[256];
+		size_t n = strftime(chr, sizeof(chr), "%Y-%m-%d %H:%M:%S", &tm);
+		(void)n;
+		return chr;
+	}
+
+#ifdef _windows_
+	//strptime
+	static char* strptime(const char* s, const char* fmt, struct tm* tm) {
+		// Isn't the C++ standard lib nice? std::get_time is defined such that its
+		// format parameters are the exact same as strptime. Of course, we have to
+		// create a string stream first, and imbue it with the current C locale, and
+		// we also have to make sure we return the right things if it fails, or
+		// if it succeeds, but this is still far simpler an implementation than any
+		// of the versions in any of the C standard libraries.
+		std::istringstream input(s);
+		input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
+		input >> std::get_time(tm, fmt);
+		if (input.fail()) {
+			return nullptr;
+		}
+		return (char*)(s + input.tellg());
+	}
+#endif
+
+	//strpTime
+	time_t strpTime(char const* s, int64_t timezone) {
+		struct tm tm = { 0 };
+		strptime(s, "%Y-%m-%d %H:%M:%S", &tm);
+		//tm -> time_t
+		time_t t = mktime(&tm);
+		struct tm tm_zone = { 0 };
+		time_t t_zone = 0;
+		utils::convertUTC(t, tm_zone, &t_zone, timezone);
+		return t_zone;
 	}
 
 	namespace uuid {
@@ -792,6 +796,7 @@ namespace utils {
 	//CURLCheckVersion
 	//-1失败，退出 0成功，退出 1失败，继续
 	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb) {
+		AUTHORIZATION_CHECK;
 		MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
@@ -848,11 +853,11 @@ namespace utils {
 				std::string path = f->Path();
 				std::string::size_type pos = path.find_last_of('\\');
 				std::string filename = path.substr(pos + 1, -1);
-				TLOG_INFO("下载进度 %d%% 路径 %s", (int)((lnow / ltotal) * 100), path.c_str());
+				TLOG_INFO("下载进度 %.2f%% 路径 %s", (lnow / ltotal) * 100, path.c_str());
 				if (lnow == ltotal) {
 					f->Flush();
 					f->Close();
-					PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", path.c_str(), ltotal);
+					PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", ltotal);
 					char md5[32 + 1] = { 0 };
 					MD5Encode32(&data.front(), data.size(), md5, 0);
 					if (atol(version["size"].c_str()) == data.size() &&

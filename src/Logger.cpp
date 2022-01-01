@@ -7,6 +7,7 @@
 #include "../Logger.h"
 #include "Log.h"
 #include "../utils.h"
+#include "auth.h"
 
 namespace LOGGER {
 
@@ -32,11 +33,13 @@ namespace LOGGER {
 
 	//init
 	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
+		AUTHORIZATION_CHECK;
 		LOGGER::Log::instance()->init(dir, level, prename, logsize);
 	}
 
 	//write
 	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...) {
+		AUTHORIZATION_CHECK;
 		if (LOGGER::Log::instance()->check(level)) {
 			static size_t const PATHSZ = 512;
 			static size_t const MAXSZ = 81920;
@@ -74,6 +77,7 @@ namespace LOGGER {
 
 	//enable
 	void Logger::enable() {
+		AUTHORIZATION_CHECK;
 		LOGGER::Log::instance()->enable();
 	}
 

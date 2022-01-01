@@ -15,12 +15,6 @@ namespace utils {
 		//createUUID
 		std::string createUUID();
 	}
-	
-	//initConsole
-	void initConsole();
-
-	//closeConsole
-	void closeConsole();
 
 	//readIni
 	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
@@ -54,6 +48,12 @@ namespace utils {
 
 	//convertUTC
 	void convertUTC(time_t const t, struct tm& tm, time_t* tp = NULL, int64_t timezone = MY_CCT);
+
+	//strfTime
+	std::string strfTime(time_t const t, int64_t timezone);
+	
+	//strpTime
+	time_t strpTime(char const* s, int64_t timezone);
 
 	//timezoneInfo
 	void timezoneInfo(struct tm const& tm, int64_t timezone);

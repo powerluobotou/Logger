@@ -6,6 +6,7 @@
 */
 #include "Log.h"
 #include "../utils.h"
+#include "Console.h"
 
 #ifdef _windows_
 #include <process.h>
