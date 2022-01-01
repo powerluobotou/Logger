@@ -673,21 +673,36 @@ namespace utils {
 	}
 	
 	//replaceAll
-	void replaceAll(std::string& s, std::string const& a, std::string const& b) {
-		do {
-			std::string::size_type i = s.find(a);
-			if (i == std::string::npos) {
-				break;
-			}
-			s = s.replace(i, 1, b);
-		} while (true);
+	void replaceAll(std::string& s, std::string const& src, std::string const& dst) {
+		std::string::size_type pos = s.find(src, 0);
+		while (pos != std::string::npos) {
+			s.replace(pos, src.length(), dst);
+			//s.replace(pos, src.length(), dst, 0, dst.length());
+			pos = s.find(src, pos + dst.size());
+		}
 	}
-
-	//getModuleFilePath
-	std::string getModuleFilePath(std::string* filename) {
+	
+	//replaceEscChar
+	void replaceEscChar(std::string& s) {
+		static struct replace_t {
+			char const* src;
+			char const* dst;
+		} const chr[] = {
+			{"\\r","\r"},
+			{"\\n","\n"},
+			{"\\t","\t"},
+		};
+		static int const n = sizeof(chr) / sizeof(chr[0]);
+		for (int i = 0; i < n; ++i) {
+			replaceAll(s, chr[i].src, chr[i].dst);
+		}
+	}
+	
+	//GetModulePath
+	std::string GetModulePath(std::string* filename) {
 		char chr[512];
 #ifdef _windows_
-		::GetModuleFileNameA(NULL, chr, sizeof(chr));
+		::GetModuleFileNameA(NULL/*(HMODULE)GetModuleHandle(NULL)*/, chr, sizeof(chr));
 #else
 		char link[100];
 		snprintf(link, sizeof(link), "/proc/%d/exe", getpid());
@@ -723,12 +738,8 @@ namespace utils {
 		char date[256];
 		snprintf(date, sizeof(date), "_%04d-%02d-%02d_%02d_%02d_%02d",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-		char chr[512];
-		::GetModuleFileNameA((HMODULE)GetModuleHandle(NULL), chr, sizeof(chr));
-		std::string s(chr);
-		std::string::size_type pos = s.find_last_of('\\');
-		std::string path = s.substr(0, pos);
-		std::string filename = s.substr(pos + 1, -1);
+		std::string filename;
+		std::string path = utils::GetModulePath(&filename);
 		std::string prefix = filename.substr(0, filename.find_last_of('.'));
 		std::string df(path);
 		df += "\\" + prefix + date;
@@ -776,43 +787,38 @@ namespace utils {
 	}
 
 	//CURLCheckVersion
-	//-1失败，退出进程 0成功，退出进程 1失败，登陆旧版
+	//-1失败，退出 0成功，退出 1失败，继续
 	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb) {
 		MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
-		std::string setupFilename = url.substr(pos + 1, -1);
-		std::string downloadpath = utils::getModuleFilePath() + "/download";
-		std::string setuppath = downloadpath + "/";
-		utils::mkDir(setuppath.c_str());
-		setuppath += setupFilename;
-		Operation::CFile f(setuppath.c_str());
+		std::string filename = url.substr(pos + 1, -1);
+		std::string path = utils::GetModulePath() + "/download";
+		utils::mkDir(path.c_str());
+		path += "/" + filename;
+		Operation::CFile f(path.c_str());
 		if (f.isValid()) {
 			std::vector<char> data;
 			f.MFBuffer(data);
 			f.MFClose();
-			PLOG_DEBUG("安装包已存在! 共 %d 字节，正在校验...", data.size());
+			PLOG_DEBUG("安装包已存在! 共 %d 字节，准备校验...", data.size());
 			if (data.size() > 0) {
 				char md5[32 + 1] = { 0 };
 				MD5Encode32(&data.front(), data.size(), md5, 0);
-				std::string md5key(md5);
 				if (atol(version["size"].c_str()) == data.size() &&
-					strncasecmp(md5key.c_str(), version["md5"].c_str(), md5key.length()) == 0) {
-					PLOG_DEBUG("校验成功，启动安装新版本程序包...");
+					strncasecmp(md5, version["md5"].c_str(), strlen(md5)) == 0) {
+					PLOG_DEBUG("校验成功，开始安装新版程序包...");
 					std::string content = version["context"];
-					utils::replaceAll(content, "\\n","\n");
-					utils::replaceAll(content, "\\t", "\t");
-					utils::replaceAll(content, "n", "");
-					utils::replaceAll(content, "t", "");
+					utils::replaceEscChar(content);
 					PLOG_WARN("*******************************************");
 					//PLOG_WARN(content.c_str(), m["no"].c_str());
 					PLOG_WARN(content.c_str());
 					PLOG_WARN("*******************************************");
-					//::WinExec(setuppath.c_str(), SW_SHOWMAXIMIZED);
-					::ShellExecuteA(NULL, "open", setuppath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+					//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
+					::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 					xsleep(10000);
 					LOG_CONSOLE_CLOSE();
-					cb(0);//成功，退出进程
+					cb(0);//成功，退出
 				}
 			}
 			TLOG_DEBUG("校验失败，重新下载安装包... %s", url.c_str());
@@ -824,7 +830,7 @@ namespace utils {
 		Curl::Client req(true);
 		if (req.download(
 			url.c_str(),
-			setuppath.c_str(),
+			path.c_str(),
 			[&](Curl::Easy* easy, void* buffer, size_t size, size_t nmemb) -> size_t {
 				size_t n = easy->Write(buffer, size, nmemb);
 				if (n > 0) {
@@ -839,44 +845,40 @@ namespace utils {
 				std::string path = f->MFPath();
 				std::string::size_type pos = path.find_last_of('\\');
 				std::string filename = path.substr(pos + 1, -1);
-				PLOG_INFO("下载进度 %d%% 路径 %s", (int)((lnow / ltotal) * 100), setuppath.c_str());
+				TLOG_INFO("下载进度 %d%% 路径 %s", (int)((lnow / ltotal) * 100), path.c_str());
 				if (lnow == ltotal) {
 					f->MFFlush();
 					f->MFClose();
-					PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验MD5...", setuppath.c_str(), ltotal);
+					PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", path.c_str(), ltotal);
 					char md5[32 + 1] = { 0 };
 					MD5Encode32(&data.front(), data.size(), md5, 0);
-					std::string md5key(md5);
 					if (atol(version["size"].c_str()) == data.size() &&
-						strncasecmp(md5key.c_str(), version["md5"].c_str(), md5key.length()) == 0) {
-						PLOG_DEBUG("校验成功，启动安装新版本程序包...");
+						strncasecmp(md5, version["md5"].c_str(), strlen(md5)) == 0) {
+						PLOG_DEBUG("校验成功，开始安装新版程序包...");
 						std::string content = version["context"];
-						utils::replaceAll(content, "\\n", "\n");
-						utils::replaceAll(content, "\\t", "\t");
-						utils::replaceAll(content, "n", "");
-						utils::replaceAll(content, "t", "");
+						utils::replaceEscChar(content);
 						PLOG_WARN("*******************************************");
 						//PLOG_WARN(content.c_str(), version["no"].c_str());
 						PLOG_WARN(content.c_str());
 						PLOG_WARN("*******************************************");
-						//::WinExec(setuppath.c_str(), SW_SHOWMAXIMIZED);
-						::ShellExecuteA(NULL, "open", setuppath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+						//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
+						::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 						xsleep(10000);
 						LOG_CONSOLE_CLOSE();
-						cb(0);//成功，退出进程
+						cb(0);//成功，退出
 					}
 					else {
 						PLOG_ERROR("校验失败，请检查安装包[版本号/大小/MD5值]\n");
 						xsleep(10000);
 						LOG_CONSOLE_CLOSE();
-						cb(1);//失败，登陆旧版
+						cb(1);//失败，继续
 					}
 				}
 			}, NULL, false, stdout)) {
-			PLOG_ERROR("更新失败，文件可能被占用，请关闭安装程序后重试");
+			PLOG_ERROR("更新失败，下载包可能被占用，请关闭后重试");
 			xsleep(10000);
 			LOG_CONSOLE_CLOSE();
-			cb(-1);//失败，退出进程
+			cb(-1);//失败，退出
 		}
 		MY_CATCH();
 	}

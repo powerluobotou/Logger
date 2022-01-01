@@ -26,10 +26,13 @@ namespace utils {
 	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
 
 	//replaceAll
-	void replaceAll(std::string& s, std::string const& a, std::string const& b);
+	void replaceAll(std::string& s, std::string const& src, std::string const& dst);
+	
+	//replaceEscChar
+	void replaceEscChar(std::string& s);
 
-	//getModuleFilePath
-	std::string getModuleFilePath(std::string* filename = NULL);
+	//GetModulePath
+	std::string GetModulePath(std::string* filename = NULL);
 
 	//mkDir
 	bool mkDir(char const* dir);
@@ -77,7 +80,7 @@ namespace utils {
 	unsigned int now_ms();
 
 	//CURLCheckVersion
-	//-1失败，退出进程 0成功，退出进程 1失败，登陆旧版
+	//-1失败，退出 0成功，退出 1失败，继续
 	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb);
 }
 
