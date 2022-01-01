@@ -37,9 +37,19 @@ namespace Operation {
 			}
 			return 0;
 		}
+		void Buffer(char* buffer, size_t size) {
+			if (op_) {
+				op_->Buffer(buffer, size);
+			}
+		}
 		void GetBuffer(std::string & s) {
 			if (op_) {
-				return op_->Buffer(s);
+				op_->Buffer(s);
+			}
+		}
+		void GetBuffer(std::vector<char>& buffer) {
+			if (op_) {
+				op_->Buffer(buffer);
 			}
 		}
 		void SetOperation(IOperation* op){ op_ = op;};
