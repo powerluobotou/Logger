@@ -34,6 +34,7 @@ namespace utils {
 	
 	//readIni
 	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini) {
+		AUTHORIZATION_CHECK;
 		ini.clear();
 		std::string st(buf);
 		std::string field;
@@ -123,6 +124,7 @@ namespace utils {
 
 	//stack_backtrace
 	std::string stack_backtrace() {
+		AUTHORIZATION_CHECK_S;
 		/*
 			windows
 				SymInitialize
@@ -467,6 +469,7 @@ namespace utils {
 
 	//strfTime 2021-12-31 23:59:59
 	std::string strfTime(time_t const t, int64_t timezone) {
+		AUTHORIZATION_CHECK_S;
 		struct tm tm = { 0 };
 		utils::convertUTC(t, tm, NULL, timezone);
 		char chr[256];
@@ -496,6 +499,7 @@ namespace utils {
 
 	//strpTime
 	time_t strpTime(char const* s, int64_t timezone) {
+		AUTHORIZATION_CHECK_P;
 		struct tm tm = { 0 };
 		strptime(s, "%Y-%m-%d %H:%M:%S", &tm);
 		//tm -> time_t
@@ -513,6 +517,7 @@ namespace utils {
 		static std::uniform_int_distribution<> dis2(8, 11);
 		//createUUID
 		std::string createUUID() {
+			AUTHORIZATION_CHECK_S;
 			std::stringstream ss;
 			int i;
 			ss << std::hex;
@@ -542,6 +547,7 @@ namespace utils {
 
 	//ws2str
 	std::string ws2str(std::wstring const& ws) {
+		AUTHORIZATION_CHECK_S;
 #ifdef _windows_
 		_bstr_t const t = ws.c_str();
 		return (char const*const)t;
@@ -565,6 +571,7 @@ namespace utils {
 	//https://blog.csdn.net/u012234115/article/details/83186386
 	//gbk2UTF8
 	std::string gbk2UTF8(const char* gbk, size_t len) {
+		AUTHORIZATION_CHECK_S;
 #ifdef _windows_
 		size_t length = MultiByteToWideChar(CP_ACP, 0, gbk, -1, NULL, 0);
 		wchar_t* wc = new wchar_t[length + 1];
@@ -586,6 +593,7 @@ namespace utils {
 
 	//utf82GBK
 	std::string utf82GBK(char const* utf8, size_t len) {
+		AUTHORIZATION_CHECK_S;
 #ifdef _windows_
 		size_t length = ::MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
 		wchar_t* wc = new wchar_t[length + 1];
@@ -608,6 +616,7 @@ namespace utils {
 	//https://www.its404.com/article/sinolover/112461377
 	//is_utf8
 	bool is_utf8(char const* str, size_t len) {
+		AUTHORIZATION_CHECK_B;
 		bool isUTF8 = true;
 		unsigned char* start = (unsigned char*)str;
 		unsigned char* end = (unsigned char*)str + len;
@@ -681,6 +690,7 @@ namespace utils {
 	
 	//replaceAll
 	void replaceAll(std::string& s, std::string const& src, std::string const& dst) {
+		AUTHORIZATION_CHECK;
 		std::string::size_type pos = s.find(src, 0);
 		while (pos != std::string::npos) {
 			s.replace(pos, src.length(), dst);
@@ -707,6 +717,7 @@ namespace utils {
 	
 	//GetModulePath
 	std::string GetModulePath(std::string* filename) {
+		AUTHORIZATION_CHECK_S;
 		char chr[512];
 #ifdef _windows_
 		::GetModuleFileNameA(NULL/*(HMODULE)GetModuleHandle(NULL)*/, chr, sizeof(chr));
@@ -730,6 +741,7 @@ namespace utils {
 #ifdef _windows_
 	//crashCallback
 	static long _stdcall crashCallback(EXCEPTION_POINTERS* excp) {
+		AUTHORIZATION_CHECK_P;
 		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
 		LOG_FATAL_SYN(
 			"\nExceptionCode:%d" \
@@ -782,6 +794,7 @@ namespace utils {
 
 	//enableCrashDump
 	void enableCrashDump() {
+		AUTHORIZATION_CHECK;
 #ifdef _windows_
 		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)crashCallback);
 #endif
@@ -789,6 +802,7 @@ namespace utils {
 
 	//now_ms
 	unsigned int now_ms() {
+		AUTHORIZATION_CHECK_P;
 		//自开机经过的毫秒数
 		return gettime() * 1000;
 	}

@@ -27,7 +27,22 @@ namespace utils {
 		return; \
 	}
 
-#define AUTHORIZATION_CHECK_R \
+#define AUTHORIZATION_CHECK_B \
 	if (!utils::authCheck()) { \
 		return false; \
+	}
+
+#define AUTHORIZATION_CHECK_P \
+	if (!utils::authCheck()) { \
+		return NULL; \
+	}
+
+#define AUTHORIZATION_CHECK_I \
+	if (!utils::authCheck()) { \
+		return -1; \
+	}
+
+#define AUTHORIZATION_CHECK_S \
+	if (!utils::authCheck()) { \
+		return ""; \
 	}
