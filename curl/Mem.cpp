@@ -4,7 +4,7 @@
 namespace Operation {
 
 	CMemory::CMemory() {
-		currentPos_ = 0;
+		pos_ = 0;
 		buffer_.clear();
 	}
 
@@ -24,7 +24,7 @@ namespace Operation {
 	}
 
 	int CMemory::Eof() {
-		return currentPos_ == buffer_.size() ?  -1 : 0 ;
+		return pos_ == buffer_.size() ?  -1 : 0 ;
 	}
 
 	int CMemory::Getc() {
@@ -37,9 +37,9 @@ namespace Operation {
 
 	int CMemory::GetPos( fpos_t * pos ) {
 		#if WIN32
-		*pos = currentPos_;
+		*pos = pos_;
 		#else
-		 pos->__pos = currentPos_;
+		 pos->__pos = pos_;
 		#endif
 		return 0;
 	}
@@ -47,16 +47,16 @@ namespace Operation {
 	char * CMemory::Gets( char * str, int num ) {
 		char * szReadBuffer = 0;
 		do {
-			if (!str || currentPos_ >= buffer_.size()) {
+			if (!str || pos_ >= buffer_.size()) {
 				break;
 			}
 
 			size_t unReaded = 0;
-			if (currentPos_ + num <= buffer_.size()) {
+			if (pos_ + num <= buffer_.size()) {
 				unReaded = num;
 			}
 			else {
-				unReaded = buffer_.size() - currentPos_;
+				unReaded = buffer_.size() - pos_;
 			}
 
 			if ( 0 == unReaded ) {
@@ -66,20 +66,20 @@ namespace Operation {
 			size_t index = 0;
 			szReadBuffer = str;
 			for (;index < unReaded; index++) {
-				memcpy(szReadBuffer + index, buffer_.data() + currentPos_ + index, 1);
-				if ( '\n' == *(buffer_.data() + currentPos_ + index) ) {
+				memcpy(szReadBuffer + index, buffer_.data() + pos_ + index, 1);
+				if ( '\n' == *(buffer_.data() + pos_ + index) ) {
 					break; 
 				}
 			}
 			
-			currentPos_ += index;
+			pos_ += index;
 		} while (0);
 
 		return szReadBuffer;
 	}
 
 	bool CMemory::Open(Mode mode) {
-		currentPos_ = 0;
+		pos_ = 0;
 		return true;
 	}
 
@@ -99,24 +99,24 @@ namespace Operation {
 
 		unsigned int unReaded = 0;
 		do {
-			if ( !ptr || currentPos_ >= buffer_.size() ) {
+			if ( !ptr || pos_ >= buffer_.size() ) {
 				break;
 			}
 
 			unsigned int unNeedRead = size * count;
-			if ( currentPos_ + unNeedRead <= buffer_.size() ) {
+			if ( pos_ + unNeedRead <= buffer_.size() ) {
 				unReaded = unNeedRead;
 			}
 			else {
-				unReaded = buffer_.size() - currentPos_;
+				unReaded = buffer_.size() - pos_;
 			}
 
 			if ( 0 == unReaded ) {
 				break;
 			}
 
-			memcpy(ptr, buffer_.data() + currentPos_, unReaded);
-			currentPos_ += unReaded;
+			memcpy(ptr, buffer_.data() + pos_, unReaded);
+			pos_ += unReaded;
 		} while (0);
 		
 		return unReaded;
@@ -127,15 +127,15 @@ namespace Operation {
 		int nRet = EOF;
 		if ( offset >= 0 ) {
 			if ( SEEK_CUR == origin ) {
-				currentPos_ = currentPos_ + offset;
+				pos_ = pos_ + offset;
 				nRet = 0;
 			}
 			else if ( SEEK_SET == origin ) {
-				currentPos_ = offset;
+				pos_ = offset;
 				nRet = 0;
 			}
             else if (SEEK_END == origin) {
-                currentPos_ =  buffer_.size() + offset;
+                pos_ =  buffer_.size() + offset;
                 nRet = 0;
             }
 		}
@@ -145,8 +145,8 @@ namespace Operation {
 #pragma warning(push)
 #pragma warning(disable:4018)
 #endif
-				if ( currentPos_ > abs(offset) ) {
-					currentPos_ = currentPos_ - abs(offset);
+				if ( pos_ > abs(offset) ) {
+					pos_ = pos_ - abs(offset);
 					nRet = 0;
 				}
 #ifdef WIN32				
@@ -159,11 +159,11 @@ namespace Operation {
 #pragma warning(disable:4018)
 #endif
                 if ( buffer_.size() > abs(offset) ) {
-                    currentPos_ = buffer_.size() - abs(offset);
+                    pos_ = buffer_.size() - abs(offset);
                     nRet = 0;
                 }
                 else {
-                    currentPos_ = 0;
+                    pos_ = 0;
                 }
 #ifdef WIN32				
 #pragma warning(pop) 
@@ -182,9 +182,9 @@ namespace Operation {
 #endif
 
 #ifdef WIN32
-		currentPos_ = *pos;
+		pos_ = *pos;
 #else
-	   currentPos_ =pos->__pos; 
+	   pos_ =pos->__pos; 
 #endif
 		
 #ifdef WIN32			
@@ -194,7 +194,7 @@ namespace Operation {
 	}
 
 	long CMemory::Tell() {
-		return currentPos_;
+		return pos_;
 	}
 
 	size_t CMemory::Write( const void * ptr, size_t size, size_t count ) {
@@ -206,7 +206,7 @@ namespace Operation {
 				break;
 			}
 
-			size_t unRealPos = currentPos_;
+			size_t unRealPos = pos_;
 			if ( unRealPos > buffer_.size() ) {
 				unRealPos = buffer_.size();
 			}
@@ -223,14 +223,14 @@ namespace Operation {
 			else {
 				unWritten = unNeedWrite;
 				unRealPos += unWritten;
-				currentPos_ = unRealPos;
+				pos_ = unRealPos;
 			}
 		} while (0);
 		return unWritten;
 	}
 
 	void CMemory::Rewind() {
-		currentPos_ = 0;
+		pos_ = 0;
 	}
 
 	void CMemory::Buffer(char *buffer, size_t size)
@@ -248,7 +248,7 @@ namespace Operation {
 	void CMemory::Buffer(std::vector<char>& buffer) {
 	}
 
-	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : currentPos_(0)
+	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : pos_(0)
 	{
 		buffer_.resize(ulLength);
 		memcpy(buffer_.data(), lpBuffer, ulLength);
@@ -268,19 +268,19 @@ namespace Operation {
 // 				break;
 // 			}
 // 
-// 			if ( currentPos_ + ulNumberOfBytesToRead <= buffer_.GetCount() ) {
+// 			if ( pos_ + ulNumberOfBytesToRead <= buffer_.GetCount() ) {
 // 				dwReaded = ulNumberOfBytesToRead;
 // 			}
 // 			else {
-// 				dwReaded = (unsigned long)buffer_.GetCount() - currentPos_;
+// 				dwReaded = (unsigned long)buffer_.GetCount() - pos_;
 // 			}
 // 
 // 			if ( 0 == dwReaded ) {
 // 				break;
 // 			}
 // 
-// 			memcpy(lpBuffer, buffer_.GetData() + currentPos_, dwReaded);
-// 			currentPos_ += dwReaded;
+// 			memcpy(lpBuffer, buffer_.GetData() + pos_, dwReaded);
+// 			pos_ += dwReaded;
 // 
 // 			if ( lpNumberOfBytesRead ) {
 // 				*lpNumberOfBytesRead = dwReaded;
@@ -302,12 +302,12 @@ namespace Operation {
 // 				break;
 // 			}
 // 
-// 			if ( currentPos_ + ulNumberOfBytesToWrite > buffer_.GetCount() ) {
-// 				buffer_.SetCount(currentPos_ + ulNumberOfBytesToWrite);
+// 			if ( pos_ + ulNumberOfBytesToWrite > buffer_.GetCount() ) {
+// 				buffer_.SetCount(pos_ + ulNumberOfBytesToWrite);
 // 			}
 // 
-// 			memcpy(buffer_.GetData() + currentPos_, lpBuffer, dwWritten);
-// 			currentPos_ += dwWritten;
+// 			memcpy(buffer_.GetData() + pos_, lpBuffer, dwWritten);
+// 			pos_ += dwWritten;
 // 
 // 			if ( lpNumberOfBytesWritten ) {
 // 				*lpNumberOfBytesWritten = dwWritten;
@@ -326,16 +326,16 @@ namespace Operation {
 // 		do {
 // 			if ( FILE_CURRENT == origin ) {
 // 				if ( offset > 0 ) {
-// 					if ( currentPos_ + offset < buffer_.GetCount() ) {
-// 						currentPos_ += offset;
+// 					if ( pos_ + offset < buffer_.GetCount() ) {
+// 						pos_ += offset;
 // 					}
 // 					else {
 // 						break;
 // 					}
 // 				}
 // 				else {
-// 					if (currentPos_ >= offset) {
-// 						currentPos_ += offset;
+// 					if (pos_ >= offset) {
+// 						pos_ += offset;
 // 					}
 // 					else {
 // 						break;
@@ -350,7 +350,7 @@ namespace Operation {
 // 				if ( buffer_.GetCount() + offset < 0 ) {
 // 					break;
 // 				}
-// 				currentPos_ = (unsigned long)buffer_.GetCount() + offset;
+// 				pos_ = (unsigned long)buffer_.GetCount() + offset;
 // 			}
 // 			else if (FILE_BEGIN == origin) {
 // 				if ( offset < 0 ) {
@@ -361,11 +361,11 @@ namespace Operation {
 // 					break;
 // 				}
 // 
-// 				currentPos_ = offset;
+// 				pos_ = offset;
 // 			}
 // 		} while (0);
 // 
-// 		return currentPos_;
+// 		return pos_;
 // 	}
 // 
 // 	bool CMemory::Close() {
