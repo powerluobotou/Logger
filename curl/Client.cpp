@@ -318,7 +318,7 @@ void testUpload()
 void onDownload(Curl::Easy * easy, double ftotal, double fnow)
 {
 	Operation::CFile* f = (Operation::CFile *)easy->GetOperation();
-	std::string path = f->MFPath();
+	std::string path = f->Path();
 	int pos;
 	pos = path.find_last_of('\\');
 	std::string filename = path.substr(pos + 1, -1);

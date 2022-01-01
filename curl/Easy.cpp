@@ -87,7 +87,7 @@ namespace Curl {
 			fread(buffer, size, nmemb, (FILE *)stream) : 0;
 #else
 		return stream ? 
-			((Operation::IOperation *)stream)->MFRead(buffer, size, nmemb) : 0;
+			((Operation::IOperation *)stream)->Read(buffer, size, nmemb) : 0;
 #endif
 	}
 
@@ -539,9 +539,9 @@ namespace Curl {
 	}
 
 	bool Easy::formAdd(CURL *curl, FMParam const& param) {
-		param.value->MFSeek(0L, SEEK_END);
-		size_t size = param.value->MFTell();
-		param.value->MFSeek(0L, SEEK_SET);
+		param.value->Seek(0L, SEEK_END);
+		size_t size = param.value->Tell();
+		param.value->Seek(0L, SEEK_SET);
 
 		//multipart/form-data
 		return CURLE_OK == ::curl_formadd(&formpost_,

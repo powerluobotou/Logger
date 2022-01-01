@@ -11,7 +11,7 @@ namespace Operation {
 	CMemory::~CMemory() {
 	}
 
-	bool CMemory::isValid() {
+	bool CMemory::Valid() {
 		return m_buffer.size() > 0;
 	}
 
@@ -19,23 +19,23 @@ namespace Operation {
         return false;
     }
 
-	bool CMemory::MFClose() {
+	bool CMemory::Close() {
 		return true;
 	}
 
-	int CMemory::MFEof() {
+	int CMemory::Eof() {
 		return m_ulCurrentPos == m_buffer.size() ?  -1 : 0 ;
 	}
 
-	int CMemory::MFGetc() {
+	int CMemory::Getc() {
 		int nget = 0;
-		if ( 0 == MFRead( &nget, sizeof(char), 1) ) {
+		if ( 0 == Read( &nget, sizeof(char), 1) ) {
 			return EOF;
 		}
 		return nget;
 	}
 
-	int CMemory::MFGetPos( fpos_t * pos ) {
+	int CMemory::GetPos( fpos_t * pos ) {
 		#if WIN32
 		*pos = m_ulCurrentPos;
 		#else
@@ -44,7 +44,7 @@ namespace Operation {
 		return 0;
 	}
 
-	char * CMemory::MFGets( char * str, int num ) {
+	char * CMemory::Gets( char * str, int num ) {
 		char * szReadBuffer = 0;
 		do {
 			if (!str || m_ulCurrentPos >= m_buffer.size()) {
@@ -78,24 +78,24 @@ namespace Operation {
 		return szReadBuffer;
 	}
 
-	bool CMemory::MFOpen(Mode mode) {
+	bool CMemory::Open(Mode mode) {
 		m_ulCurrentPos = 0;
 		return true;
 	}
 
-	int CMemory::MFPutc( int character ) {
+	int CMemory::Putc( int character ) {
 		size_t unCount = sizeof(character);
-		MFWrite( &character, sizeof(char), unCount );
+		Write( &character, sizeof(char), unCount );
 		return 0;
 	}
 
-	int CMemory::MFPuts( const char * str ) {
+	int CMemory::Puts( const char * str ) {
 		size_t unCount = strlen(str);
-		MFWrite( str, sizeof(char), unCount );
+		Write( str, sizeof(char), unCount );
 		return 0;
 	}
 
-	size_t CMemory::MFRead( void * ptr, size_t size, size_t count ) {
+	size_t CMemory::Read( void * ptr, size_t size, size_t count ) {
 
 		unsigned int unReaded = 0;
 		do {
@@ -122,7 +122,7 @@ namespace Operation {
 		return unReaded;
 	}
 
-	int CMemory::MFSeek( long offset, int origin ) {
+	int CMemory::Seek( long offset, int origin ) {
 		
 		int nRet = EOF;
 		if ( offset >= 0 ) {
@@ -174,7 +174,7 @@ namespace Operation {
 
 	}
 
-	int CMemory::MFSetpos( const fpos_t * pos ) {
+	int CMemory::Setpos( const fpos_t * pos ) {
 		
 #ifdef WIN32			
 #pragma warning(push)
@@ -193,11 +193,11 @@ namespace Operation {
 		return 0;
 	}
 
-	long CMemory::MFTell() {
+	long CMemory::Tell() {
 		return m_ulCurrentPos;
 	}
 
-	size_t CMemory::MFWrite( const void * ptr, size_t size, size_t count ) {
+	size_t CMemory::Write( const void * ptr, size_t size, size_t count ) {
 		
 		size_t unWritten = 0;
 		do {
@@ -229,23 +229,23 @@ namespace Operation {
 		return unWritten;
 	}
 
-	void CMemory::MFRewind() {
+	void CMemory::Rewind() {
 		m_ulCurrentPos = 0;
 	}
 
-	void CMemory::MFBuffer(char *buffer, size_t size)
+	void CMemory::Buffer(char *buffer, size_t size)
 	{
 		memset(buffer, 0, size);
-		memcpy(buffer, m_buffer.data(), MFTell());
+		memcpy(buffer, m_buffer.data(), Tell());
 	}
 
-	void CMemory::MFBuffer(std::string & s)
+	void CMemory::Buffer(std::string & s)
 	{
 		s.clear();
-		s.append((char *)m_buffer.data(), (long)MFTell());
+		s.append((char *)m_buffer.data(), (long)Tell());
 	}
 
-	void CMemory::MFBuffer(std::vector<char>& buffer) {
+	void CMemory::Buffer(std::vector<char>& buffer) {
 	}
 
 	CMemory::CMemory( void* lpBuffer, unsigned long ulLength ) : m_ulCurrentPos(0)
@@ -255,11 +255,11 @@ namespace Operation {
 	}
 // 
 // 
-// 	bool CMemory::MFOpen() {
+// 	bool CMemory::Open() {
 // 		return true;
 // 	}
 // 
-// 	bool CMemory::MFRead( void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead ) {
+// 	bool CMemory::Read( void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead ) {
 // 		bool bRet = false;
 // 		unsigned long dwReaded;
 // 
@@ -292,7 +292,7 @@ namespace Operation {
 // 		return bRet;
 // 	}
 // 
-// 	bool CMemory::MFWrite( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
+// 	bool CMemory::Write( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
 // 	{
 // 		bool bRet = false;
 // 		unsigned long dwWritten = ulNumberOfBytesToWrite;
@@ -319,7 +319,7 @@ namespace Operation {
 // 		return bRet;
 // 	}
 // 
-// 	unsigned long CMemory::MFSeek( long offset, int origin )
+// 	unsigned long CMemory::Seek( long offset, int origin )
 // 	{
 // 		unsigned long retval = INVALID_SET_FILE_POINTER;
 // 
@@ -368,7 +368,7 @@ namespace Operation {
 // 		return m_ulCurrentPos;
 // 	}
 // 
-// 	bool CMemory::MFClose() {
+// 	bool CMemory::Close() {
 // 		return true;
 // 	}
 // 

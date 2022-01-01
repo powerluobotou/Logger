@@ -6,45 +6,45 @@ namespace Operation {
 
 	class CSetOperation {
 	public:
-		CSetOperation(){ m_pFMOp = NULL; };
-		virtual ~CSetOperation(){};
+		CSetOperation() :op_(NULL) {}
+		virtual ~CSetOperation() {}
 	public:
         bool Open(Mode mode = Mode::M_READ) {
-            if (m_pFMOp) {
-                return m_pFMOp->MFOpen(mode);
+            if (op_) {
+                return op_->Open(mode);
             }
 			return false;
         }
 		void Flush() {
-			if (m_pFMOp) {
-				m_pFMOp->MFFlush();
+			if (op_) {
+				op_->Flush();
 			}
 		}
         void Close() {
-            if (m_pFMOp) {
-				m_pFMOp->MFClose(); 
+            if (op_) {
+				op_->Close();
             }
         }
         size_t Write( const void * ptr, size_t size, size_t count ) {
-            if (m_pFMOp) {
-                return m_pFMOp->MFWrite(ptr, size, count);
+            if (op_) {
+                return op_->Write(ptr, size, count);
             }
             return 0;
         }
 		size_t Read(void * ptr, size_t size, size_t count) {
-			if (m_pFMOp) {
-				return m_pFMOp->MFRead(ptr, size, count);
+			if (op_) {
+				return op_->Read(ptr, size, count);
 			}
 			return 0;
 		}
 		void GetBuffer(std::string & s) {
-			if (m_pFMOp) {
-				return m_pFMOp->MFBuffer(s);
+			if (op_) {
+				return op_->Buffer(s);
 			}
 		}
-		void SetOperation(IOperation* pFMop){m_pFMOp = pFMop;};
-		IOperation* GetOperation() { return m_pFMOp; }
+		void SetOperation(IOperation* op){ op_ = op;};
+		IOperation* GetOperation() { return op_; }
     private:
-		IOperation* m_pFMOp;
+		IOperation* op_;
 	};
 }

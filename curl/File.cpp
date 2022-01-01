@@ -6,14 +6,14 @@ namespace Operation {
 	CFile::CFile(const char* pFilePath)
 		: m_stream(NULL)
 		, m_strFilePath(pFilePath) {
-		MFOpen();
+		Open();
 	}
 
 	CFile::~CFile() {
-		MFClose();
+		Close();
 	}
 	
-	bool CFile::isValid() {
+	bool CFile::Valid() {
 		return m_stream != NULL;
 	}
 	
@@ -21,10 +21,10 @@ namespace Operation {
 		return true;
 	}
 
-	void CFile::MFClearErr() {
+	void CFile::ClearErr() {
 	}
 
-	bool CFile::MFClose() {
+	bool CFile::Close() {
 		if (m_stream) {
 			fclose(m_stream);
 			m_stream = NULL;
@@ -32,7 +32,7 @@ namespace Operation {
 		return true;
 	}
 
-	int CFile::MFEof() {
+	int CFile::Eof() {
 		if (m_stream) {
 			//http://c.biancheng.net/cpp/html/2514.html
 			return feof(m_stream);
@@ -40,47 +40,47 @@ namespace Operation {
 		return 0x0010;
 	}
 
-	int CFile::MFError() {
+	int CFile::Error() {
 		if (m_stream) {
 			return ferror(m_stream);
 		}
 		return 0x0020;
 	}
 
-	int CFile::MFFlush() {
+	int CFile::Flush() {
 		if (m_stream) {
 			return fflush(m_stream);
 		}
 		return -1;
 	}
 
-	int CFile::MFGetc() {
+	int CFile::Getc() {
 		if (m_stream) {
 			return fgetc(m_stream);
 		}
 		return -1;
 	}
 
-	int CFile::MFGetPos(fpos_t* pos) {
+	int CFile::GetPos(fpos_t* pos) {
 		if (m_stream && pos) {
 			return fgetpos(m_stream, pos);
 		}
 		return -1;
 	}
 
-	char* CFile::MFGets(char* str, int num) {
+	char* CFile::Gets(char* str, int num) {
 		if (m_stream && str) {
 			return fgets(str, num, m_stream);
 		}
 		return 0;
 	}
 
-	bool CFile::MFOpen(Mode mode) {
+	bool CFile::Open(Mode mode) {
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4996)
 #endif
-		MFClose();
+		Close();
 		if (mode == Mode::M_WRITE) {
 			m_stream = fopen(m_strFilePath.c_str(), "wb+");
 			//if (!m_stream) {
@@ -106,21 +106,21 @@ namespace Operation {
 		return m_stream != NULL;
 	}
 
-	int CFile::MFPutc(int character) {
+	int CFile::Putc(int character) {
 		if (m_stream) {
 			return fputc(character, m_stream);
 		}
 		return EOF;
 	}
 
-	int CFile::MFPuts(const char* str) {
+	int CFile::Puts(const char* str) {
 		if (m_stream) {
 			return fputs(str, m_stream);
 		}
 		return EOF;
 	}
 
-	size_t CFile::MFRead(void* ptr, size_t size, size_t count) {
+	size_t CFile::Read(void* ptr, size_t size, size_t count) {
 		if (m_stream) {
 			//fread(ptr, 1, length, m_stream);
 			return fread(ptr, size, count, m_stream);
@@ -128,7 +128,7 @@ namespace Operation {
 		return 0;
 	}
 
-	int CFile::MFSeek(long offset, int origin) {
+	int CFile::Seek(long offset, int origin) {
 		if (m_stream) {
 			//SEEK_SET/SEEK_CUR/SEEK_END
 			return fseek(m_stream, offset, origin);
@@ -136,14 +136,14 @@ namespace Operation {
 		return EOF;
 	}
 
-	int CFile::MFSetpos(const fpos_t* pos) {
+	int CFile::Setpos(const fpos_t* pos) {
 		if (m_stream && pos) {
 			return fsetpos(m_stream, pos);
 		}
 		return EOF;
 	}
 
-	long CFile::MFTell() {
+	long CFile::Tell() {
 		if (m_stream) {
 			//fseek(m_stream, 0L, SEEK_END);
 			return ftell(m_stream);
@@ -151,7 +151,7 @@ namespace Operation {
 		return EOF;
 	}
 
-	size_t CFile::MFWrite(const void* ptr, size_t size, size_t count) {
+	size_t CFile::Write(const void* ptr, size_t size, size_t count) {
 		if (m_stream) {
 			size_t n = fwrite(ptr, size, count, m_stream);
 			if (n != 0) {
@@ -185,19 +185,19 @@ namespace Operation {
 		return 0;
 	}
 
-	void CFile::MFRewind() {
+	void CFile::Rewind() {
 		if (m_stream) {
 			rewind(m_stream);
 		}
 	}
 
-	void CFile::MFBuffer(char* buffer, size_t size) {
+	void CFile::Buffer(char* buffer, size_t size) {
 	}
 
-	void CFile::MFBuffer(std::string& s) {
+	void CFile::Buffer(std::string& s) {
 	}
 
-	void CFile::MFBuffer(std::vector<char>& buffer) {
+	void CFile::Buffer(std::vector<char>& buffer) {
 		buffer.clear();
 		if (m_stream) {
 			fseek(m_stream, 0L, SEEK_END);

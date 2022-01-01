@@ -797,10 +797,10 @@ namespace utils {
 		utils::mkDir(path.c_str());
 		path += "/" + filename;
 		Operation::CFile f(path.c_str());
-		if (f.isValid()) {
+		if (f.Valid()) {
 			std::vector<char> data;
-			f.MFBuffer(data);
-			f.MFClose();
+			f.Buffer(data);
+			f.Close();
 			PLOG_DEBUG("安装包已存在! 共 %d 字节，准备校验...", data.size());
 			if (data.size() > 0) {
 				char md5[32 + 1] = { 0 };
@@ -842,13 +842,13 @@ namespace utils {
 			},
 			[&](Curl::Easy* easy, double ltotal, double lnow) {
 				Operation::CFile* f = (Operation::CFile*)easy->GetOperation();
-				std::string path = f->MFPath();
+				std::string path = f->Path();
 				std::string::size_type pos = path.find_last_of('\\');
 				std::string filename = path.substr(pos + 1, -1);
 				TLOG_INFO("下载进度 %d%% 路径 %s", (int)((lnow / ltotal) * 100), path.c_str());
 				if (lnow == ltotal) {
-					f->MFFlush();
-					f->MFClose();
+					f->Flush();
+					f->Close();
 					PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", path.c_str(), ltotal);
 					char md5[32 + 1] = { 0 };
 					MD5Encode32(&data.front(), data.size(), md5, 0);

@@ -13,47 +13,47 @@ namespace Operation {
 		IOperation(){};
 		virtual ~IOperation(){};
 	public:
-		virtual bool isValid() = 0;
+		virtual bool Valid() = 0;
         virtual bool IsFile() = 0;
-		virtual void MFClearErr() {};
+		virtual void ClearErr() {};
 		//int fclose ( FILE * stream );
-		virtual bool MFClose() = 0;
+		virtual bool Close() = 0;
 		//int feof ( FILE * stream );
-		virtual int MFEof() = 0;
+		virtual int Eof() = 0;
 		// int ferror ( FILE * stream );
-		virtual int MFError() {return 0;};
+		virtual int Error() {return 0;};
 		//int fflush ( FILE * stream );
-		virtual int MFFlush() {return 0;};
+		virtual int Flush() {return 0;};
 		//int fgetc ( FILE * stream );
-		virtual int MFGetc() = 0;
+		virtual int Getc() = 0;
 		//int fgetpos ( FILE * stream, fpos_t * pos );
-		virtual int MFGetPos( fpos_t * pos ) = 0;
+		virtual int GetPos( fpos_t * pos ) = 0;
 		//char * fgets ( char * str, int num, FILE * stream );
-		virtual char * MFGets( char * str, int num ) = 0;
+		virtual char * Gets( char * str, int num ) = 0;
 		//FILE * fopen ( const char * filename, const char * mode );
-		virtual bool MFOpen(Mode mode = Mode::M_READ) = 0;
+		virtual bool Open(Mode mode = Mode::M_READ) = 0;
 		// int fputc ( int character, FILE * stream );
-		virtual int MFPutc( int character ) = 0;
+		virtual int Putc( int character ) = 0;
 		// int fputs ( const char * str, FILE * stream );
-		virtual int MFPuts( const char * str ) = 0;
+		virtual int Puts( const char * str ) = 0;
 		//size_t fread ( void * ptr, size_t size, size_t count, FILE * stream );
-		virtual size_t MFRead(void * ptr, size_t size, size_t count) = 0;
+		virtual size_t Read(void * ptr, size_t size, size_t count) = 0;
 		//int fseek ( FILE * stream, long int offset, int origin );
-		virtual int MFSeek( long offset, int origin ) = 0;
+		virtual int Seek( long offset, int origin ) = 0;
 		//int fsetpos ( FILE * stream, const fpos_t * pos );
-		virtual int MFSetpos( const fpos_t * pos ) = 0;
+		virtual int Setpos( const fpos_t * pos ) = 0;
 		//long int ftell ( FILE * stream );	
-		virtual long MFTell() = 0;
+		virtual long Tell() = 0;
 		//size_t fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
-		virtual size_t MFWrite( const void * ptr, size_t size, size_t count ) = 0;
+		virtual size_t Write( const void * ptr, size_t size, size_t count ) = 0;
 		//void rewind ( FILE * stream );
-		virtual void MFRewind() = 0;
-		virtual void MFBuffer(char *buffer, size_t size) = 0;
-		virtual void MFBuffer(std::string & s) = 0;
-		virtual void MFBuffer(std::vector<char>& buffer) = 0;
+		virtual void Rewind() = 0;
+		virtual void Buffer(char *buffer, size_t size) = 0;
+		virtual void Buffer(std::string & s) = 0;
+		virtual void Buffer(std::vector<char>& buffer) = 0;
 		/* UnSuport
-		int putc ( int character, FILE * stream ); use MFPutc
-		int getc ( FILE * stream ); use MFGetc
+		int putc ( int character, FILE * stream ); use Putc
+		int getc ( FILE * stream ); use Getc
 		FILE * freopen ( const char * filename, const char * mode, FILE * stream );
 		void setbuf ( FILE * stream, char * buffer );
 		int setvbuf ( FILE * stream, char * buffer, int mode, size_t size ); 
