@@ -678,7 +678,7 @@ namespace utils {
 		while (pos != std::string::npos) {
 			s.replace(pos, src.length(), dst);
 			//s.replace(pos, src.length(), dst, 0, dst.length());
-			pos = s.find(src, pos + dst.size());
+			pos = s.find(src, pos + dst.length());
 		}
 	}
 	
