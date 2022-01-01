@@ -5,6 +5,9 @@
 #include <string.h>
 #include "Client.h"
 
+//multipart/form-data详细介绍 http://blog.csdn.net/yankai0219/article/details/8159701
+//C++ curl库 源码编译及使用（VS2019）https://blog.csdn.net/xray2/article/details/120496410
+
 namespace Curl {
 
 	void Easy::dump_(const char *text, FILE *stream, unsigned char *ptr, size_t size) {

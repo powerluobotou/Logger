@@ -8,7 +8,7 @@ namespace Operation {
 
 	class CFile : public IOperation {
 	public:
-		explicit CFile(const char* pFilePath);
+		explicit CFile(const char* path);
 		~CFile();
 	public:
 		virtual bool Valid();
@@ -62,9 +62,9 @@ namespace Operation {
 		int vfscanf ( FILE * stream, const char * format, va_list arg );
 		*/
 	private:
-		FILE * m_stream;
-		std::string m_strFilePath;
+		FILE * stream_;
+		std::string path_;
 	public:
-		char const * Path() { return m_strFilePath.c_str(); }
+		char const * Path() { return path_.c_str(); }
 	};
 }

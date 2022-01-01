@@ -66,4 +66,4 @@ namespace Operation {
 	};
 
     typedef IOperation* LPIOperation;
-};
+}

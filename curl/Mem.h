@@ -38,7 +38,7 @@ namespace Operation {
 		//bool Close();
 		//bool IsEmpty();
 	public:
-		std::vector<char> m_buffer;
-		size_t m_ulCurrentPos;
+		std::vector<char> buffer_;
+		size_t currentPos_;
 	};
 }
