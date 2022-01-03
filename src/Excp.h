@@ -1,4 +1,4 @@
-/**
+﻿/**
 *
 *   异常处理
 *	Created by andy_ro@qq.com 2021.11.20
@@ -38,7 +38,7 @@ namespace excp {
 }
 
 // TRACE[ __NAME__ ] __STRERR__ __FILE__(__LINE__) __FUNC__
-#define _MY_TRACE_A(fn, err_str) \
+#define __MY_TRACE_A(fn, err_str) \
 	{ \
 		try { \
 			throw base_error(__FILE__, __LINE__, __FUNC__, err_str); \
@@ -52,7 +52,7 @@ namespace excp {
 	}
 
 // TRACE[ __NAME__(__ERRNO__) ] __STRERR__ __FILE__(__LINE__) __FUNC__
-#define _MY_TRACE_B(fn, err_no, err_str) \
+#define __MY_TRACE_B(fn, err_no, err_str) \
 	{ \
 		try { \
 			throw base_error(__FILE__, __LINE__, __FUNC__, err_no, err_str); \
@@ -69,18 +69,18 @@ namespace excp {
 // EXCEPTION: __STRERR__ __FILE__(__LINE__) __FUNC__
 // EXCEPTION: __NAME__(__ERRNO__) __STRERR__ __FILE__(__LINE__) __FUNC__
 
-#define _MY_TRY() \
+#define __MY_TRY() \
 	try { \
 
-#define _MY_TRY_TRACE() \
+#define __MY_TRY_TRACE() \
 	try { \
 	_LOG_DEBUG("")
 
-#define _MY_THROW_A(err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, err_str))
-#define _MY_THROW_C(fn_str, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
-#define _MY_THROW_B(fn_str, err_no, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
+#define __MY_THROW_A(err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, err_str))
+#define __MY_THROW_C(fn_str, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
+#define __MY_THROW_B(fn_str, err_no, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
 
-#define _FUNC_CATCH() \
+#define __FUNC_CATCH() \
 	} \
 	catch (excp::function_error& e) { \
 		std::ostringstream oss; \
@@ -95,22 +95,22 @@ namespace excp {
 		 ) : \
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
 		   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
-		_LOG_S_FATAL(oss.str());
+		__LOG_S_FATAL(oss.str());
 
 
-#define _STD_CATCH() \
+#define __STD_CATCH() \
 	} \
 	catch (std::exception const& e) { \
-		_LOG_S_FATAL(std::string("EXCEPTION: ") + e.what());
+		__LOG_S_FATAL(std::string("EXCEPTION: ") + e.what());
 
 
-#define _ANY_CATCH() \
+#define __ANY_CATCH() \
 	} \
 	catch (...) { \
-		_LOG_S_FATAL("EXCEPTION: unknown error");
+		__LOG_S_FATAL("EXCEPTION: unknown error");
 
-#define _MY_CATCH() \
-	_FUNC_CATCH() \
-	_STD_CATCH() \
-	_ANY_CATCH() \
+#define __MY_CATCH() \
+	__FUNC_CATCH() \
+	__STD_CATCH() \
+	__ANY_CATCH() \
 	}

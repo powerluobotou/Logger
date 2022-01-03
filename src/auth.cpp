@@ -10,44 +10,45 @@
 
 namespace utils {
 
-	typedef bool (*AuthCallback)(char const* expired, bool& noOk, int64_t timezone);
+	typedef bool (*AuthCallback)(time_t const expired, bool& noOk, int64_t timezone);
 
 	static struct auth_cb_t {
 		bool noOk;
 		int64_t timezone;
-		std::string expired;
+		time_t expired;
 		AuthCallback cb;
-	}s_authcb/* = { false, 0, "", NULL }*/;
+	}s_authcb = { false, MY_CCT, 0, NULL };
 
-	static bool checkExpired(char const* expired, bool& noOk, int64_t timezone) {
+	static bool checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
 		noOk = false;
-		time_t t_zone_expired = utils::_strpTime(expired, timezone);
 		struct tm tm = { 0 };
-		time_t t_zone_now = 0;
-		utils::_convertUTC(time(NULL), tm, &t_zone_now, timezone);
-		if (t_zone_now <= t_zone_expired) {//unexpired
+		time_t t_now = 0;
+		utils::_convertUTC(time(NULL), tm, &t_now, timezone);
+		if (t_now <= expired) {//unexpired
 			return false;
 		}
-		_LOG_CONSOLE_OPEN();
-		std::string s = utils::_strfTime(t_zone_expired, timezone);
-		_TLOG_ERROR("auth expired %s", s.c_str());
+		__LOG_CONSOLE_OPEN();
+		std::string s = utils::_strfTime(expired, timezone);
+		__TLOG_ERROR("auth expired %s", s.c_str());
+		xsleep(5000);
+		__LOG_CONSOLE_CLOSE();
 		noOk = true;
 		return true;
 	}
 
 	void regAuthCallback(char const* expired, int64_t timezone) {
 		s_authcb.cb = checkExpired;
-		s_authcb.expired = expired;
+		s_authcb.expired = utils::_strpTime(expired, timezone);
 		s_authcb.timezone = timezone;
 	}
 
 	bool authExpired() {
-		if (!s_authcb.expired.empty()) {
+		if (s_authcb.expired) {
 			if (s_authcb.noOk) {
 				return true;
 			}
-			return checkExpired/*s_authcb.cb*/(
-				s_authcb.expired.c_str(),
+			return checkExpired(
+				s_authcb.expired,
 				s_authcb.noOk,
 				s_authcb.timezone);
 		}
@@ -58,7 +59,7 @@ namespace utils {
 #ifdef AUTHORIZATION_SUPPORT
 static struct __init_t {
 	__init_t() {
-		RegAuthCallback("2021-01-03 12:39:00", MY_GST);
+		RegAuthCallback("2022-04-24 10:00:00", MY_GST);
 	}
 }__x;
 #endif

@@ -1,4 +1,4 @@
-/**
+﻿/**
 *
 *   堆栈跟踪
 *	Created by andy_ro@qq.com 2021.11.17
@@ -281,7 +281,7 @@ namespace utils {
 #ifdef _windows_
 	static long _stdcall _crashCallback(EXCEPTION_POINTERS* excp) {
 		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
-		_LOG_FATAL_SYN(
+		__LOG_FATAL_SYN(
 			"\nExceptionCode:%d" \
 			"\nExceptionAddress:%#x" \
 			"\nExceptionFlags:%d" \

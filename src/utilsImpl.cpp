@@ -1,4 +1,4 @@
-#include "utilsImpl.h"
+﻿#include "utilsImpl.h"
 #include "gettimeofday.h"
 #include "auth.h"
 
@@ -128,7 +128,7 @@ namespace utils {
 				assert(t_zone == mktime(&tm));
 				*tp = t_zone;
 				if (t_zone != mktime(&tm)) {
-					_LOG_S_FATAL("t_zone != mktime(&tm)");
+					__LOG_S_FATAL("t_zone != mktime(&tm)");
 				}
 			}
 			break;
@@ -164,7 +164,7 @@ namespace utils {
 				*tp = t_zone;
 			}
 			if (t_zone != mktime(&tm)) {
-				_LOG_S_FATAL("t_zone != mktime(&tm)");
+				__LOG_S_FATAL("t_zone != mktime(&tm)");
 			}
 			break;
 		}
@@ -174,27 +174,27 @@ namespace utils {
 	void _timezoneInfo(struct tm const& tm, int64_t timezone) {
 		switch (timezone) {
 		case MY_EST: {
-			_TLOG_INFO("America/New_York %04d-%02d-%02d %02d:%02d:%02d",
+			__TLOG_INFO("America/New_York %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_BST: {
-			_TLOG_INFO("Europe/London %04d-%02d-%02d %02d:%02d:%02d",
+			__TLOG_INFO("Europe/London %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_GST: {
-			_TLOG_INFO("Asia/Dubai %04d-%02d-%02d %02d:%02d:%02d",
+			__TLOG_INFO("Asia/Dubai %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_CCT: {
-			_TLOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
+			__TLOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
 		case MY_JST: {
-			_TLOG_INFO("Asia/Tokyo %04d-%02d-%02d %02d:%02d:%02d",
+			__TLOG_INFO("Asia/Tokyo %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
@@ -461,7 +461,7 @@ namespace utils {
 
 	//-1失败，退出 0成功，退出 1失败，继续
 	void _CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb) {
-		_MY_TRY();
+		__MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
 		std::string filename = url.substr(pos + 1, -1);
@@ -473,30 +473,30 @@ namespace utils {
 			std::vector<char> data;
 			f.Buffer(data);
 			f.Close();
-			_PLOG_DEBUG("安装包已存在! 共 %d 字节，准备校验...", data.size());
+			__PLOG_DEBUG("安装包已存在! 共 %d 字节，准备校验...", data.size());
 			if (data.size() > 0) {
 				char md5[32 + 1] = { 0 };
 				MD5Encode32(&data.front(), data.size(), md5, 0);
 				if (atol(version["size"].c_str()) == data.size() &&
 					strncasecmp(md5, version["md5"].c_str(), strlen(md5)) == 0) {
-					_PLOG_DEBUG("校验成功，开始安装新版程序包...");
+					__PLOG_DEBUG("校验成功，开始安装新版程序包...");
 					std::string content = version["context"];
 					utils::_replaceEscChar(content);
-					_PLOG_WARN("*******************************************");
+					__PLOG_WARN("*******************************************");
 					//PLOG_WARN(content.c_str(), m["no"].c_str());
-					_PLOG_WARN(content.c_str());
-					_PLOG_WARN("*******************************************");
+					__PLOG_WARN(content.c_str());
+					__PLOG_WARN("*******************************************");
 					//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
 					::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 					xsleep(10000);
-					_LOG_CONSOLE_CLOSE();
+					__LOG_CONSOLE_CLOSE();
 					cb(0);//成功，退出
 				}
 			}
-			_TLOG_DEBUG("校验失败，重新下载安装包... %s", url.c_str());
+			__TLOG_DEBUG("校验失败，重新下载安装包... %s", url.c_str());
 		}
 		else {
-			_TLOG_DEBUG("开始下载安装包... %s", url.c_str());
+			__TLOG_DEBUG("开始下载安装包... %s", url.c_str());
 		}
 		std::vector<char> data;
 		Curl::Client req(true);
@@ -517,41 +517,41 @@ namespace utils {
 				std::string path = f->Path();
 				std::string::size_type pos = path.find_last_of('\\');
 				std::string filename = path.substr(pos + 1, -1);
-				_TLOG_INFO("下载进度 %.2f%% 路径 %s", (lnow / ltotal) * 100, path.c_str());
+				__TLOG_INFO("下载进度 %.2f%% 路径 %s", (lnow / ltotal) * 100, path.c_str());
 				if (lnow == ltotal) {
 					f->Flush();
 					f->Close();
-					_PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", ltotal);
+					__PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", ltotal);
 					char md5[32 + 1] = { 0 };
 					MD5Encode32(&data.front(), data.size(), md5, 0);
 					if (atol(version["size"].c_str()) == data.size() &&
 						strncasecmp(md5, version["md5"].c_str(), strlen(md5)) == 0) {
-						_PLOG_DEBUG("校验成功，开始安装新版程序包...");
+						__PLOG_DEBUG("校验成功，开始安装新版程序包...");
 						std::string content = version["context"];
 						utils::_replaceEscChar(content);
-						_PLOG_WARN("*******************************************");
+						__PLOG_WARN("*******************************************");
 						//PLOG_WARN(content.c_str(), version["no"].c_str());
-						_PLOG_WARN(content.c_str());
-						_PLOG_WARN("*******************************************");
+						__PLOG_WARN(content.c_str());
+						__PLOG_WARN("*******************************************");
 						//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
 						::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 						xsleep(10000);
-						_LOG_CONSOLE_CLOSE();
+						__LOG_CONSOLE_CLOSE();
 						cb(0);//成功，退出
 					}
 					else {
-						_PLOG_ERROR("校验失败，请检查安装包[版本号/大小/MD5值]\n");
+						__PLOG_ERROR("校验失败，请检查安装包[版本号/大小/MD5值]\n");
 						xsleep(10000);
-						_LOG_CONSOLE_CLOSE();
+						__LOG_CONSOLE_CLOSE();
 						cb(1);//失败，继续
 					}
 				}
 			}, NULL, false, stdout)) {
-			_PLOG_ERROR("更新失败，下载包可能被占用，请关闭后重试");
+			__PLOG_ERROR("更新失败，下载包可能被占用，请关闭后重试");
 			xsleep(10000);
-			_LOG_CONSOLE_CLOSE();
+			__LOG_CONSOLE_CLOSE();
 			cb(-1);//失败，退出
 		}
-		_MY_CATCH();
+		__MY_CATCH();
 	}
 }

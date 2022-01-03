@@ -1,4 +1,4 @@
-/**
+﻿/**
 *
 *   宏定义
 *	Created by andy_ro@qq.com 2021.11.17
@@ -93,6 +93,8 @@ typedef int tid_t;
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
+
+#pragma execution_character_set("utf-8")
 
 #define read_lock(mutex) std::shared_lock<std::shared_mutex> lock(mutex)
 #define write_lock(mutex) std::unique_lock<std::shared_mutex> lock(mutex)

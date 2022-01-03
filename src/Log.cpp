@@ -1,4 +1,4 @@
-/**
+﻿/**
 *
 *   异步日志系统实现
 *	Created by andy_ro@qq.com 2021.11.17
