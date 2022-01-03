@@ -99,6 +99,38 @@ namespace LOGGER {
 		}
 	}
 	
+	//write
+	void Log::write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...) {
+		if (check(level)) {
+			static size_t const PATHSZ = 512;
+			static size_t const MAXSZ = 81920;
+			char msg[PATHSZ + MAXSZ + 2];
+			size_t pos = format(level, file, line, func, flag, msg, PATHSZ);
+			va_list ap;
+			va_start(ap, fmt);
+#ifdef _windows_
+			size_t n = vsnprintf_s(msg + pos, MAXSZ, _TRUNCATE, fmt, ap);
+#else
+			size_t n = vsnprintf(msg + pos, MAXSZ, fmt, ap);
+#endif
+			va_end(ap);
+			msg[pos + n] = '\n';
+			msg[pos + n + 1] = '\0';
+			if (started()) {
+				notify(msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
+			}
+			else {
+				stdoutbuf(level, msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
+				checkSync(flag);
+			}
+		}
+	}
+
+	//write_s
+	void Log::write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg) {
+		write(level, file, line, func, stack, flag, "%s", msg.c_str());
+	}
+	
 	//timezoneInfo
 	void Log::timezoneInfo() {
 		struct tm tm = { 0 };
@@ -387,7 +419,7 @@ namespace LOGGER {
 	}
 
 	//stdoutbuf
-	//需要调用utils::initConsole()初始化
+	//需要调用utils::_initConsole()初始化
 	void Log::stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen) {
 #ifdef QT_CONSOLE
 		switch (level) {
@@ -401,7 +433,7 @@ namespace LOGGER {
 		}
 #elif defined(_windows_)
 		if (enable_ && !isConsoleOpen_) {
-			utils::initConsole();
+			utils::_initConsole();
 			isConsoleOpen_ = true;
 		}
 		if (!isConsoleOpen_) {
@@ -503,7 +535,7 @@ namespace LOGGER {
 		}
 		//::CloseHandle(h);
 		if (!enable_ && isConsoleOpen_) {
-			utils::closeConsole();
+			utils::_closeConsole();
 			isConsoleOpen_ = false;
 		}
 #else
@@ -556,11 +588,15 @@ namespace LOGGER {
 
 	//enable
 	void Log::enable() {
-		enable_ = true;
+		if (!enable_) {
+			enable_ = true;
+		}
 	}
 
 	//disable
 	void Log::disable() {
-		enable_ = false;
+		if (enable_) {
+			enable_ = false;
+		}
 	}
 }

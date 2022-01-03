@@ -4,8 +4,7 @@
 *	Created by andy_ro@qq.com 2021.11.18
 *
 */
-#ifndef ATOMIC_H_INCLUDE
-#define ATOMIC_H_INCLUDE
+#pragma once
 
 #include "Macro.h"
 #include <atomic>
@@ -90,5 +89,3 @@
 // private:
 // 	volatile long atom_;
 // };
-
-#endif

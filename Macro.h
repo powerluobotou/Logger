@@ -4,8 +4,7 @@
 *	Created by andy_ro@qq.com 2021.11.17
 *
 */
-#ifndef MACRO_H_INCLUDE
-#define MACRO_H_INCLUDE
+#pragma once
 
 #if defined(WIN32) || defined(_WIN32)|| defined(WIN64) || defined(_WIN64)
 #define _windows_
@@ -97,5 +96,3 @@ typedef int tid_t;
 
 #define read_lock(mutex) std::shared_lock<std::shared_mutex> lock(mutex)
 #define write_lock(mutex) std::unique_lock<std::shared_mutex> lock(mutex)
-
-#endif

@@ -4,8 +4,7 @@
 *	Created by andy_ro@qq.com 2021.11.17
 *
 */
-#ifndef GETTIMEOFDAY_H_INCLUDE
-#define GETTIMEOFDAY_H_INCLUDE
+#pragma once
 
 #include "../Macro.h"
 
@@ -41,5 +40,3 @@ void gettimeofday(struct timeval* tv, struct timezone* tz);
 
 //gettime
 double gettime();
-
-#endif

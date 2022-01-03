@@ -11,8 +11,7 @@
 
 namespace utils {
 
-	//initConsole
-	static void initConsole() {
+	static void _initConsole() {
 		AUTHORIZATION_CHECK;
 #if defined(_windows_)
 		::AllocConsole();
@@ -42,8 +41,7 @@ namespace utils {
 #endif
 	}
 
-	//closeConsole
-	static void closeConsole() {
+	static void _closeConsole() {
 #if defined(_windows_)
 		::fclose(stdout);
 		::FreeConsole();

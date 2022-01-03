@@ -4,13 +4,15 @@
 *	Created by andy_ro@qq.com 2021.11.17
 *
 */
-#ifndef LOGGER_H_INCLUDE
-#define LOGGER_H_INCLUDE
+#pragma once
 
 #include "utils.h"
 
 #pragma execution_character_set("utf-8")
 
+#ifdef __STACK__
+#undef __STACK__
+#endif
 #define __STACK__       utils::stack_backtrace().c_str()
 
 #define PARAM_FATAL     0,__FILE__,__LINE__,__FUNC__,__STACK__
@@ -168,5 +170,3 @@ namespace LOGGER {
 
 //PLOG_S_XXX(msg)
 #define PLOG_S_FATAL_SYN(msg)    LOG_S(PARAM_FATAL, F_SYNC, msg); LOG_WAIT()
-
-#endif

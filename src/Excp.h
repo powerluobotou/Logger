@@ -6,29 +6,13 @@
 */
 #pragma once
 
-#include "Macro.h"
+#include "../Macro.h"
 
 #include <exception>
 #include <stdexcept>
-#include "utils.h"
 #include "Log.h"
 
-#ifdef QT_SUPPORT
-#include <QException>
-#include <QUnhandledException>
-#endif
-
-//https://www.csdndocs.com/article/5961151
-//https://developer.aliyun.com/article/317590
-#ifdef _windows_// /EHa /EHsc
-#define _TRY_   __try
-#define _CATCH_ __except
-#else
-#define _TRY_   try
-#define _CATCH_ catch
-#endif
-
-namespace EXCPT {
+namespace excp {
 	//base_error
 	class base_error : public std::runtime_error {
 	public:
@@ -51,19 +35,10 @@ namespace EXCPT {
 	public:
 		std::string const fn_str_;
 	};
-
-	//http://qt6.digitser.net/6.2/zh-CN/qexception.html
-#ifdef QT_SUPPORT
-	class plat_error : public QException {
-	public:
-		void raise() const override { throw* this; }
-		plat_error* clone() const override { return new plat_error(*this); }
-	};
-#endif
 }
 
 // TRACE[ __NAME__ ] __STRERR__ __FILE__(__LINE__) __FUNC__
-#define MY_TRACE_A(fn, err_str) \
+#define _MY_TRACE_A(fn, err_str) \
 	{ \
 		try { \
 			throw base_error(__FILE__, __LINE__, __FUNC__, err_str); \
@@ -72,12 +47,12 @@ namespace EXCPT {
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << " ] " << e.what() \
 			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
-			LOG_S_TRACE(oss.str()); \
+			_LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
 // TRACE[ __NAME__(__ERRNO__) ] __STRERR__ __FILE__(__LINE__) __FUNC__
-#define MY_TRACE_B(fn, err_no, err_str) \
+#define _MY_TRACE_B(fn, err_no, err_str) \
 	{ \
 		try { \
 			throw base_error(__FILE__, __LINE__, __FUNC__, err_no, err_str); \
@@ -86,7 +61,7 @@ namespace EXCPT {
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << "(" << e.err_no_ << ") ] " << e.what() \
 			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
-			LOG_S_TRACE(oss.str()); \
+			_LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
@@ -94,33 +69,20 @@ namespace EXCPT {
 // EXCEPTION: __STRERR__ __FILE__(__LINE__) __FUNC__
 // EXCEPTION: __NAME__(__ERRNO__) __STRERR__ __FILE__(__LINE__) __FUNC__
 
-#define MY_TRY() \
+#define _MY_TRY() \
 	try { \
 
-#define MY_TRY_TRACE() \
+#define _MY_TRY_TRACE() \
 	try { \
-	LOG_DEBUG("")
+	_LOG_DEBUG("")
 
-#define MY_THROW_A(err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, err_str))
-#define MY_THROW_C(fn_str, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
-#define MY_THROW_B(fn_str, err_no, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
+#define _MY_THROW_A(err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, err_str))
+#define _MY_THROW_C(fn_str, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
+#define _MY_THROW_B(fn_str, err_no, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_no, err_str))
 
-#ifdef QT_SUPPORT
-#define PLAT_CATCH() \
+#define _FUNC_CATCH() \
 	} \
-	catch (QException const& e) { \
-		LOG_S_FATAL(std::string("QT EXCEPTION: ") + e.what()); \
-	} \
-	catch(QUnhandledException const& e) { \
-		LOG_S_FATAL(std::string("QT EXCEPTION: ") + e.what());
-
-#else
-#define PLAT_CATCH()
-#endif
-
-#define FUNC_CATCH() \
-	} \
-	catch (EXCPT::function_error& e) { \
+	catch (excp::function_error& e) { \
 		std::ostringstream oss; \
 		e.err_no_ == 0XFFFFFFFFL ? \
 		( \
@@ -133,23 +95,22 @@ namespace EXCPT {
 		 ) : \
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
 		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
-		LOG_S_FATAL(oss.str());
+		_LOG_S_FATAL(oss.str());
 
 
-#define STD_CATCH() \
+#define _STD_CATCH() \
 	} \
 	catch (std::exception const& e) { \
-		LOG_S_FATAL(std::string("EXCEPTION: ") + e.what());
+		_LOG_S_FATAL(std::string("EXCEPTION: ") + e.what());
 
 
-#define ANY_CATCH() \
+#define _ANY_CATCH() \
 	} \
 	catch (...) { \
-		LOG_S_FATAL("EXCEPTION: unknown error");
+		_LOG_S_FATAL("EXCEPTION: unknown error");
 
-#define MY_CATCH() \
-	PLAT_CATCH() \
-	FUNC_CATCH() \
-	STD_CATCH() \
-	ANY_CATCH() \
+#define _MY_CATCH() \
+	_FUNC_CATCH() \
+	_STD_CATCH() \
+	_ANY_CATCH() \
 	}

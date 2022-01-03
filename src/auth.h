@@ -1,6 +1,6 @@
 /**
 *
-*   授权过期时间
+*   鎺堟潈杩囨湡鏃堕棿
 *	Created by andy_ro@qq.com 2021.11.17
 *
 */
@@ -8,20 +8,16 @@
 
 #include "utils.h"
 
+#define AUTHORIZATION_SUPPORT
+
 namespace utils {
 	
-	typedef bool (*AuthCallback)(char const* expired, bool& noOk, int64_t timezone);
+	void regAuthCallback(char const* expired, int64_t timezone);
 
-	//checkExpired
-	bool checkExpired(char const* expired, bool& noOk, int64_t timezone);
-
-	//regAuthCallback
-	void regAuthCallback(AuthCallback cb, char const* expired);
-
-	//authCheck
 	bool authCheck();
 }
 
+#ifdef AUTHORIZATION_SUPPORT
 #define AUTHORIZATION_CHECK \
 	if (!utils::authCheck()) { \
 		return; \
@@ -37,12 +33,27 @@ namespace utils {
 		return NULL; \
 	}
 
-#define AUTHORIZATION_CHECK_I \
+#define AUTHORIZATION_CHECK_R \
 	if (!utils::authCheck()) { \
 		return -1; \
+	}
+
+#define AUTHORIZATION_CHECK_I \
+	if (!utils::authCheck()) { \
+		return 0; \
 	}
 
 #define AUTHORIZATION_CHECK_S \
 	if (!utils::authCheck()) { \
 		return ""; \
 	}
+#define RegAuthCallback regAuthCallback
+#else
+#define AUTHORIZATION_CHECK
+#define AUTHORIZATION_CHECK_B
+#define AUTHORIZATION_CHECK_P
+#define AUTHORIZATION_CHECK_R
+#define AUTHORIZATION_CHECK_I
+#define AUTHORIZATION_CHECK_S
+#define RegAuthCallback
+#endif
