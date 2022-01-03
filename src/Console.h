@@ -12,7 +12,6 @@
 namespace utils {
 
 	static void _initConsole() {
-		AUTHORIZATION_CHECK;
 #if defined(_windows_)
 		::AllocConsole();
 		::SetConsoleOutputCP(65001);

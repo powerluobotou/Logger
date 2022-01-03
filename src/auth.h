@@ -14,37 +14,37 @@ namespace utils {
 	
 	void regAuthCallback(char const* expired, int64_t timezone);
 
-	bool authCheck();
+	bool authExpired();
 }
 
 #ifdef AUTHORIZATION_SUPPORT
 #define AUTHORIZATION_CHECK \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return; \
 	}
 
 #define AUTHORIZATION_CHECK_B \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return false; \
 	}
 
 #define AUTHORIZATION_CHECK_P \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return NULL; \
 	}
 
 #define AUTHORIZATION_CHECK_R \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return -1; \
 	}
 
 #define AUTHORIZATION_CHECK_I \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return 0; \
 	}
 
 #define AUTHORIZATION_CHECK_S \
-	if (!utils::authCheck()) { \
+	if (utils::authExpired()) { \
 		return ""; \
 	}
 #define RegAuthCallback utils::regAuthCallback

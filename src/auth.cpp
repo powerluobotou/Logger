@@ -19,7 +19,7 @@ namespace utils {
 		AuthCallback cb;
 	}s_authcb/* = { false, 0, "", NULL }*/;
 
-	bool checkExpired(char const* expired, bool& noOk, int64_t timezone) {
+	static bool checkExpired(char const* expired, bool& noOk, int64_t timezone) {
 		noOk = false;
 		time_t t_zone_expired = utils::_strpTime(expired, timezone);
 		struct tm tm = { 0 };
@@ -29,7 +29,8 @@ namespace utils {
 			return false;
 		}
 		_LOG_CONSOLE_OPEN();
-		_PLOG_ERROR("auth expired");
+		std::string s = utils::_strfTime(t_zone_expired, timezone);
+		_TLOG_ERROR("auth expired %s", s.c_str());
 		noOk = true;
 		return true;
 	}
@@ -40,18 +41,17 @@ namespace utils {
 		s_authcb.timezone = timezone;
 	}
 
-	bool authCheck() {
+	bool authExpired() {
 		if (!s_authcb.expired.empty()) {
 			if (s_authcb.noOk) {
-				_PLOG_ERROR("auth expired");
-				return false;
+				return true;
 			}
 			return checkExpired/*s_authcb.cb*/(
 				s_authcb.expired.c_str(),
 				s_authcb.noOk,
 				s_authcb.timezone);
 		}
-		return true;
+		return false;
 	}
 }
 

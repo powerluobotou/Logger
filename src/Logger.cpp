@@ -37,7 +37,7 @@ namespace LOGGER {
 
 	//init
 	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
-		AUTHORIZATION_CHECK;
+		//AUTHORIZATION_CHECK;
 		_LOG_INIT(dir, level, prename, logsize);
 	}
 
