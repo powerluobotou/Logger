@@ -5,7 +5,7 @@
 *
 */
 #include "Log.h"
-#include "../utils.h"
+#include "utilsImpl.h"
 #include "Console.h"
 
 #ifdef _windows_
@@ -45,7 +45,7 @@ namespace LOGGER {
 			std::unique_lock<std::shared_mutex> lock(tm_mutex_); {
 				gettimeofday(&tv_, NULL);
 				time_t t = tv_.tv_sec;
-				utils::convertUTC(t, tm_, NULL, timezone_);
+				utils::_convertUTC(t, tm_, NULL, timezone_);
 				tm = tm_;
 				tv = tv_;
 			}
@@ -87,7 +87,7 @@ namespace LOGGER {
 
 	//init
 	void Log::init(char const* dir, int level, char const* prename, size_t logsize) {
-		utils::mkDir(dir);
+		utils::_mkDir(dir);
 		//打印level_及以下级别日志
 		level_.store(level);
 		if (start()) {
@@ -134,8 +134,8 @@ namespace LOGGER {
 	//timezoneInfo
 	void Log::timezoneInfo() {
 		struct tm tm = { 0 };
-		utils::convertUTC(time(NULL), tm, NULL, timezone_);
-		utils::timezoneInfo(tm, timezone_);
+		utils::_convertUTC(time(NULL), tm, NULL, timezone_);
+		utils::_timezoneInfo(tm, timezone_);
 	}
 
 	//started
@@ -160,8 +160,8 @@ namespace LOGGER {
 				chr[level],
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
-				utils::gettid().c_str(),
-				utils::trim_file(file).c_str(), line, utils::trim_func(func).c_str()) :
+				utils::_gettid().c_str(),
+				utils::_trim_file(file).c_str(), line, utils::_trim_func(func).c_str()) :
 			snprintf(msg, size, "%c%02d:%02d:%02d.%.6lu] ",
 				chr[level],
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
@@ -175,7 +175,7 @@ namespace LOGGER {
 		fd_ = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == fd_) {
 			int err = GetLastError();
-			std::string errmsg = utils::str_error(err);
+			std::string errmsg = utils::_str_error(err);
 			fprintf(stderr, "open %s error[%d:%s]\n", path, err, errmsg.c_str());
 		}
 		else {
@@ -184,7 +184,7 @@ namespace LOGGER {
 #else
 		fd_ = open(path, O_WRONLY | O_CREAT | O_APPEND | O_LARGEFILE, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (fd_ == INVALID_HANDLE_VALUE) {
-			std::string errmsg = utils::str_error(errno);
+			std::string errmsg = utils::_str_error(errno);
 			fprintf(stderr, "open %s error[%d:%s]\n", path, errno, errmsg.c_str());
 	    }
 #endif

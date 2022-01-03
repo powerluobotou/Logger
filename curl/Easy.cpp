@@ -1,5 +1,5 @@
-#include "../utils.h"
-#include "../Logger.h"
+#include "../src/utilsImpl.h"
+#include "../src/Log.h"
 #include "Easy.h"
 #include <assert.h>
 #include <string.h>
@@ -133,7 +133,7 @@ namespace Curl {
 		if (this->progress_cb_) {
 
 			const unsigned int elapseTime = 500;
-			unsigned long tickcount_ = utils::now_ms();
+			unsigned long tickcount_ = utils::_now_ms();
 			
 			if ((EUpload == this->mode_ && 0 != ultotal) && (ultotal == ulnow || (tickcount_ - this->lasttime_ >= elapseTime))) {
 

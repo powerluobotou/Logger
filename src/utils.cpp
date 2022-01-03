@@ -4,7 +4,7 @@
 *	Created by andy_ro@qq.com 2021.11.17
 *
 */
-#include "utils.h"
+#include "../utils.h"
 #include "utilsImpl.h"
 #include "backtrace.h"
 #include "mymd5.h"
@@ -40,12 +40,12 @@ namespace utils {
 		return utils::_trim_file(_FILE_);
 	}
 
-	std::string const _trim_func(char const* _FUNC_) {
+	std::string const trim_func(char const* _FUNC_) {
 		AUTHORIZATION_CHECK_S;
 		return utils::_trim_func(_FUNC_);
 	}
 
-	std::string _str_error(unsigned errnum) {
+	std::string str_error(unsigned errnum) {
 		AUTHORIZATION_CHECK_S;
 		return utils::_str_error(errnum);
 	}
@@ -92,7 +92,7 @@ namespace utils {
 		return gbk2UTF8(gbk, len);
 	}
 
-	std::string _utf82GBK(char const* utf8, size_t len) {
+	std::string utf82GBK(char const* utf8, size_t len) {
 		AUTHORIZATION_CHECK_S;
 		return utils::_utf82GBK(utf8, len);
 	}
@@ -127,7 +127,11 @@ namespace utils {
 		AUTHORIZATION_CHECK_S;
 		return utils::_GetModulePath(filename);
 	}
-	
+
+	unsigned int now_ms() {
+		return utils::_now_ms();
+	}
+
 	std::string stack_backtrace() {
 		/*
 			windows
@@ -303,6 +307,6 @@ namespace utils {
 	
 	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb) {
 		AUTHORIZATION_CHECK;
-		_CURLCheckVersion(version, cb);
+		utils::_CURLCheckVersion(version, cb);
 	}
 }

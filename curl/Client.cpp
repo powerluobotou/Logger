@@ -250,14 +250,14 @@ namespace Curl{
 #include "httpCurl/Client.h"
 #include "httpCurl/Easy.h"
 
-unsigned lasttime = utils::now_ms();
+unsigned lasttime = utils::_now_ms();
 
 void onUpload(Curl::Easy * easy, double ftotal, double fnow)
 {
 	printf("progress[%.3f / %.3f] [%d%%]\n", fnow, ftotal, (int)((fnow / ftotal) * 100));
 	if (fnow != 0 && fnow == ftotal)
 	{
-		lasttime = utils::now_ms();
+		lasttime = utils::_now_ms();
 	}
 }
 
@@ -312,7 +312,7 @@ void testUpload()
 	req.upload("http://192.168.1.80:8088/cgi-bin/upload2",
 		&slist, &resp, onUpload, NULL, false);
 #endif
-	unsigned tickcount = utils::now_ms();
+	unsigned tickcount = utils::_now_ms();
 	printf("返回数据2:\n%s\n", resp.c_str());
 
 	printf("time = %d ms", tickcount - lasttime);

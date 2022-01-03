@@ -46,7 +46,7 @@ namespace excp {
 		catch (base_error& e) { \
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << " ] " << e.what() \
-			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
+			   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
 			_LOG_S_TRACE(oss.str()); \
 		} \
 	}
@@ -60,7 +60,7 @@ namespace excp {
 		catch (base_error& e) { \
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << "(" << e.err_no_ << ") ] " << e.what() \
-			   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
+			   << " " << utils_::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
 			_LOG_S_TRACE(oss.str()); \
 		} \
 	}
@@ -88,13 +88,13 @@ namespace excp {
 		( \
 		e.fn_str_.empty() ? \
 		oss << "EXCEPTION: " << e.what() \
-		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()) \
+		   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()) \
 		   : \
 		oss << "EXCEPTION: " << e.fn_str_ << " " << e.what() \
-		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << e.fn_ \
+		   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << e.fn_ \
 		 ) : \
 		oss << "EXCEPTION: " << e.fn_str_ << "(" << e.err_no_ << ") " << e.what() \
-		   << " " << utils::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::trim_func(e.fn_.c_str()); \
+		   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
 		_LOG_S_FATAL(oss.str());
 
 
