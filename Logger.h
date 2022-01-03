@@ -50,12 +50,12 @@ namespace LOGGER {
 #define LOG_CONSOLE_CLOSE LOGGER::Logger::disable
 #define LOG_CLEANUP LOGGER::Logger::cleanup
 
-#define LOG_SET_FATAL        LOG_SET(LVL_FATAL)
-#define LOG_SET_ERROR        LOG_SET(LVL_ERROR)
-#define LOG_SET_WARN         LOG_SET(LVL_WARN)
-#define LOG_SET_INFO         LOG_SET(LVL_INFO)
-#define LOG_SET_TRACE        LOG_SET(LVL_TRACE)
-#define LOG_SET_DEBUG        LOG_SET(LVL_DEBUG)
+#define LOG_SET_FATAL LOG_SET(LVL_FATAL)
+#define LOG_SET_ERROR LOG_SET(LVL_ERROR)
+#define LOG_SET_WARN  LOG_SET(LVL_WARN)
+#define LOG_SET_INFO  LOG_SET(LVL_INFO)
+#define LOG_SET_TRACE LOG_SET(LVL_TRACE)
+#define LOG_SET_DEBUG LOG_SET(LVL_DEBUG)
 
 #define LOG_COLOR_FATAL(a,b) LOG_COLOR(LVL_FATAL, a, b)
 #define LOG_COLOR_ERROR(a,b) LOG_COLOR(LVL_ERROR, a, b)
@@ -66,19 +66,19 @@ namespace LOGGER {
 
 //LOG_XXX("%s", msg)
 #ifdef _windows_
-#define LOG_FATAL(fmt,...)   LOG(PARAM_FATAL, F_DETAIL|F_SYNC, fmt, ##__VA_ARGS__); LOG_WAIT(); std::abort()
-#define LOG_ERROR(fmt,...)   LOG(PARAM_ERROR, F_DETAIL,        fmt, ##__VA_ARGS__)
-#define LOG_WARN(fmt,...)    LOG(PARAM_WARN,  F_DETAIL,        fmt, ##__VA_ARGS__)
-#define LOG_INFO(fmt,...)    LOG(PARAM_INFO,  F_DETAIL,        fmt, ##__VA_ARGS__)
-#define LOG_TRACE(fmt,...)   LOG(PARAM_TRACE, F_DETAIL,        fmt, ##__VA_ARGS__)
-#define LOG_DEBUG(fmt,...)   LOG(PARAM_DEBUG, F_DETAIL,        fmt, ##__VA_ARGS__)
+#define LOG_FATAL(fmt,...) LOG(PARAM_FATAL, F_DETAIL|F_SYNC, fmt, ##__VA_ARGS__); LOG_WAIT(); std::abort()
+#define LOG_ERROR(fmt,...) LOG(PARAM_ERROR, F_DETAIL,        fmt, ##__VA_ARGS__)
+#define LOG_WARN(fmt,...)  LOG(PARAM_WARN,  F_DETAIL,        fmt, ##__VA_ARGS__)
+#define LOG_INFO(fmt,...)  LOG(PARAM_INFO,  F_DETAIL,        fmt, ##__VA_ARGS__)
+#define LOG_TRACE(fmt,...) LOG(PARAM_TRACE, F_DETAIL,        fmt, ##__VA_ARGS__)
+#define LOG_DEBUG(fmt,...) LOG(PARAM_DEBUG, F_DETAIL,        fmt, ##__VA_ARGS__)
 #else
-#define LOG_FATAL(args...)   LOG(PARAM_FATAL, F_DETAIL|F_SYNC, ##args); LOG_WAIT(); std::abort()
-#define LOG_ERROR(args...)   LOG(PARAM_ERROR, F_DETAIL,        ##args)
-#define LOG_WARN(args...)    LOG(PARAM_WARN,  F_DETAIL,        ##args)
-#define LOG_INFO(args...)    LOG(PARAM_INFO,  F_DETAIL,        ##args)
-#define LOG_TRACE(args...)   LOG(PARAM_TRACE, F_DETAIL,        ##args)
-#define LOG_DEBUG(args...)   LOG(PARAM_DEBUG, F_DETAIL,        ##args)
+#define LOG_FATAL(args...) LOG(PARAM_FATAL, F_DETAIL|F_SYNC, ##args); LOG_WAIT(); std::abort()
+#define LOG_ERROR(args...) LOG(PARAM_ERROR, F_DETAIL,        ##args)
+#define LOG_WARN(args...)  LOG(PARAM_WARN,  F_DETAIL,        ##args)
+#define LOG_INFO(args...)  LOG(PARAM_INFO,  F_DETAIL,        ##args)
+#define LOG_TRACE(args...) LOG(PARAM_TRACE, F_DETAIL,        ##args)
+#define LOG_DEBUG(args...) LOG(PARAM_DEBUG, F_DETAIL,        ##args)
 #endif
 
 //LOG_S_XXX(msg)
