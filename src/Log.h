@@ -98,6 +98,7 @@ namespace LOGGER {
 		bool isConsoleOpen_ = false;
 	};
 }
+
 #define __LOG_INSTANCE LOGGER::Log::instance
 #define __LOG_INIT LOGGER::Log::instance()->init
 #define __LOG LOGGER::Log::instance()->write
@@ -117,12 +118,12 @@ namespace LOGGER {
 #define __LOG_CHECK_NOTIFY LOGGER::Log::instance()->notify
 #define __LOG_CHECK_STDOUT LOGGER::Log::instance()->stdoutbuf
 
-#define __LOG_SET_FATAL        __LOG_SET(LVL_FATAL)
-#define __LOG_SET_ERROR        __LOG_SET(LVL_ERROR)
-#define __LOG_SET_WARN         __LOG_SET(LVL_WARN)
-#define __LOG_SET_INFO         __LOG_SET(LVL_INFO)
-#define __LOG_SET_TRACE        __LOG_SET(LVL_TRACE)
-#define __LOG_SET_DEBUG        __LOG_SET(LVL_DEBUG)
+#define __LOG_SET_FATAL __LOG_SET(LVL_FATAL)
+#define __LOG_SET_ERROR __LOG_SET(LVL_ERROR)
+#define __LOG_SET_WARN  __LOG_SET(LVL_WARN)
+#define __LOG_SET_INFO  __LOG_SET(LVL_INFO)
+#define __LOG_SET_TRACE __LOG_SET(LVL_TRACE)
+#define __LOG_SET_DEBUG __LOG_SET(LVL_DEBUG)
 
 #define __LOG_COLOR_FATAL(a,b) __LOG_COLOR(LVL_FATAL, a, b)
 #define __LOG_COLOR_ERROR(a,b) __LOG_COLOR(LVL_ERROR, a, b)
@@ -135,26 +136,26 @@ namespace LOGGER {
 #ifdef _windows_
 #define __LOG_FATAL(fmt,...) __LOG(_PARAM_FATAL, F_DETAIL|F_SYNC, fmt, ##__VA_ARGS__); __LOG_WAIT(); std::abort()
 #define __LOG_ERROR(fmt,...) __LOG(_PARAM_ERROR, F_DETAIL,        fmt, ##__VA_ARGS__)
-#define __LOG_WARN(fmt,...)	 __LOG(_PARAM_WARN,  F_DETAIL,        fmt, ##__VA_ARGS__)
-#define __LOG_INFO(fmt,...)	 __LOG(_PARAM_INFO,  F_DETAIL,        fmt, ##__VA_ARGS__)
+#define __LOG_WARN(fmt,...)  __LOG(_PARAM_WARN,  F_DETAIL,        fmt, ##__VA_ARGS__)
+#define __LOG_INFO(fmt,...)  __LOG(_PARAM_INFO,  F_DETAIL,        fmt, ##__VA_ARGS__)
 #define __LOG_TRACE(fmt,...) __LOG(_PARAM_TRACE, F_DETAIL,        fmt, ##__VA_ARGS__)
 #define __LOG_DEBUG(fmt,...) __LOG(_PARAM_DEBUG, F_DETAIL,        fmt, ##__VA_ARGS__)
 #else
 #define __LOG_FATAL(args...) __LOG(_PARAM_FATAL, F_DETAIL|F_SYNC, ##args); __LOG_WAIT(); std::abort()
 #define __LOG_ERROR(args...) __LOG(_PARAM_ERROR, F_DETAIL,        ##args)
 #define __LOG_WARN(args...)  __LOG(_PARAM_WARN,  F_DETAIL,        ##args)
-#define __LOG_INFO(args...)	 __LOG(_PARAM_INFO,  F_DETAIL,        ##args)
+#define __LOG_INFO(args...)  __LOG(_PARAM_INFO,  F_DETAIL,        ##args)
 #define __LOG_TRACE(args...) __LOG(_PARAM_TRACE, F_DETAIL,        ##args)
 #define __LOG_DEBUG(args...) __LOG(_PARAM_DEBUG, F_DETAIL,        ##args)
 #endif
 
 //__LOG_S_XXX(msg)
-#define __LOG_S_FATAL(msg)   __LOG_S(_PARAM_FATAL, F_DETAIL|F_SYNC, msg); __LOG_WAIT(); std::abort()
-#define __LOG_S_ERROR(msg)   __LOG_S(_PARAM_ERROR, F_DETAIL,        msg)
-#define __LOG_S_WARN(msg)    __LOG_S(_PARAM_WARN,  F_DETAIL,        msg)
-#define __LOG_S_INFO(msg)    __LOG_S(_PARAM_INFO,  F_DETAIL,        msg)
-#define __LOG_S_TRACE(msg)   __LOG_S(_PARAM_TRACE, F_DETAIL,        msg)
-#define __LOG_S_DEBUG(msg)   __LOG_S(_PARAM_DEBUG, F_DETAIL,        msg)
+#define __LOG_S_FATAL(msg) __LOG_S(_PARAM_FATAL, F_DETAIL|F_SYNC, msg); __LOG_WAIT(); std::abort()
+#define __LOG_S_ERROR(msg) __LOG_S(_PARAM_ERROR, F_DETAIL,        msg)
+#define __LOG_S_WARN(msg)  __LOG_S(_PARAM_WARN,  F_DETAIL,        msg)
+#define __LOG_S_INFO(msg)  __LOG_S(_PARAM_INFO,  F_DETAIL,        msg)
+#define __LOG_S_TRACE(msg) __LOG_S(_PARAM_TRACE, F_DETAIL,        msg)
+#define __LOG_S_DEBUG(msg) __LOG_S(_PARAM_DEBUG, F_DETAIL,        msg)
 
 //__LOG_XXX("%s", msg)
 #ifdef _windows_
@@ -164,7 +165,7 @@ namespace LOGGER {
 #endif
 
 //__LOG_S_XXX(msg)
-#define __LOG_S_FATAL_SYN(msg)    __LOG_S(_PARAM_FATAL, F_DETAIL|F_SYNC, msg); __LOG_WAIT()
+#define __LOG_S_FATAL_SYN(msg) __LOG_S(_PARAM_FATAL, F_DETAIL|F_SYNC, msg); __LOG_WAIT()
 
 //__TLOG_XXX("%s", msg)
 #ifdef _windows_
@@ -184,12 +185,12 @@ namespace LOGGER {
 #endif
 
 //__TLOG_S_XXX(msg)
-#define __TLOG_S_FATAL(msg)     __LOG_S(_PARAM_FATAL, F_TMSTMP|F_SYNC, msg); __LOG_WAIT(); std::abort()
-#define __TLOG_S_ERROR(msg)     __LOG_S(_PARAM_ERROR, F_TMSTMP,        msg)
-#define __TLOG_S_WARN(msg)      __LOG_S(_PARAM_WARN,  F_TMSTMP,        msg)
-#define __TLOG_S_INFO(msg)      __LOG_S(_PARAM_INFO,  F_TMSTMP,        msg)
-#define __TLOG_S_TRACE(msg)     __LOG_S(_PARAM_TRACE, F_TMSTMP,        msg)
-#define __TLOG_S_DEBUG(msg)     __LOG_S(_PARAM_DEBUG, F_TMSTMP,        msg)
+#define __TLOG_S_FATAL(msg) __LOG_S(_PARAM_FATAL, F_TMSTMP|F_SYNC, msg); __LOG_WAIT(); std::abort()
+#define __TLOG_S_ERROR(msg) __LOG_S(_PARAM_ERROR, F_TMSTMP,        msg)
+#define __TLOG_S_WARN(msg)  __LOG_S(_PARAM_WARN,  F_TMSTMP,        msg)
+#define __TLOG_S_INFO(msg)  __LOG_S(_PARAM_INFO,  F_TMSTMP,        msg)
+#define __TLOG_S_TRACE(msg) __LOG_S(_PARAM_TRACE, F_TMSTMP,        msg)
+#define __TLOG_S_DEBUG(msg) __LOG_S(_PARAM_DEBUG, F_TMSTMP,        msg)
 
 //__TLOG_XXX("%s", msg)
 #ifdef _windows_
@@ -199,7 +200,7 @@ namespace LOGGER {
 #endif
 
 //__TLOG_S_XXX(msg)
-#define __TLOG_S_FATAL_SYN(msg)    __LOG_S(_PARAM_FATAL, F_TMSTMP|F_SYNC, msg); __LOG_WAIT()
+#define __TLOG_S_FATAL_SYN(msg) __LOG_S(_PARAM_FATAL, F_TMSTMP|F_SYNC, msg); __LOG_WAIT()
 
 //__PLOG_XXX("%s", msg)
 #ifdef _windows_
@@ -219,12 +220,12 @@ namespace LOGGER {
 #endif
 
 //__PLOG_S_XXX(msg)
-#define __PLOG_S_FATAL(msg)     __LOG_S(_PARAM_FATAL, F_SYNC, msg); __LOG_WAIT(); std::abort()
-#define __PLOG_S_ERROR(msg)     __LOG_S(_PARAM_ERROR, F_PURE, msg)
-#define __PLOG_S_WARN(msg)      __LOG_S(_PARAM_WARN,  F_PURE, msg)
-#define __PLOG_S_INFO(msg)      __LOG_S(_PARAM_INFO,  F_PURE, msg)
-#define __PLOG_S_TRACE(msg)     __LOG_S(_PARAM_TRACE, F_PURE, msg)
-#define __PLOG_S_DEBUG(msg)     __LOG_S(_PARAM_DEBUG, F_PURE, msg)
+#define __PLOG_S_FATAL(msg) __LOG_S(_PARAM_FATAL, F_SYNC, msg); __LOG_WAIT(); std::abort()
+#define __PLOG_S_ERROR(msg) __LOG_S(_PARAM_ERROR, F_PURE, msg)
+#define __PLOG_S_WARN(msg)  __LOG_S(_PARAM_WARN,  F_PURE, msg)
+#define __PLOG_S_INFO(msg)  __LOG_S(_PARAM_INFO,  F_PURE, msg)
+#define __PLOG_S_TRACE(msg) __LOG_S(_PARAM_TRACE, F_PURE, msg)
+#define __PLOG_S_DEBUG(msg) __LOG_S(_PARAM_DEBUG, F_PURE, msg)
 
 //__PLOG_XXX("%s", msg)
 #ifdef _windows_
@@ -234,4 +235,4 @@ namespace LOGGER {
 #endif
 
 //__PLOG_S_XXX(msg)
-#define __PLOG_S_FATAL_SYN(msg)    __LOG_S(_PARAM_FATAL, F_SYNC, msg); __LOG_WAIT()
+#define __PLOG_S_FATAL_SYN(msg) __LOG_S(_PARAM_FATAL, F_SYNC, msg); __LOG_WAIT()
