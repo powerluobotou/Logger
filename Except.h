@@ -99,7 +99,7 @@ namespace EXCPT {
 
 #define MY_TRY_TRACE() \
 	try { \
-	LOG_DEBUG("")
+	LOG_DEBUG("");
 
 #define MY_THROW_A(err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, err_str))
 #define MY_THROW_C(fn_str, err_str) (throw EXCPT::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))

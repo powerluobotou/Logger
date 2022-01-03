@@ -47,7 +47,7 @@ namespace excp {
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << " ] " << e.what() \
 			   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
-			_LOG_S_TRACE(oss.str()); \
+			__LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
@@ -60,8 +60,8 @@ namespace excp {
 		catch (base_error& e) { \
 			std::ostringstream oss; \
 			oss << "TRACE[ " << #fn << "(" << e.err_no_ << ") ] " << e.what() \
-			   << " " << utils_::trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
-			_LOG_S_TRACE(oss.str()); \
+			   << " " << utils::_trim_file(e.f_.c_str()) << "(" << e.l_ << ") " << utils::_trim_func(e.fn_.c_str()); \
+			__LOG_S_TRACE(oss.str()); \
 		} \
 	}
 
@@ -74,7 +74,7 @@ namespace excp {
 
 #define __MY_TRY_TRACE() \
 	try { \
-	_LOG_DEBUG("")
+	__LOG_DEBUG("");
 
 #define __MY_THROW_A(err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, err_str))
 #define __MY_THROW_C(fn_str, err_str) (throw excp::function_error(__FILE__, __LINE__, __FUNC__, fn_str, err_str))
