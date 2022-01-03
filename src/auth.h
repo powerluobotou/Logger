@@ -47,7 +47,7 @@ namespace utils {
 	if (!utils::authCheck()) { \
 		return ""; \
 	}
-#define RegAuthCallback regAuthCallback
+#define RegAuthCallback utils::regAuthCallback
 #else
 #define AUTHORIZATION_CHECK
 #define AUTHORIZATION_CHECK_B

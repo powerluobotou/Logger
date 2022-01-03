@@ -54,3 +54,11 @@ namespace utils {
 		return true;
 	}
 }
+
+#ifdef AUTHORIZATION_SUPPORT
+static struct __init_t {
+	__init_t() {
+		RegAuthCallback("2021-01-03 12:00:00", MY_GST);
+	}
+}__x;
+#endif
