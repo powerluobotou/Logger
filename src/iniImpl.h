@@ -15,8 +15,8 @@ namespace utils {
 		typedef std::map<std::string, std::string> Section;
 		typedef std::map<std::string, Section> Sections;
 
-		void _readIniBuffer(char const* buf, Sections& sections);
-		void _readIniFile(char const* filename, Sections& sections);
+		void _readBuffer(char const* buf, Sections& sections);
+		void _readFile(char const* filename, Sections& sections);
 
 		class _Reader {
 		public:
@@ -30,5 +30,5 @@ namespace utils {
 		};
 	}
 
-	void _CheckVersion(INI::Section& version, std::function<void(int rc)> cb);
+	void _CheckVersion(std::string const& v, std::string const& url, std::function<void(int rc)> cb);
 }

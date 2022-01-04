@@ -65,7 +65,7 @@ namespace utils {
 
 	namespace INI {
 		
-		void _readIniBuffer(char const* buf, Sections& sections) {
+		void _readBuffer(char const* buf, Sections& sections) {
 			sections.clear();
 			std::string st(buf);
 			std::string field;
@@ -116,7 +116,7 @@ namespace utils {
 			};
 		}
 		
-		void _readIniFile(char const* filename, Sections& sections) {
+		void _readFile(char const* filename, Sections& sections) {
 			std::string field;
 			std::string s;
 #if 0
@@ -148,24 +148,27 @@ namespace utils {
 			}
 #else
 			std::fstream stream(filename);
-			//读取一行数据
-			while (getline(stream, s)) {
-				s = utils::_trimLineCRLF(s);
-				if (!s.empty()) {
-					if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
-						field = s.substr(1, s.length() - 2);
-						std::map<std::string, std::string>& m = sections[field];
-					}
-					else if (!field.empty()) {
-						std::string::size_type pos = s.find_first_of('=');
-						if (pos != std::string::npos) {
+			if (stream.is_open()) {
+				//读取一行数据
+				while (getline(stream, s)) {
+					s = utils::_trimLineCRLF(s);
+					if (!s.empty()) {
+						if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
+							field = s.substr(1, s.length() - 2);
 							std::map<std::string, std::string>& m = sections[field];
-							std::string key = s.substr(0, pos);
-							std::string val = s.substr(pos + 1, -1);
-							m[key] = val;
+						}
+						else if (!field.empty()) {
+							std::string::size_type pos = s.find_first_of('=');
+							if (pos != std::string::npos) {
+								std::map<std::string, std::string>& m = sections[field];
+								std::string key = s.substr(0, pos);
+								std::string val = s.substr(pos + 1, -1);
+								m[key] = val;
+							}
 						}
 					}
 				}
+				stream.close();
 			}
 #endif
 		}
@@ -173,7 +176,7 @@ namespace utils {
 		bool _Reader::parse(char const* filename) {
 			m_.clear();
 			if (filename && filename[0]) {
-				utils::INI::_readIniFile(filename, m_);
+				utils::INI::_readFile(filename, m_);
 			}
 			return m_.size() > 0;
 		}
@@ -181,7 +184,7 @@ namespace utils {
 		bool _Reader::parse(char const* buf, size_t len) {
 			m_.clear();
 			if (buf && buf[0]) {
-				utils::INI::_readIniBuffer(buf, m_);
+				utils::INI::_readBuffer(buf, m_);
 			}
 			return m_.size() > 0;
 		}
@@ -218,7 +221,7 @@ namespace utils {
 	}
 
 	//-1失败，退出 0成功，退出 1失败，继续
-	void _CheckVersion(INI::Section& version, std::function<void(int rc)> cb) {
+	void _CheckNewVersion(INI::Section& version, std::function<void(int rc)> cb) {
 		__MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
@@ -304,11 +307,60 @@ namespace utils {
 						cb(1);//失败，继续
 					}
 				}
-			}, NULL, false, stdout)) {
-			__PLOG_ERROR("更新失败，下载包可能被占用，请关闭后重试");
+			}, NULL, false, stdout) < 0) {
+			__PLOG_ERROR("更新失败，失败原因可能：\n\t1.下载包可能被占用，请关闭后重试.\n\t2.可能权限不够，请选择其它盘安装，不要安装在C盘!\n\t3.检查链接%s是否有效!\n\t4.请检查本地网络.", url.c_str());
 			xsleep(10000);
 			__LOG_CONSOLE_CLOSE();
 			cb(-1);//失败，退出
+		}
+		__MY_CATCH();
+	}
+
+	//-1失败，退出 0成功，退出 1失败，继续
+	void _CheckVersion(std::string const& v, std::string const& url, std::function<void(int rc)> cb) {
+		__LOG_CONSOLE_OPEN();
+		__TLOG_DEBUG("正在检查版本信息 %s", url.c_str());
+		__PLOG_DEBUG("当前版本号 %s", v.c_str());
+		__MY_TRY();
+		//text/plain
+		//text/html
+		//application/json;charset=UTF-8
+		//application/octet-stream
+		std::list<std::string> header;
+		header.push_back("Content-Type: text/plain;charset=UTF-8");
+		std::string vi;
+		Curl::Client req;
+		if (req.get(url.c_str(), &header, &vi) < 0) {
+			__PLOG_ERROR("下载失败，失败原因可能：\n\t1.检查链接%s是否有效!\n\t2.请检查本地网络.", url.c_str());
+			xsleep(10000);
+			__LOG_CONSOLE_CLOSE();
+			cb(1);//失败，继续
+		}
+		else {
+			//__LOG_WARN(vi.c_str());
+			utils::INI::Section* version = NULL;
+			utils::INI::_Reader reader;
+			if (reader.parse(vi.c_str(), vi.length())) {
+				version = reader.get("version");
+				if (version && version->size() > 0) {
+					__PLOG_WARN("发现新版本 %s\n文件大小 %s 字节\nMD5值 %s\n准备更新...",
+						(*version)["no"].c_str(),
+						(*version)["size"].c_str(),
+						(*version)["md5"].c_str());
+					utils::_CheckNewVersion(*version, cb);
+					return;
+				}
+				__PLOG_INFO("版本检查完毕，没有发现新版本.");
+				xsleep(2000);
+				__LOG_CONSOLE_CLOSE();
+				cb(1);//失败，继续
+			}
+			else {
+				__PLOG_ERROR("版本配置解析失败.");
+				xsleep(10000);
+				__LOG_CONSOLE_CLOSE();
+				cb(1);//失败，继续
+			}
 		}
 		__MY_CATCH();
 	}

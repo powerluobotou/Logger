@@ -36,8 +36,8 @@ namespace utils {
 		}
 	}
 
-	void CheckVersion(INI::Section& version, std::function<void(int rc)> cb) {
+	void CheckVersion(std::string const& v, std::string const& url, std::function<void(int rc)> cb) {
 		AUTHORIZATION_CHECK;
-		utils::_CheckVersion(version, cb);
+		utils::_CheckVersion(v, url, cb);
 	}
 }
