@@ -48,7 +48,7 @@ namespace LOGGER {
 		void init(char const* dir, int level, char const* prename, size_t logsize);
 		void write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...);
 		void write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg);
-		size_t format(int level, char const* file, int line, char const* func, uint8_t flag, char* msg, size_t size);
+		size_t format(int level, char const* file, int line, char const* func, uint8_t flag, char* buffer, size_t size);
 		void notify(char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen);
 		void stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack = NULL, size_t stacklen = 0);
 		void checkSync(uint8_t flag);

@@ -150,19 +150,19 @@ namespace LOGGER {
 	}
 
 	//format
-	size_t Log::format(int level, char const* file, int line, char const* func, uint8_t flag, char* msg, size_t size) {
+	size_t Log::format(int level, char const* file, int line, char const* func, uint8_t flag, char* buffer, size_t size) {
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
 		static char const chr[] = { 'F','E','W','I','T','D' };
 		size_t pos = (flag & F_DETAIL) ?
-			snprintf(msg, size, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			snprintf(buffer, size, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				chr[level],
 				pid_,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::_gettid().c_str(),
 				utils::_trim_file(file).c_str(), line, utils::_trim_func(func).c_str()) :
-			snprintf(msg, size, "%c%02d:%02d:%02d.%.6lu] ",
+			snprintf(buffer, size, "%c%02d:%02d:%02d.%.6lu] ",
 				chr[level],
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 		return pos;

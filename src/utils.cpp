@@ -25,11 +25,6 @@
 
 namespace utils {
 	
-	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini) {
-		AUTHORIZATION_CHECK;
-		utils::_readIni(buf, ini);
-	}
-
 	/*tid_t*/std::string gettid() {
 		AUTHORIZATION_CHECK_S;
 		return utils::_gettid();
@@ -303,10 +298,5 @@ namespace utils {
 	void enableCrashDump() {
 		AUTHORIZATION_CHECK;
 		utils::_enableCrashDump();
-	}
-	
-	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb) {
-		AUTHORIZATION_CHECK;
-		utils::_CURLCheckVersion(version, cb);
 	}
 }

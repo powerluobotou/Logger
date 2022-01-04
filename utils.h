@@ -16,8 +16,6 @@ namespace utils {
 
 	char const* MD5Encode(char const* src, unsigned len, char dst[], int upper);
 
-	void readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
-
 	void replaceAll(std::string& s, std::string const& src, std::string const& dst);
 	
 	void replaceEscChar(std::string& s);
@@ -57,6 +55,4 @@ namespace utils {
 	std::string stack_backtrace();
 
 	void enableCrashDump();
-
-	void CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb);
 }

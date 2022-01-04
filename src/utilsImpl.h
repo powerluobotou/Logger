@@ -8,8 +8,6 @@ namespace utils {
 		std::string _createUUID();
 	}
 
-	void _readIni(char const* buf, std::map<std::string, std::map<std::string, std::string>>& ini);
-
 	void _replaceAll(std::string& s, std::string const& src, std::string const& dst);
 	
 	void _replaceEscChar(std::string& s);
@@ -45,6 +43,4 @@ namespace utils {
 	std::string _utf82GBK(char const* utf8, size_t len);
 
 	unsigned int _now_ms();
-
-	void _CURLCheckVersion(std::map<std::string, std::string>& version, std::function<void(int rc)> cb);
 }
