@@ -10,7 +10,7 @@ namespace Curl {
 		curlm_ = ::curl_multi_init();
 	}
 
-	int Multi::add_handle(CURL * curl) {
+	int Multi::add_handle(CURL* curl) {
 		int rc = 0;
 		do {
 			CHECKPTR_BREAK(curl);
@@ -49,7 +49,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Multi::remove_handle(CURL * curl) {
+	int Multi::remove_handle(CURL* curl) {
 		int rc = 0;
 		do {
 			CHECKPTR_BREAK(curl);
@@ -81,7 +81,7 @@ namespace Curl {
 
 	int Multi::select() {
 		REQState rc = eFailed;
-		do  {
+		do {
 			CHECKPTR_BREAK(curlm_);
 
 			timeval timeout;
@@ -148,18 +148,18 @@ namespace Curl {
 			if (0 != (rc = add_handles())) {
 				break;
 			}
-			
+
 			// run curl_multi_perform
 			int running = 0;
 			while (CURLM_CALL_MULTI_PERFORM == ::curl_multi_perform(curlm_, &running)) {
 				assert(false);
 			}
 
-// 			if (pFMop)
-// 				pFMop->Open();
+			//if (pFMop)
+			//	pFMop->Open();
 
 			do {
-				if( 0 != (rc = this->select())) {
+				if (0 != (rc = this->select())) {
 					break;
 				}
 
@@ -168,8 +168,8 @@ namespace Curl {
 				}
 			} while (running);
 
-// 			if (pFMop)
-// 				pFMop->Close();
+			//if (pFMop)
+			//	pFMop->Close();
 
 			info_read();
 
@@ -186,7 +186,7 @@ namespace Curl {
 	int Multi::info_read() {
 		int rc = 0;
 		int left;
-		CURLMsg *msg;
+		CURLMsg* msg;
 		while ((msg = ::curl_multi_info_read(curlm_, &left))) { // 获取当前解析的curl的相关传输信息
 			if (CURLMSG_DONE == msg->msg) {
 				if (CURLE_OK != msg->data.result) {

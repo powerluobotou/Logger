@@ -54,7 +54,7 @@ namespace Operation {
 		}
 		void SetOperation(IOperation* op) { op_ = op; }
 		IOperation* GetOperation() { return op_; }
-    private:
+	private:
 		IOperation* op_;
 	};
 }

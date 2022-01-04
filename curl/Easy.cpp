@@ -10,7 +10,7 @@
 
 namespace Curl {
 
-	void Easy::dump_(const char *text, FILE *stream, unsigned char *ptr, size_t size) {
+	void Easy::dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
 		size_t i;
 		size_t c;
 		unsigned int width = 0x10;
@@ -39,28 +39,28 @@ namespace Curl {
 		}
 	}
 
-	int Easy::debugCallback_(CURL *curl, curl_infotype type, char *data, size_t size, void *userp) {
-		FILE * fd = (FILE *)((Easy::debug_data_t *)userp)->fd;
-		bool & debug_flag = ((Easy::debug_data_t *)userp)->dump_flag_;
-		
+	int Easy::debugCallback_(CURL* curl, curl_infotype type, char* data, size_t size, void* userp) {
+		FILE* fd = (FILE*)((Easy::debug_data_t*)userp)->fd;
+		bool& debug_flag = ((Easy::debug_data_t*)userp)->dump_flag_;
+
 		fd = fd ? fd : stderr;
 
-		const char *text;
+		const char* text;
 		(void)curl; /* prevent compiler warning */
 		switch (type) {
 		case CURLINFO_TEXT:
 			fprintf(fd, "== Info: %s", data);
 		default: /* in case a new one is introduced to shock us */
 			return 0;
-		// 请求头
+			// 请求头
 		case CURLINFO_HEADER_OUT:
 			text = "=> Send header";
 			break;
-		// 请求体
+			// 请求体
 		case CURLINFO_DATA_OUT:
 			text = "=> Send data";
 			if (false == debug_flag) {
-				dump_(text, fd, (unsigned char *)data, size);
+				dump_(text, fd, (unsigned char*)data, size);
 				debug_flag = true;
 			}
 			return 0;
@@ -68,11 +68,11 @@ namespace Curl {
 		case CURLINFO_SSL_DATA_OUT:
 			text = "=> Send SSL data";
 			break;
-		// 响应头
+			// 响应头
 		case CURLINFO_HEADER_IN:
 			text = "<= Recv header";
 			break;
-		// 响应体
+			// 响应体
 		case CURLINFO_DATA_IN:
 			text = "<= Recv data";
 			break;
@@ -80,35 +80,35 @@ namespace Curl {
 			text = "<= Recv SSL data";
 			break;
 		}
-		dump_(text, fd, (unsigned char *)data, size);
+		dump_(text, fd, (unsigned char*)data, size);
 		return 0;
 	}
 
-	size_t Easy::readCallback_(void *buffer, size_t size, size_t nmemb, void *stream) {
+	size_t Easy::readCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
 #if 0
-		return stream ? 
-			fread(buffer, size, nmemb, (FILE *)stream) : 0;
+		return stream ?
+			fread(buffer, size, nmemb, (FILE*)stream) : 0;
 #else
-		return stream ? 
-			((Operation::IOperation *)stream)->Read(buffer, size, nmemb) : 0;
+		return stream ?
+			((Operation::IOperation*)stream)->Read(buffer, size, nmemb) : 0;
 #endif
 	}
 
-	size_t Easy::writeCallback_(void *buffer, size_t size, size_t nmemb, void *stream) {
+	size_t Easy::writeCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
 		return stream ?
-			((Easy *)stream)->writeCallback(buffer, size, nmemb) : 0;
+			((Easy*)stream)->writeCallback(buffer, size, nmemb) : 0;
 	}
 
-	int Easy::progressCallback_(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+	int Easy::progressCallback_(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
 		return clientp ?
-			((Easy *)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow) : 0;
+			((Easy*)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow) : 0;
 	}
 
-	size_t Easy::readCallback(void *buffer, size_t size, size_t nmemb) {
+	size_t Easy::readCallback(void* buffer, size_t size, size_t nmemb) {
 		return size * nmemb;
 	}
-	
-	size_t Easy::writeCallback(void *buffer, size_t size, size_t nmemb) {
+
+	size_t Easy::writeCallback(void* buffer, size_t size, size_t nmemb) {
 		// CURLINFO_CONTENT_LENGTH_DOWNLOAD
 		// CURLINFO_CONTENT_LENGTH_UPLOAD
 		// CURLINFO_FILETIME
@@ -134,11 +134,11 @@ namespace Curl {
 
 			const unsigned int elapseTime = 500;
 			unsigned long tickcount_ = utils::_now_ms();
-			
+
 			if ((EUpload == this->mode_ && 0 != ultotal) && (ultotal == ulnow || (tickcount_ - this->lasttime_ >= elapseTime))) {
 
 				this->lasttime_ = tickcount_;
-				
+
 				if (!this->finished_)
 					this->progress_cb_(this, ultotal, ulnow);
 
@@ -146,9 +146,9 @@ namespace Curl {
 					this->finished_ = true;
 			}
 			else if ((EDownload == this->mode_ && 0 != dltotal) && (dltotal == dlnow || (tickcount_ - this->lasttime_ >= elapseTime))) {
-				
+
 				this->lasttime_ = tickcount_;
-				
+
 				if (!this->finished_)
 					this->progress_cb_(this, dltotal, dlnow);
 
@@ -156,7 +156,7 @@ namespace Curl {
 					this->finished_ = true;
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -177,7 +177,7 @@ namespace Curl {
 		char const* url,
 		std::list<std::string> const* headers,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 #if 0
 		purge();
 #endif
@@ -193,7 +193,7 @@ namespace Curl {
 				break;
 			if (0 != addHeader(headers))
 				break;
-			if (0 != setCallback(/*NULL*/(void *)readCallback_, (void *)writeCallback_, /*NULL*/(void *)progressCallback_))
+			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
 			if (0 != setTimeout())
 				break;
@@ -219,7 +219,7 @@ namespace Curl {
 		std::list<std::string> const* headers,
 		char const* spost,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 #if 0
 		purge();
 #endif
@@ -237,7 +237,7 @@ namespace Curl {
 				break;
 			if (0 != addPost(NULL, spost))
 				break;
-			if (0 != setCallback(/*NULL*/(void *)readCallback_, (void *)writeCallback_, /*NULL*/(void *)progressCallback_))
+			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
 			if (0 != setTimeout())
 				break;
@@ -265,7 +265,7 @@ namespace Curl {
 		std::list<FMParam> const* params,
 		OnProgress onProgress,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 #if 0
 		purge();
 #endif
@@ -283,7 +283,7 @@ namespace Curl {
 				break;
 			if (0 != addPost(params, NULL))
 				break;
-			if (0 != setCallback(/*NULL*/(void *)readCallback_, (void *)writeCallback_, /*NULL*/(void *)progressCallback_))
+			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
 			if (0 != setTimeout())
 				break;
@@ -313,7 +313,7 @@ namespace Curl {
 		OnBuffer onBuffer,
 		OnProgress onProgress,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		this->finished_ = false;
 		this->mode_ = EDownload;
 		this->buffer_cb_ = onBuffer;
@@ -375,7 +375,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setDebug(bool dump, FILE *fd) {
+	int Easy::setDebug(bool dump, FILE* fd) {
 		memset(&debug_data_, 0, sizeof(debug_data_));
 		debug_data_.fd = fd;
 		debug_data_.dump_flag_ = dump;
@@ -432,7 +432,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setCallback(void *readcb, void *writecb, void *progresscb) {
+	int Easy::setCallback(void* readcb, void* writecb, void* progresscb) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -442,7 +442,7 @@ namespace Curl {
 				easycode = curl_easy_setopt(curl_, CURLOPT_READDATA, this);
 				CHECKCURLE_BREAK(easycode);
 			}
-			if (writecb){
+			if (writecb) {
 				easycode = curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, writecb/*writeCallback_*/);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_WRITEDATA, this);
@@ -473,8 +473,8 @@ namespace Curl {
 			}
 			else {
 				// 缺省 PEM，另外支持 DER
- 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSLCERTTYPE, "PEM");
- 				//CHECKCURLE_BREAK(easycode);
+				//easycode = curl_easy_setopt(curl_, CURLOPT_SSLCERTTYPE, "PEM");
+				//CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_CAINFO, spath);
@@ -519,11 +519,11 @@ namespace Curl {
 		return rc;
 	}
 
-	bool Easy::formAdd(CURL *curl, std::list<FMParam> const& params) {
+	bool Easy::formAdd(CURL* curl, std::list<FMParam> const& params) {
 		bool suc = true;
 		do {
 			CHECKPTR_BREAK(curl_);
-			
+
 			if (formpost_) {
 				::curl_formfree(formpost_);
 				formpost_ = NULL;
@@ -541,7 +541,7 @@ namespace Curl {
 		return suc;
 	}
 
-	bool Easy::formAdd(CURL *curl, FMParam const& param) {
+	bool Easy::formAdd(CURL* curl, FMParam const& param) {
 		param.value->Seek(0L, SEEK_END);
 		size_t size = param.value->Tell();
 		param.value->Seek(0L, SEEK_SET);
@@ -660,7 +660,7 @@ namespace Curl {
 		do {
 			CHECKPTR_BREAK(curl_);
 
-			CURLcode easycode;	
+			CURLcode easycode;
 			easycode = ::curl_easy_perform(curl_);
 			CHECKCURLE_BREAK(easycode);
 
@@ -673,7 +673,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::check(char const* url, double & size) {
+	int Easy::check(char const* url, double& size) {
 #if 0
 		purge();
 #endif

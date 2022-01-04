@@ -23,7 +23,7 @@
 			break;  \
 		}
 
-namespace Curl{
+namespace Curl {
 
 	Client::Client()
 		: multi_(NULL) {
@@ -33,7 +33,7 @@ namespace Curl{
 		: multi_(sync ? (new Multi()) : NULL) {
 	}
 
-	int Client::check(char const* url, double & size) {
+	int Client::check(char const* url, double& size) {
 		Easy easy;
 		return easy.check(url, size);
 	}
@@ -41,9 +41,9 @@ namespace Curl{
 	int Client::get(
 		char const* url,
 		std::list<std::string> const* headers,
-		std::string *resp,
+		std::string* resp,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		int rc = -1;
 		do {
 			Easy easy;
@@ -70,9 +70,9 @@ namespace Curl{
 		char const* url,
 		std::list<std::string> const* headers,
 		char const* spost,
-		std::string *resp,
+		std::string* resp,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		int rc = -1;
 		do {
 			Easy easy;
@@ -96,10 +96,10 @@ namespace Curl{
 	int Client::upload(
 		char const* url,
 		std::list<FMParam> const* params,
-		std::string *resp,
+		std::string* resp,
 		OnProgress onProgress,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		int rc = -1;
 		do {
 			Easy easy;
@@ -142,15 +142,15 @@ namespace Curl{
 	int Client::addUpload(
 		char const* url,
 		std::list<FMParam> const* params,
-		std::string *resp,
+		std::string* resp,
 		OnBuffer onBuffer,
 		OnProgress onProgress,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		int rc = -1;
 		do
 		{
-			Easy * easy = new Easy();
+			Easy* easy = new Easy();
 			CHECKPTR_BREAK(easy);
 
 			if (0 != easy->buildUpload(url, params, callback, spath, dump, fd)) {
@@ -170,7 +170,7 @@ namespace Curl{
 		OnBuffer onBuffer,
 		OnProgress onProgress,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		int rc = -1;
 		do {
 			Easy easy;
@@ -214,16 +214,16 @@ namespace Curl{
 		char const* url,
 		callback_t callback,
 		char const* spath,
-		bool dump, FILE *fd) {
+		bool dump, FILE* fd) {
 		do {
-			Easy * easy = new Easy();
+			Easy* easy = new Easy();
 			if (0 != easy->buildDownload(url, callback, spath, dump, fd)) {
 				delete easy;
 				break;
 			}
 			this->list_easy_.push_back(easy);
 		} while (0);
-		
+
 		return 0;
 	}
 #endif
@@ -252,8 +252,7 @@ namespace Curl{
 
 unsigned lasttime = utils::_now_ms();
 
-void onUpload(Curl::Easy * easy, double ftotal, double fnow)
-{
+void onUpload(Curl::Easy* easy, double ftotal, double fnow) {
 	printf("progress[%.3f / %.3f] [%d%%]\n", fnow, ftotal, (int)((fnow / ftotal) * 100));
 	if (fnow != 0 && fnow == ftotal)
 	{
@@ -318,9 +317,8 @@ void testUpload()
 	printf("time = %d ms", tickcount - lasttime);
 };
 
-void onDownload(Curl::Easy * easy, double ftotal, double fnow)
-{
-	Operation::CFile* f = (Operation::CFile *)easy->GetOperation();
+void onDownload(Curl::Easy* easy, double ftotal, double fnow) {
+	Operation::CFile* f = (Operation::CFile*)easy->GetOperation();
 	std::string path = f->Path();
 	int pos;
 	pos = path.find_last_of('\\');
