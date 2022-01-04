@@ -30,5 +30,5 @@ namespace utils {
 		};
 	}
 
-	void _CheckVersion(std::string const& v, std::string const& url, std::function<void(int rc)> cb);
+	void _CheckVersion(std::string const& v, std::string const& url, std::string const& dir, std::function<void(int rc)> cb);
 }
