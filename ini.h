@@ -21,6 +21,7 @@ namespace utils {
 		public:
 			bool parse(char const* filename);
 			bool parse(char const* buf, size_t len);
+			Sections const& get();
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);
 		private:

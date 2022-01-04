@@ -25,6 +25,9 @@ namespace utils {
 			AUTHORIZATION_CHECK_B;
 			return reader_->parse(buf, len);
 		}
+		Sections const& Reader::get() {
+			return reader_->get();
+		}
 		Section* Reader::get(char const* section) {
 			return reader_->get(section);
 		}

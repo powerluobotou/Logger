@@ -186,6 +186,10 @@ namespace utils {
 			return m_.size() > 0;
 		}
 		
+		Sections const& _Reader::get() {
+			return m_;
+		}
+
 		Section* _Reader::get(char const* section) {
 			if (section && section[0]) {
 				Sections::iterator it = m_.find(section);
