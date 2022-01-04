@@ -19,6 +19,7 @@ namespace utils {
 			Reader();
 			~Reader();
 		public:
+			bool parse(char const* filename);
 			bool parse(char const* buf, size_t len);
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);

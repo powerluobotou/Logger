@@ -17,6 +17,10 @@ namespace utils {
 		Reader::~Reader() {
 			delete reader_;
 		}
+		bool Reader::parse(char const* filename) {
+			AUTHORIZATION_CHECK_B;
+			return reader_->parse(filename);
+		}
 		bool Reader::parse(char const* buf, size_t len) {
 			AUTHORIZATION_CHECK_B;
 			return reader_->parse(buf, len);

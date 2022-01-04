@@ -15,10 +15,12 @@ namespace utils {
 		typedef std::map<std::string, std::string> Section;
 		typedef std::map<std::string, Section> Sections;
 
-		void _readIni(char const* buf, Sections& sections);
+		void _readIniBuffer(char const* buf, Sections& sections);
+		void _readIniFile(char const* filename, Sections& sections);
 
 		class _Reader {
 		public:
+			bool parse(char const* filename);
 			bool parse(char const* buf, size_t len);
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);

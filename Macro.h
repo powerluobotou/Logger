@@ -23,14 +23,18 @@
 #include <string.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <errno.h>
 #include <fcntl.h>
 #include <assert.h>
 #include <time.h>
 #include <iomanip>
+#include <memory>
 #include <random>
 #include <stdarg.h>
 
+#include <algorithm>
+#include <utility>
 #include <vector>
 #include <list>
 #include <map>
