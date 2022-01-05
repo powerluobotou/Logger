@@ -2,7 +2,7 @@
 
 #include "../../Macro.h"
 
-#include "../SetOperation.h"
+#include "../Operation.h"
 #include "../Args.h"
 
 #include "curl/curl.h"
@@ -12,10 +12,10 @@ namespace Curl {
 	class ClientImpl;
 	class EasyImpl;
 
-	typedef std::function<size_t(Operation::CSetOperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
-	typedef std::function<void(Operation::CSetOperation* obj, double ltotal, double lnow)> OnProgress;
+	typedef std::function<size_t(Operation::COperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
+	typedef std::function<void(Operation::COperation* obj, double ltotal, double lnow)> OnProgress;
 
-	class EasyImpl : public Operation::CSetOperation {
+	class EasyImpl : public Operation::COperation {
 		friend class ClientImpl;
 		enum { EUpload, EDownload };
 	public:

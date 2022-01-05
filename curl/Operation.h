@@ -4,10 +4,10 @@
 
 namespace Operation {
 
-	class CSetOperation {
+	class COperation {
 	public:
-		CSetOperation() :op_(NULL) {}
-		virtual ~CSetOperation() {}
+		COperation() :op_(NULL) {}
+		virtual ~COperation() {}
 	public:
 		bool Open(Mode mode = Mode::M_READ) {
 			if (op_) {

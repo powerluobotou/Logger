@@ -64,7 +64,7 @@ namespace utils {
 		if (req.download(
 			url.c_str(),
 			path.c_str(),
-			[&](Operation::CSetOperation* obj, void* buffer, size_t size, size_t nmemb) -> size_t {
+			[&](Operation::COperation* obj, void* buffer, size_t size, size_t nmemb) -> size_t {
 				size_t n = obj->Write(buffer, size, nmemb);
 				if (n > 0) {
 					int offset = data.size();
@@ -73,7 +73,7 @@ namespace utils {
 				}
 				return n;
 			},
-			[&](Operation::CSetOperation* obj, double ltotal, double lnow) {
+			[&](Operation::COperation* obj, double ltotal, double lnow) {
 				Operation::FileImpl* f = (Operation::FileImpl*)obj->GetOperation();
 				std::string path = f->Path();
 				std::string::size_type pos = path.find_last_of('\\');

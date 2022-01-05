@@ -1,12 +1,12 @@
 ﻿#pragma once
 
 #include "Args.h"
-#include "SetOperation.h"
+#include "Operation.h"
 
 namespace Curl {
 
-	typedef std::function<size_t(Operation::CSetOperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
-	typedef std::function<void(Operation::CSetOperation* obj, double ltotal, double lnow)> OnProgress;
+	typedef std::function<size_t(Operation::COperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
+	typedef std::function<void(Operation::COperation* obj, double ltotal, double lnow)> OnProgress;
 
 	class ClientImpl;
 	class Client {
