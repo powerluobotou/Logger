@@ -7,7 +7,7 @@
 
 #include "../curl/impl/ClientImpl.h"
 //#include "../curl/impl/MemImpl.h"
-//#include "../curl/impl/FileImpl.h"
+#include "../curl/impl/FileImpl.h"
 
 #include "mymd5.h"
 

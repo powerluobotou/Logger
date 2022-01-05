@@ -6,7 +6,7 @@ namespace Operation {
 
 	COperation::~COperation() {}
 
-	bool COperation::Open(Mode mode = Mode::M_READ) {
+	bool COperation::Open(Mode mode/* = Mode::M_READ*/) {
 		if (op_) {
 			return op_->Open(mode);
 		}
