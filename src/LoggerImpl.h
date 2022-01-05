@@ -61,8 +61,7 @@ namespace LOGGER {
 		bool valid();
 		void sync();
 		void timezoneInfo();
-		void openConsole();
-		void closeConsole();
+		void doConsole(char const cmd);
 	private:
 #ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
