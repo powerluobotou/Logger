@@ -9,7 +9,7 @@ namespace Operation {
 	public:
 		explicit FileImpl(const char* path);
 		~FileImpl();
-		char const* Path() { return path_.c_str(); }
+		char const* Path();
 	public:
 		virtual bool Valid();
 		virtual bool IsFile();

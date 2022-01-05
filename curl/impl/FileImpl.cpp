@@ -12,6 +12,10 @@ namespace Operation {
 	FileImpl::~FileImpl() {
 		Close();
 	}
+	
+	char const* FileImpl::Path() {
+		return path_.c_str();
+	}
 
 	bool FileImpl::Valid() {
 		return stream_ != NULL;

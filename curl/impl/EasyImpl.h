@@ -1,10 +1,8 @@
 ﻿#pragma once
 
 #include "../../Macro.h"
-
 #include "../Operation.h"
 #include "../Args.h"
-
 #include "curl/curl.h"
 
 namespace Curl {

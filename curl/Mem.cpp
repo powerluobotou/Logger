@@ -10,6 +10,11 @@ namespace Operation {
 	CMemory::~CMemory() {
 		delete impl_;
 	}
+	
+	char const* CMemory::Path() {
+		AUTHORIZATION_CHECK_P;
+		return impl_->Path();
+	}
 
 	bool CMemory::Valid() {
 		AUTHORIZATION_CHECK_B;

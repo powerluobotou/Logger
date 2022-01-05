@@ -10,7 +10,7 @@ namespace Operation {
 	public:
 		IOperation() {}
 		virtual ~IOperation() {}
-	public:
+		virtual char const* Path() = 0;
 		virtual bool Valid() = 0;
 		virtual bool IsFile() = 0;
 		virtual void ClearErr() {}

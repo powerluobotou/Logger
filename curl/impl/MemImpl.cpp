@@ -10,6 +10,10 @@ namespace Operation {
 	MemImpl::~MemImpl() {
 	}
 
+	char const* MemImpl::Path() {
+		return NULL;
+	}
+
 	bool MemImpl::Valid() {
 		return buffer_.size() > 0;
 	}

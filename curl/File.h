@@ -9,8 +9,7 @@ namespace Operation {
 	public:
 		explicit CFile(const char* path);
 		~CFile();
-		char const* Path();
-	public:
+		virtual char const* Path();
 		virtual bool Valid();
 		virtual bool IsFile();
 		virtual void ClearErr();

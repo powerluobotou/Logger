@@ -10,6 +10,7 @@ namespace Operation {
 		CMemory();
 		~CMemory();
 	public:
+		virtual char const* Path();
 		virtual bool Valid();
 		virtual bool IsFile();
 		virtual bool Close();

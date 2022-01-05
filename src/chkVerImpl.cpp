@@ -6,8 +6,8 @@
 #include "excp.h"
 
 #include "../curl/impl/ClientImpl.h"
-#include "../curl/impl/MemImpl.h"
-#include "../curl/impl/FileImpl.h"
+//#include "../curl/impl/MemImpl.h"
+//#include "../curl/impl/FileImpl.h"
 
 #include "mymd5.h"
 
@@ -74,14 +74,15 @@ namespace utils {
 				return n;
 			},
 			[&](Operation::COperation* obj, double ltotal, double lnow) {
-				Operation::FileImpl* f = (Operation::FileImpl*)obj->GetOperation();
-				std::string path = f->Path();
+				//Operation::FileImpl* f = (Operation::FileImpl*)obj->GetOperation();
+				//std::string path = f->Path();
+				std::string path = obj->GetOperation()->Path();
 				std::string::size_type pos = path.find_last_of('\\');
 				std::string filename = path.substr(pos + 1, -1);
 				__TLOG_INFO("下载进度 %.2f%% 路径 %s", (lnow / ltotal) * 100, path.c_str());
 				if (lnow == ltotal) {
-					f->Flush();
-					f->Close();
+					obj->GetOperation()->Flush();
+					obj->GetOperation()->Close();
 					__PLOG_DEBUG("下载完成! 共 %.0f 字节，准备校验...", ltotal);
 					char md5[32 + 1] = { 0 };
 					MD5Encode32(&data.front(), data.size(), md5, 0);
