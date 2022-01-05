@@ -21,8 +21,7 @@ namespace utils {
 		std::string filename = url.substr(pos + 1, -1);
 		if (!utils::_mkDir(dir.c_str())) {
 			__PLOG_ERROR("创建下载目录失败..%s\n\t1.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!", dir.c_str());
-			xsleep(10000);
-			__LOG_CONSOLE_CLOSE();
+			__LOG_CONSOLE_CLOSE(10000);
 			cb(-1);//失败，退出
 			return;
 		}
@@ -49,8 +48,7 @@ namespace utils {
 					__PLOG_WARN("*******************************************");
 					//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
 					::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
-					xsleep(10000);
-					__LOG_CONSOLE_CLOSE();
+					__LOG_CONSOLE_CLOSE(10000);
 					cb(0);//成功，退出
 				}
 			}
@@ -97,21 +95,18 @@ namespace utils {
 						__PLOG_WARN("*******************************************");
 						//::WinExec(path.c_str(), SW_SHOWMAXIMIZED);
 						::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
-						xsleep(10000);
-						__LOG_CONSOLE_CLOSE();
+						__LOG_CONSOLE_CLOSE(10000);
 						cb(0);//成功，退出
 					}
 					else {
 						__PLOG_ERROR("校验失败，请检查安装包[版本号/大小/MD5值]\n");
-						xsleep(10000);
-						__LOG_CONSOLE_CLOSE();
+						__LOG_CONSOLE_CLOSE(10000);
 						cb(1);//失败，继续
 					}
 				}
 			}, NULL, false, stdout) < 0) {
 			__PLOG_ERROR("更新失败，失败原因可能：\n\t1.下载包打开失败，目录or文件?\n\t2.下载包可能被占用，请关闭后重试.\n\t3.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!\n\t4.检查下载链接%s是否有效!\n\t5.请检查本地网络.", url.c_str());
-			xsleep(10000);
-			__LOG_CONSOLE_CLOSE();
+			__LOG_CONSOLE_CLOSE(10000);
 			cb(-1);//失败，退出
 		}
 		__MY_CATCH();
@@ -133,8 +128,7 @@ namespace utils {
 		Curl::ClientImpl req;
 		if (req.get(url.c_str(), &header, &vi) < 0) {
 			__PLOG_ERROR("下载失败，失败原因可能：\n\t1.检查链接%s是否有效!\n\t2.请检查本地网络.", url.c_str());
-			xsleep(10000);
-			__LOG_CONSOLE_CLOSE();
+			__LOG_CONSOLE_CLOSE(10000);
 			cb(1);//失败，继续
 		}
 		else {
@@ -152,14 +146,12 @@ namespace utils {
 					return;
 				}
 				__PLOG_INFO("版本检查完毕，没有发现新版本.");
-				xsleep(2000);
-				__LOG_CONSOLE_CLOSE();
+				__LOG_CONSOLE_CLOSE(2000);
 				cb(1);//失败，继续
 			}
 			else {
 				__PLOG_ERROR("版本配置解析失败.");
-				xsleep(10000);
-				__LOG_CONSOLE_CLOSE();
+				__LOG_CONSOLE_CLOSE(10000);
 				cb(1);//失败，继续
 			}
 		}

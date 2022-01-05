@@ -97,9 +97,9 @@ namespace LOGGER {
 	}
 
 	//disable
-	void Logger::disable() {
+	void Logger::disable(int delay) {
 		AUTHORIZATION_CHECK;
-		impl_->disable();
+		impl_->disable(delay);
 	}
 
 	//cleanup

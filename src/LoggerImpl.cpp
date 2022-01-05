@@ -360,6 +360,7 @@ namespace LOGGER {
 		case 'I':return LVL_INFO;
 		case 'T':return LVL_TRACE;
 		case 'D':return LVL_DEBUG;
+		case 'X':
 		default:
 			return -1;
 		}
@@ -391,6 +392,10 @@ namespace LOGGER {
 				case LVL_DEBUG: {
 					write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
 					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+					break;
+				}
+				default: {
+					closeConsole();
 					break;
 				}
 				}
@@ -426,10 +431,7 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
-		if (enable_ && !isConsoleOpen_) {
-			utils::_initConsole();
-			isConsoleOpen_ = true;
-		}
+		openConsole();
 		if (!isConsoleOpen_) {
 			return;
 		}
@@ -528,10 +530,7 @@ namespace LOGGER {
 		}
 		}
 		//::CloseHandle(h);
-		if (!enable_ && isConsoleOpen_) {
-			utils::_closeConsole();
-			isConsoleOpen_ = false;
-		}
+		closeConsole();
 #else
 		switch (level) {
 		case LVL_FATAL:
@@ -588,9 +587,28 @@ namespace LOGGER {
 	}
 
 	//disable
-	void LoggerImpl::disable() {
+	void LoggerImpl::disable(int delay) {
 		if (enable_) {
 			enable_ = false;
+			timer_.AsyncWait(delay, [&] {
+				notify("X", 1, 0, 0, NULL, 0);
+				});
+		}
+	}
+	
+	//openConsole
+	void LoggerImpl::openConsole() {
+		if (enable_ && !isConsoleOpen_) {
+			utils::_initConsole();
+			isConsoleOpen_ = true;
+		}
+	}
+	
+	//closeConsole
+	void LoggerImpl::closeConsole() {
+		if (!enable_ && isConsoleOpen_) {
+			utils::_closeConsole();
+			isConsoleOpen_ = false;
 		}
 	}
 }

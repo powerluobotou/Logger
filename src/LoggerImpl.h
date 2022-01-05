@@ -10,6 +10,8 @@
 
 #include "Atomic.h"
 
+#include "timer.h"
+
 #ifdef __STACK__
 #undef __STACK__
 #endif
@@ -31,7 +33,7 @@ namespace LOGGER {
 	public:
 		static LoggerImpl* instance();
 		void enable();
-		void disable();
+		void disable(int delay = 0);
 		void set_timezone(int64_t timezone = MY_CCT);
 		void set_level(int level);
 		char const* get_level();
@@ -59,6 +61,8 @@ namespace LOGGER {
 		bool valid();
 		void sync();
 		void timezoneInfo();
+		void openConsole();
+		void closeConsole();
 	private:
 #ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
@@ -90,6 +94,7 @@ namespace LOGGER {
 		std::condition_variable sync_cond_;
 		bool enable_ = false;
 		bool isConsoleOpen_ = false;
+		utils::Timer timer_;
 	};
 }
 
