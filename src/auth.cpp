@@ -24,8 +24,7 @@ namespace utils {
 		__LOG_CONSOLE_OPEN();
 		std::string s = utils::_strfTime(expired, timezone);
 		__TLOG_ERROR("auth expired %s", s.c_str());
-		xsleep(5000);
-		__LOG_CONSOLE_CLOSE();
+		__LOG_CONSOLE_CLOSE(5000);
 		noOk = true;
 		return true;
 	}
