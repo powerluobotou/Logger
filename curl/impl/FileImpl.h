@@ -1,10 +1,4 @@
-﻿/**
-*
-*   文件操作类
-*	Created by 萝卜 2021.12.17
-*
-*/
-#pragma once
+﻿#pragma once
 
 #include "../../Macro.h"
 #include "../IOperation.h"

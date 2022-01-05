@@ -1,10 +1,4 @@
-﻿/**
-*
-*   基于CURL库的HTTP操作
-*	Created by 萝卜 2021.12.17
-*
-*/
-#include "../../src/utilsImpl.h"
+﻿#include "../../src/utilsImpl.h"
 #include "../../src/LoggerImpl.h"
 #include "EasyImpl.h"
 #include "ClientImpl.h"

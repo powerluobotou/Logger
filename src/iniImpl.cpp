@@ -1,10 +1,4 @@
-﻿/**
-*
-*   INI配置读取
-*	Created by andy_ro@qq.com 2022.01.04
-*
-*/
-#include "iniImpl.h"
+﻿#include "iniImpl.h"
 #include "utilsImpl.h"
 
 #include "LoggerImpl.h"

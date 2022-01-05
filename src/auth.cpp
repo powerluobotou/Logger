@@ -1,10 +1,4 @@
-/**
-*
-*   授权过期时间
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#include "auth.h"
+﻿#include "auth.h"
 #include "utilsImpl.h"
 #include "LoggerImpl.h"
 

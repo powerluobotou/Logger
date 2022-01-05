@@ -1,10 +1,4 @@
-﻿/**
-*
-*   文件操作类
-*	Created by 萝卜 2021.12.17
-*
-*/
-#include "File.h"
+﻿#include "File.h"
 #include "impl/FileImpl.h"
 #include "../src/auth.h"
 

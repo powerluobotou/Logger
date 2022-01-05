@@ -1,10 +1,4 @@
-﻿/**
-*
-*   异常处理
-*	Created by andy_ro@qq.com 2021.11.20
-*
-*/
-#pragma once
+﻿#pragma once
 
 #include "Macro.h"
 

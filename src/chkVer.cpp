@@ -1,9 +1,3 @@
-/**
-*
-*   版本检查
-*	Created by andy_ro@qq.com 2022.01.04
-*
-*/
 #include "chkVer.h"
 #include "chkVerImpl.h"
 #include "auth.h"

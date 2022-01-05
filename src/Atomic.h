@@ -1,9 +1,3 @@
-/**
-*
-*   原子锁
-*	Created by andy_ro@qq.com 2021.11.18
-*
-*/
 #pragma once
 
 #include "Macro.h"

@@ -1,10 +1,4 @@
-﻿/**
-*
-*   版本检查
-*	Created by andy_ro@qq.com 2022.01.04
-*
-*/
-#include "chkVerImpl.h"
+﻿#include "chkVerImpl.h"
 #include "utilsImpl.h"
 #include "iniImpl.h"
 

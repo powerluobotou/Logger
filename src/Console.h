@@ -1,10 +1,4 @@
-﻿/**
-*
-*   控制台开关
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#pragma once
+﻿#pragma once
 
 #include "Macro.h"
 

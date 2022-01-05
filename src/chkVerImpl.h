@@ -1,9 +1,3 @@
-/**
-*
-*   版本检查
-*	Created by andy_ro@qq.com 2022.01.04
-*
-*/
 #pragma once
 
 #include "Macro.h"

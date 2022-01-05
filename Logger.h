@@ -1,10 +1,4 @@
-﻿/**
-*
-*   异步日志系统实现
-*	Created by 萝卜 2021.11.17
-*
-*/
-#pragma once
+﻿#pragma once
 
 #include "utils.h"
 

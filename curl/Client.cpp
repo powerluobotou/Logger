@@ -1,10 +1,4 @@
-﻿/**
-*
-*   基于CURL库的HTTP操作
-*	Created by 萝卜 2021.12.17
-*
-*/
-#include "Client.h"
+﻿#include "Client.h"
 #include "impl/ClientImpl.h"
 #include "../src/auth.h"
 

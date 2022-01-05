@@ -1,10 +1,4 @@
-﻿/**
-*
-*   全局函数
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#include "../utils.h"
+﻿#include "../utils.h"
 #include "utilsImpl.h"
 #include "backtrace.h"
 #include "mymd5.h"

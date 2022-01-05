@@ -1,10 +1,4 @@
-﻿/**
-*
-*   gettimeofday
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#include "gettimeofday.h"
+﻿#include "gettimeofday.h"
 
 #ifdef _windows_
 

@@ -1,10 +1,4 @@
-﻿/**
-*
-*   堆栈跟踪
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#pragma once
+﻿#pragma once
 
 #include "Macro.h"
 

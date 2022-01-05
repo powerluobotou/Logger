@@ -1,10 +1,4 @@
-﻿/**
-*
-*   异步日志系统实现
-*	Created by andy_ro@qq.com 2021.11.17
-*
-*/
-#include "../Logger.h"
+﻿#include "../Logger.h"
 #include "LoggerImpl.h"
 #include "../utils.h"
 #include "auth.h"

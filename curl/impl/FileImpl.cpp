@@ -1,10 +1,4 @@
-﻿/**
-*
-*   文件操作类
-*	Created by 萝卜 2021.12.17
-*
-*/
-#include "FileImpl.h"
+﻿#include "FileImpl.h"
 #include "../../src/LoggerImpl.h"
 
 namespace Operation {

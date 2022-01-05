@@ -1,10 +1,4 @@
-﻿/**
-*
-*   内存操作类
-*	Created by 萝卜 2021.12.17
-*
-*/
-#include "Mem.h"
+﻿#include "Mem.h"
 #include "impl/MemImpl.h"
 #include "../src/auth.h"
 
