@@ -50,31 +50,31 @@ namespace utils {
 	}
 
 	void EchoFunc(std::string const&& s) {
-		__TLOG_DEBUG("test: %s", s.c_str());
+		__TLOG_ERROR("test: %s", s.c_str());
 	}
 
 	void testTimer() {
 		Timer t;
 		//周期性执行定时任务
-		t.StartTimer(1000, std::bind(EchoFunc, "hello world!"));
-		std::this_thread::sleep_for(std::chrono::seconds(4));
-		__TLOG_DEBUG("try to expire timer!");
+		t.StartTimer(10000, std::bind(EchoFunc, "timeout StartTimer1!"));
+		//std::this_thread::sleep_for(std::chrono::seconds(4));
+		__TLOG_WARN("try to expire timer!");
 		t.Expire();
 
 		//周期性执行定时任务
-		t.StartTimer(1000, std::bind(EchoFunc, "hello c++11!"));
-		std::this_thread::sleep_for(std::chrono::seconds(4));
-		__TLOG_DEBUG("try to expire timer!");
+		t.StartTimer(10000, std::bind(EchoFunc, "timeout StartTimer2!"));
+		//std::this_thread::sleep_for(std::chrono::seconds(4));
+		__TLOG_INFO("try to expire timer!");
 		t.Expire();
 
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		//std::this_thread::sleep_for(std::chrono::seconds(2));
 
 		//只执行一次定时任务
 		//同步
-		t.SyncWait(1000, EchoFunc, "hello world!");
+		t.SyncWait(10000, EchoFunc, "timeout SyncWait!");
 		//异步
-		t.AsyncWait(1000, EchoFunc, "hello c++11!");
+		t.AsyncWait(10000, EchoFunc, "timeout AsyncWait!");
 
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		//std::this_thread::sleep_for(std::chrono::seconds(10));
 	}
 }
