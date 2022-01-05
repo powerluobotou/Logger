@@ -1,26 +1,32 @@
+﻿/**
+*
+*   基于CURL库的HTTP操作
+*	Created by 萝卜 2021.12.17
+*
+*/
 #pragma once
 
+#include "../../Macro.h"
+
+#include "../SetOperation.h"
+#include "../Args.h"
+
 #include "curl/curl.h"
-#include "SetOperation.h"
-#include "ParamDefine.h"
-#include <list>
-#include <string>
-#include <functional>
 
 namespace Curl {
 
-	class Client;
-	class Easy;
+	class ClientImpl;
+	class EasyImpl;
 
-	typedef std::function<size_t(Easy* easy, void* buffer, size_t size, size_t nmemb)> OnBuffer;
-	typedef std::function<void(Easy* easy, double ltotal, double lnow)> OnProgress;
+	typedef std::function<size_t(Operation::CSetOperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
+	typedef std::function<void(Operation::CSetOperation* obj, double ltotal, double lnow)> OnProgress;
 
-	class Easy : public Operation::CSetOperation {
-		friend class Client;
+	class EasyImpl : public Operation::CSetOperation {
+		friend class ClientImpl;
 		enum { EUpload, EDownload };
 	public:
-		Easy();
-		~Easy();
+		EasyImpl();
+		~EasyImpl();
 	protected:
 		int buildGet(
 			char const* url,
@@ -35,7 +41,7 @@ namespace Curl {
 			bool dump = true, FILE* fd = stderr);
 		int buildUpload(
 			char const* url,
-			std::list<FMParam> const* params,
+			std::list<Operation::Args> const* args,
 			OnProgress onProgress,
 			char const* spath = NULL,
 			bool dump = true, FILE* fd = stderr);
@@ -53,7 +59,7 @@ namespace Curl {
 		int setDebug(bool dump = true, FILE* fd = stderr);
 		int setUrl(char const* url);
 		int addHeader(std::list<std::string> const* headers);
-		int addPost(std::list<FMParam> const* params, char const* spost);
+		int addPost(std::list<Operation::Args> const* args, char const* spost);
 		int setProxy(char const* sproxy = NULL, char const* sagent = NULL);
 		int setSSLCA(char const* spath = NULL);
 		int setCallback(void* readcbk = NULL, void* writecbk = NULL, void* progresscbk = NULL);
@@ -84,8 +90,8 @@ namespace Curl {
 		static size_t writeCallback_(void* buffer, size_t size, size_t nmemb, void* stream);
 		static int progressCallback_(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 	private:
-		bool formAdd(CURL* curl, FMParam const& param);
-		bool formAdd(CURL* curl, std::list<FMParam> const& params);
+		bool formAdd(CURL* curl, Operation::Args const& args);
+		bool formAdd(CURL* curl, std::list<Operation::Args> const& args);
 		void purge();
 	};
 }

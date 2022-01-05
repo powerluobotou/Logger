@@ -1,15 +1,21 @@
+﻿/**
+*
+*   文件操作类
+*	Created by 萝卜 2021.12.17
+*
+*/
 #pragma once
 
+#include "../Macro.h"
 #include "IOperation.h"
-#include <stdio.h>
-#include <string>
 
 namespace Operation {
-
+	class FileImpl;
 	class CFile : public IOperation {
 	public:
 		explicit CFile(const char* path);
 		~CFile();
+		char const* Path();
 	public:
 		virtual bool Valid();
 		virtual bool IsFile();
@@ -62,9 +68,6 @@ namespace Operation {
 		int vfscanf ( FILE * stream, const char * format, va_list arg );
 		*/
 	private:
-		FILE * stream_;
-		std::string path_;
-	public:
-		char const * Path() { return path_.c_str(); }
+		FileImpl* impl_;
 	};
 }

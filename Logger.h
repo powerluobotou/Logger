@@ -1,7 +1,7 @@
 ﻿/**
 *
 *   异步日志系统实现
-*	Created by andy_ro@qq.com 2021.11.17
+*	Created by 萝卜 2021.11.17
 *
 */
 #pragma once
@@ -22,33 +22,41 @@
 
 namespace LOGGER {
 
+	class LoggerImpl;
 	class Logger {
+		friend class LoggerImpl;
+	private:
+		Logger();
+		~Logger();
 	public:
-		static void set_timezone(int64_t timezone = MY_CCT);
-		static void set_level(int level);
-		static char const* get_level();
-		static void set_color(int level, int title, int text);
-		static void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
-		static void write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...);
-		static void write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg);
-		static void wait();
-		static void enable();
-		static void disable();
-		static void cleanup();
+		static Logger* instance();
+		void set_timezone(int64_t timezone = MY_CCT);
+		void set_level(int level);
+		char const* get_level();
+		void set_color(int level, int title, int text);
+		void init(char const* dir, int level, char const* prename = NULL, size_t logsize = 100000000);
+		void write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...);
+		void write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg);
+		void wait();
+		void enable();
+		void disable();
+		void cleanup();
+	private:
+		LoggerImpl* impl_;
 	};
 }
 
-#define LOG_INIT LOGGER::Logger::init
-#define LOG LOGGER::Logger::write
-#define LOG_S LOGGER::Logger::write_s
-#define LOG_SET LOGGER::Logger::set_level
-#define LOG_LVL LOGGER::Logger::get_level
-#define LOG_TIMEZONE LOGGER::Logger::set_timezone
-#define LOG_WAIT LOGGER::Logger::wait
-#define LOG_COLOR LOGGER::Logger::set_color
-#define LOG_CONSOLE_OPEN LOGGER::Logger::enable
-#define LOG_CONSOLE_CLOSE LOGGER::Logger::disable
-#define LOG_CLEANUP LOGGER::Logger::cleanup
+#define LOG_INIT LOGGER::Logger::instance()->init
+#define LOG LOGGER::Logger::instance()->write
+#define LOG_S LOGGER::Logger::instance()->write_s
+#define LOG_SET LOGGER::Logger::instance()->set_level
+#define LOG_LVL LOGGER::Logger::instance()->get_level
+#define LOG_TIMEZONE LOGGER::Logger::instance()->set_timezone
+#define LOG_WAIT LOGGER::Logger::instance()->wait
+#define LOG_COLOR LOGGER::Logger::instance()->set_color
+#define LOG_CONSOLE_OPEN LOGGER::Logger::instance()->enable
+#define LOG_CONSOLE_CLOSE LOGGER::Logger::instance()->disable
+#define LOG_CLEANUP LOGGER::Logger::instance()->cleanup
 
 #define LOG_SET_FATAL LOG_SET(LVL_FATAL)
 #define LOG_SET_ERROR LOG_SET(LVL_ERROR)

@@ -1,256 +1,113 @@
+﻿/**
+*
+*   内存操作类
+*	Created by 萝卜 2021.12.17
+*
+*/
 #include "Mem.h"
-#include <string.h>
+#include "impl/MemImpl.h"
+#include "../src/auth.h"
 
 namespace Operation {
 
-	CMemory::CMemory() {
-		pos_ = 0;
-		buffer_.clear();
+	CMemory::CMemory() : impl_(new MemImpl()) {
 	}
 
 	CMemory::~CMemory() {
+		delete impl_;
 	}
 
 	bool CMemory::Valid() {
-		return buffer_.size() > 0;
+		AUTHORIZATION_CHECK_B;
+		return impl_->Valid();
 	}
 
 	bool CMemory::IsFile() {
-		return false;
+		AUTHORIZATION_CHECK_B;
+		return impl_->IsFile();
 	}
 
 	bool CMemory::Close() {
-		return true;
+		AUTHORIZATION_CHECK_B;
+		return impl_->Close();
 	}
 
 	int CMemory::Eof() {
-		return pos_ == buffer_.size() ? -1 : 0;
+		AUTHORIZATION_CHECK_R;
+		return impl_->Eof();
 	}
 
 	int CMemory::Getc() {
-		int nget = 0;
-		if (0 == Read(&nget, sizeof(char), 1)) {
-			return EOF;
-		}
-		return nget;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Getc();
 	}
 
 	int CMemory::GetPos(fpos_t* pos) {
-#if WIN32
-		* pos = pos_;
-#else
-		pos->__pos = pos_;
-#endif
-		return 0;
-	}
-
-	char* CMemory::Gets(char* str, int num) {
-		char* szReadBuffer = 0;
-		do {
-			if (!str || pos_ >= buffer_.size()) {
-				break;
-			}
-
-			size_t unReaded = 0;
-			if (pos_ + num <= buffer_.size()) {
-				unReaded = num;
-			}
-			else {
-				unReaded = buffer_.size() - pos_;
-			}
-
-			if (0 == unReaded) {
-				break;
-			}
-
-			size_t index = 0;
-			szReadBuffer = str;
-			for (; index < unReaded; index++) {
-				memcpy(szReadBuffer + index, buffer_.data() + pos_ + index, 1);
-				if ('\n' == *(buffer_.data() + pos_ + index)) {
-					break;
-				}
-			}
-
-			pos_ += index;
-		} while (0);
-
-		return szReadBuffer;
+		AUTHORIZATION_CHECK_I;
+		return impl_->GetPos(pos);
 	}
 
 	bool CMemory::Open(Mode mode) {
-		pos_ = 0;
-		return true;
+		AUTHORIZATION_CHECK_B;
+		return impl_->Open(mode);
 	}
 
 	int CMemory::Putc(int character) {
-		size_t unCount = sizeof(character);
-		Write(&character, sizeof(char), unCount);
-		return 0;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Putc(character);
 	}
 
 	int CMemory::Puts(const char* str) {
-		size_t unCount = strlen(str);
-		Write(str, sizeof(char), unCount);
-		return 0;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Puts(str);
 	}
 
 	size_t CMemory::Read(void* ptr, size_t size, size_t count) {
-
-		unsigned int unReaded = 0;
-		do {
-			if (!ptr || pos_ >= buffer_.size()) {
-				break;
-			}
-
-			unsigned int unNeedRead = size * count;
-			if (pos_ + unNeedRead <= buffer_.size()) {
-				unReaded = unNeedRead;
-			}
-			else {
-				unReaded = buffer_.size() - pos_;
-			}
-
-			if (0 == unReaded) {
-				break;
-			}
-
-			memcpy(ptr, buffer_.data() + pos_, unReaded);
-			pos_ += unReaded;
-		} while (0);
-
-		return unReaded;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Read(ptr, size, count);
 	}
 
 	int CMemory::Seek(long offset, int origin) {
-
-		int nRet = EOF;
-		if (offset >= 0) {
-			if (SEEK_CUR == origin) {
-				pos_ = pos_ + offset;
-				nRet = 0;
-			}
-			else if (SEEK_SET == origin) {
-				pos_ = offset;
-				nRet = 0;
-			}
-			else if (SEEK_END == origin) {
-				pos_ = buffer_.size() + offset;
-				nRet = 0;
-			}
-		}
-		else {
-			if (SEEK_CUR == origin) {
-#ifdef WIN32
-#pragma warning(push)
-#pragma warning(disable:4018)
-#endif
-				if (pos_ > abs(offset)) {
-					pos_ = pos_ - abs(offset);
-					nRet = 0;
-				}
-#ifdef WIN32				
-#pragma warning(pop) 
-#endif
-			}
-			else if (SEEK_CUR == origin || SEEK_END == origin) {
-#ifdef WIN32				
-#pragma warning(push)
-#pragma warning(disable:4018)
-#endif
-				if (buffer_.size() > abs(offset)) {
-					pos_ = buffer_.size() - abs(offset);
-					nRet = 0;
-				}
-				else {
-					pos_ = 0;
-				}
-#ifdef WIN32				
-#pragma warning(pop) 
-#endif
-			}
-		}
-		return nRet;
-
+		AUTHORIZATION_CHECK_R;
+		return impl_->Seek(offset, origin);
 	}
 
 	int CMemory::Setpos(const fpos_t* pos) {
-
-#ifdef WIN32			
-#pragma warning(push)
-#pragma warning(disable:4244)
-#endif
-
-#ifdef WIN32
-		pos_ = *pos;
-#else
-		pos_ = pos->__pos;
-#endif
-
-#ifdef WIN32			
-#pragma warning(pop) 
-#endif
-		return 0;
+		AUTHORIZATION_CHECK_R;
+		return impl_->Setpos(pos);
 	}
 
 	long CMemory::Tell() {
-		return pos_;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Tell();
 	}
 
 	size_t CMemory::Write(const void* ptr, size_t size, size_t count) {
-
-		size_t unWritten = 0;
-		do {
-			size_t unNeedWrite = size * count;
-			if (0 == unNeedWrite) {
-				break;
-			}
-
-			size_t unRealPos = pos_;
-			if (unRealPos > buffer_.size()) {
-				unRealPos = buffer_.size();
-			}
-
-			size_t unOriCount = buffer_.size();
-			if (unRealPos + unNeedWrite > unOriCount) {
-				buffer_.resize(unRealPos + unNeedWrite);
-			}
-
-			void* pDest = (void*)memcpy(buffer_.data() + unRealPos, (char*)ptr, unNeedWrite);
-			if ((void*)-1 == pDest) {
-				buffer_.resize(unOriCount);
-			}
-			else {
-				unWritten = unNeedWrite;
-				unRealPos += unWritten;
-				pos_ = unRealPos;
-			}
-		} while (0);
-		return unWritten;
+		AUTHORIZATION_CHECK_I;
+		return impl_->Write(ptr, size, count);
 	}
 
 	void CMemory::Rewind() {
-		pos_ = 0;
+		AUTHORIZATION_CHECK;
+		impl_->Rewind();
 	}
 
-	void CMemory::Buffer(char* buffer, size_t size)
-	{
-		memset(buffer, 0, size);
-		memcpy(buffer, buffer_.data(), Tell());
+	void CMemory::Buffer(char* buffer, size_t size) {
+		AUTHORIZATION_CHECK;
+		impl_->Buffer(buffer, size);
 	}
 
-	void CMemory::Buffer(std::string& s)
-	{
-		s.clear();
-		s.append((char*)buffer_.data(), (long)Tell());
+	void CMemory::Buffer(std::string& s) {
+		AUTHORIZATION_CHECK;
+		impl_->Buffer(s);
 	}
 
 	void CMemory::Buffer(std::vector<char>& buffer) {
+		AUTHORIZATION_CHECK;
+		impl_->Buffer(buffer);
 	}
 
-	CMemory::CMemory(void* buffer, unsigned long length) : pos_(0) {
-		buffer_.resize(length);
-		memcpy(buffer_.data(), buffer, length);
+	CMemory::CMemory(void* buffer, unsigned long length) : impl_(new MemImpl(buffer, length)) {
 	}
 // 
 // 

@@ -13,7 +13,7 @@ namespace utils {
 	namespace INI {
 		typedef std::map<std::string, std::string> Section;
 		typedef std::map<std::string, Section> Sections;
-		class _Reader;
+		class ReaderImpl;
 		class Reader {
 		public:
 			Reader();
@@ -25,9 +25,7 @@ namespace utils {
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);
 		private:
-			_Reader* reader_;
+			ReaderImpl* impl_;
 		};
 	}
-
-	void CheckVersion(std::string const& v, std::string const& url, std::string const& dir, std::function<void(int rc)> cb);
 }

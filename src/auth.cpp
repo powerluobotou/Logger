@@ -6,7 +6,7 @@
 */
 #include "auth.h"
 #include "utilsImpl.h"
-#include "Log.h"
+#include "LoggerImpl.h"
 
 namespace utils {
 

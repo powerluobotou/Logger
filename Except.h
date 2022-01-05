@@ -11,7 +11,7 @@
 #include <exception>
 #include <stdexcept>
 #include "utils.h"
-#include "Log.h"
+#include "Logger.h"
 
 #ifdef QT_SUPPORT
 #include <QException>

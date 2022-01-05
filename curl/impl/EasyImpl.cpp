@@ -1,16 +1,20 @@
-#include "../src/utilsImpl.h"
-#include "../src/Log.h"
-#include "Easy.h"
-#include <assert.h>
-#include <string.h>
-#include "Client.h"
+﻿/**
+*
+*   基于CURL库的HTTP操作
+*	Created by 萝卜 2021.12.17
+*
+*/
+#include "../../src/utilsImpl.h"
+#include "../../src/LoggerImpl.h"
+#include "EasyImpl.h"
+#include "ClientImpl.h"
 
 //multipart/form-data详细介绍 http://blog.csdn.net/yankai0219/article/details/8159701
 //C++ curl库 源码编译及使用（VS2019）https://blog.csdn.net/xray2/article/details/120496410
 
 namespace Curl {
 
-	void Easy::dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
+	void EasyImpl::dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
 		size_t i;
 		size_t c;
 		unsigned int width = 0x10;
@@ -39,9 +43,9 @@ namespace Curl {
 		}
 	}
 
-	int Easy::debugCallback_(CURL* curl, curl_infotype type, char* data, size_t size, void* userp) {
-		FILE* fd = (FILE*)((Easy::debug_data_t*)userp)->fd;
-		bool& debug_flag = ((Easy::debug_data_t*)userp)->dump_flag_;
+	int EasyImpl::debugCallback_(CURL* curl, curl_infotype type, char* data, size_t size, void* userp) {
+		FILE* fd = (FILE*)((EasyImpl::debug_data_t*)userp)->fd;
+		bool& debug_flag = ((EasyImpl::debug_data_t*)userp)->dump_flag_;
 
 		fd = fd ? fd : stderr;
 
@@ -84,7 +88,7 @@ namespace Curl {
 		return 0;
 	}
 
-	size_t Easy::readCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
+	size_t EasyImpl::readCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
 #if 0
 		return stream ?
 			fread(buffer, size, nmemb, (FILE*)stream) : 0;
@@ -94,21 +98,21 @@ namespace Curl {
 #endif
 	}
 
-	size_t Easy::writeCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
+	size_t EasyImpl::writeCallback_(void* buffer, size_t size, size_t nmemb, void* stream) {
 		return stream ?
-			((Easy*)stream)->writeCallback(buffer, size, nmemb) : 0;
+			((EasyImpl*)stream)->writeCallback(buffer, size, nmemb) : 0;
 	}
 
-	int Easy::progressCallback_(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+	int EasyImpl::progressCallback_(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
 		return clientp ?
-			((Easy*)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow) : 0;
+			((EasyImpl*)clientp)->progressCallback(dltotal, dlnow, ultotal, ulnow) : 0;
 	}
 
-	size_t Easy::readCallback(void* buffer, size_t size, size_t nmemb) {
+	size_t EasyImpl::readCallback(void* buffer, size_t size, size_t nmemb) {
 		return size * nmemb;
 	}
 
-	size_t Easy::writeCallback(void* buffer, size_t size, size_t nmemb) {
+	size_t EasyImpl::writeCallback(void* buffer, size_t size, size_t nmemb) {
 		// CURLINFO_CONTENT_LENGTH_DOWNLOAD
 		// CURLINFO_CONTENT_LENGTH_UPLOAD
 		// CURLINFO_FILETIME
@@ -129,7 +133,7 @@ namespace Curl {
 			this->Write(buffer, size, nmemb);
 	}
 
-	int Easy::progressCallback(double dltotal, double dlnow, double ultotal, double ulnow) {
+	int EasyImpl::progressCallback(double dltotal, double dlnow, double ultotal, double ulnow) {
 		if (this->progress_cb_) {
 
 			const unsigned int elapseTime = 500;
@@ -160,7 +164,7 @@ namespace Curl {
 		return 0;
 	}
 
-	Easy::Easy() {
+	EasyImpl::EasyImpl() {
 		headerlist_ = NULL;
 		formpost_ = NULL;
 		lastptr_ = NULL;
@@ -173,7 +177,7 @@ namespace Curl {
 		//::curl_global_init(CURL_GLOBAL_DEFAULT);
 	}
 
-	int Easy::buildGet(
+	int EasyImpl::buildGet(
 		char const* url,
 		std::list<std::string> const* headers,
 		char const* spath,
@@ -214,7 +218,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::buildPost(
+	int EasyImpl::buildPost(
 		char const* url,
 		std::list<std::string> const* headers,
 		char const* spost,
@@ -260,9 +264,9 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::buildUpload(
+	int EasyImpl::buildUpload(
 		char const* url,
-		std::list<FMParam> const* params,
+		std::list<Operation::Args> const* args,
 		OnProgress onProgress,
 		char const* spath,
 		bool dump, FILE* fd) {
@@ -281,7 +285,7 @@ namespace Curl {
 				break;
 			if (0 != addHeader(NULL))
 				break;
-			if (0 != addPost(params, NULL))
+			if (0 != addPost(args, NULL))
 				break;
 			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
@@ -309,7 +313,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::buildDownload(char const* url,
+	int EasyImpl::buildDownload(char const* url,
 		OnBuffer onBuffer,
 		OnProgress onProgress,
 		char const* spath,
@@ -321,7 +325,7 @@ namespace Curl {
 		return this->buildGet(url, NULL, spath, dump, fd);
 	}
 
-	int Easy::addHeader(std::list<std::string> const* headers) {
+	int EasyImpl::addHeader(std::list<std::string> const* headers) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -346,7 +350,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setTimeout() {
+	int EasyImpl::setTimeout() {
 		int rc = -1;
 		do {
 //			CURLcode easycode;
@@ -363,7 +367,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setUrl(char const* url) {
+	int EasyImpl::setUrl(char const* url) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -375,7 +379,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setDebug(bool dump, FILE* fd) {
+	int EasyImpl::setDebug(bool dump, FILE* fd) {
 		memset(&debug_data_, 0, sizeof(debug_data_));
 		debug_data_.fd = fd;
 		debug_data_.dump_flag_ = dump;
@@ -398,7 +402,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setProxy(char const* sproxy, char const* sagent) {
+	int EasyImpl::setProxy(char const* sproxy, char const* sagent) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -432,7 +436,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setCallback(void* readcb, void* writecb, void* progresscb) {
+	int EasyImpl::setCallback(void* readcb, void* writecb, void* progresscb) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -461,7 +465,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::setSSLCA(char const* spath) {
+	int EasyImpl::setSSLCA(char const* spath) {
 		int rc = -1;
 		do {
 			CURLcode easycode;
@@ -485,12 +489,12 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::addPost(std::list<FMParam> const* params, char const* spost) {
+	int EasyImpl::addPost(std::list<Operation::Args> const* args, char const* spost) {
 		int rc = -1;
 		do {
 			// form post
-			if (params) {
-				if (!formAdd(curl_, *params)) {
+			if (args) {
+				if (!formAdd(curl_, *args)) {
 					break;
 				}
 			}
@@ -519,7 +523,7 @@ namespace Curl {
 		return rc;
 	}
 
-	bool Easy::formAdd(CURL* curl, std::list<FMParam> const& params) {
+	bool EasyImpl::formAdd(CURL* curl, std::list<Operation::Args> const& args) {
 		bool suc = true;
 		do {
 			CHECKPTR_BREAK(curl_);
@@ -529,8 +533,8 @@ namespace Curl {
 				formpost_ = NULL;
 				lastptr_ = NULL;
 			}
-			for (std::list<FMParam>::const_iterator it = params.begin();
-				it != params.end();
+			for (std::list<Operation::Args>::const_iterator it = args.begin();
+				it != args.end();
 				++it) {
 				if (!formAdd(curl, *it)) {
 					suc = false;
@@ -541,18 +545,18 @@ namespace Curl {
 		return suc;
 	}
 
-	bool Easy::formAdd(CURL* curl, FMParam const& param) {
-		param.value->Seek(0L, SEEK_END);
-		size_t size = param.value->Tell();
-		param.value->Seek(0L, SEEK_SET);
+	bool EasyImpl::formAdd(CURL* curl, Operation::Args const& args) {
+		args.value->Seek(0L, SEEK_END);
+		size_t size = args.value->Tell();
+		args.value->Seek(0L, SEEK_SET);
 
 		//multipart/form-data
 		return CURLE_OK == ::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, param.strkey.c_str(),			// name=""
-			CURLFORM_STREAM, param.value,						// CURLOPT_READFUNCTION
+			CURLFORM_COPYNAME, args.key.c_str(),    			// name=""
+			CURLFORM_STREAM, args.value,						// CURLOPT_READFUNCTION
 			CURLFORM_CONTENTSLENGTH, size,
-			CURLFORM_FILENAME, param.fileinfo.szfilename,		// filename=""
+			CURLFORM_FILENAME, args.fi.filename,		        // filename=""
 			CURLFORM_CONTENTTYPE, "application/octet-stream",
 			CURLFORM_END);
 #if 0
@@ -652,7 +656,7 @@ namespace Curl {
 #endif
 	}
 
-	int Easy::perform() {
+	int EasyImpl::perform() {
 		int rc = -1;
 #if 0
 		Open();
@@ -673,7 +677,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Easy::check(char const* url, double& size) {
+	int EasyImpl::check(char const* url, double& size) {
 #if 0
 		purge();
 #endif
@@ -729,7 +733,7 @@ namespace Curl {
 		return rc;
 	}
 
-	void Easy::purge() {
+	void EasyImpl::purge() {
 		if (headerlist_) {
 			::curl_slist_free_all(headerlist_);
 			headerlist_ = NULL;
@@ -747,7 +751,7 @@ namespace Curl {
 		}
 	}
 
-	Easy::~Easy() {
+	EasyImpl::~EasyImpl() {
 		purge();
 		//curl_global_cleanup();
 	}

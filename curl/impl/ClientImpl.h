@@ -6,20 +6,37 @@
 */
 #pragma once
 
-#include "Args.h"
-#include "SetOperation.h"
+#include "../../Macro.h"
+
+#pragma comment(lib, "ws2_32.lib")
+
+#include "EasyImpl.h"
+#include "MultiImpl.h"
+
+#define CHECKPTR_BREAK(x) \
+		if (NULL == (x)) { \
+			break;  \
+		}
+
+#define CHECKCURLE_BREAK(x) \
+		if (CURLE_OK != (x)) { \
+			break;  \
+		}
+
+#define CHECKCURLM_BREAK(x) \
+		if (CURLM_OK != (x)) { \
+			break;  \
+		}
 
 namespace Curl {
 
-	typedef std::function<size_t(Operation::CSetOperation* obj, void* buffer, size_t size, size_t nmemb)> OnBuffer;
-	typedef std::function<void(Operation::CSetOperation* obj, double ltotal, double lnow)> OnProgress;
-
-	class ClientImpl;
-	class Client {
+	class EasyImpl;
+	class MultiImpl;
+	class ClientImpl {
 	public:
-		Client();
-		Client(bool sync);
-		~Client();
+		ClientImpl();
+		ClientImpl(bool sync);
+		~ClientImpl();
 		int check(char const* url, double& size);
 		int get(
 			char const* url,
@@ -48,7 +65,9 @@ namespace Curl {
 			OnProgress onProgress,
 			char const* spath = NULL,
 			bool dump = true, FILE* fd = stderr);
+		int perform();
 	private:
-		ClientImpl* impl_;
+		MultiImpl* multi_;
+		std::list<EasyImpl*> list_easy_;
 	};
 }

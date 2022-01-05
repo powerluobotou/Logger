@@ -5,50 +5,65 @@
 *
 */
 #include "../Logger.h"
-#include "Log.h"
+#include "LoggerImpl.h"
 #include "../utils.h"
 #include "auth.h"
 
 namespace LOGGER {
 
+	//constructor
+	Logger::Logger() :impl_(new LoggerImpl()) {
+	};
+
+	//destructor
+	Logger::~Logger() {
+		delete impl_;
+	}
+
+	//instance
+	Logger* Logger::instance() {
+		static Logger logger;
+		return &logger;
+	}
+
 	//set_timezone
 	void Logger::set_timezone(int64_t timezone/* = MY_CCT*/) {
 		AUTHORIZATION_CHECK;
-		__LOG_TIMEZONE(timezone);
+		impl_->set_timezone(timezone);
 	}
 
 	//set_level
 	void Logger::set_level(int level) {
 		AUTHORIZATION_CHECK;
-		__LOG_SET(level);
+		impl_->set_level(level);
 	}
 
 	//get_level
 	char const* Logger::get_level() {
 		AUTHORIZATION_CHECK_P;
-		return __LOG_LVL();
+		return impl_->get_level();
 	}
 
 	//set_color
 	void Logger::set_color(int level, int title, int text) {
 		AUTHORIZATION_CHECK;
-		__LOG_COLOR(level, title, text);
+		impl_->set_color(level, title, text);
 	}
 
 	//init
 	void Logger::init(char const* dir, int level, char const* prename, size_t logsize) {
 		//AUTHORIZATION_CHECK;
-		__LOG_INIT(dir, level, prename, logsize);
+		impl_->init(dir, level, prename, logsize);
 	}
 
 	//write
 	void Logger::write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...) {
 		AUTHORIZATION_CHECK;
-		if (__LOG_CHECK(level)) {
+		if (impl_->check(level)) {
 			static size_t const PATHSZ = 512;
 			static size_t const MAXSZ = 81920;
 			char msg[PATHSZ + MAXSZ + 2];
-			size_t pos = __LOG_FORMAT(level, file, line, func, flag, msg, PATHSZ);
+			size_t pos = impl_->format(level, file, line, func, flag, msg, PATHSZ);
 			va_list ap;
 			va_start(ap, fmt);
 #ifdef _windows_
@@ -59,12 +74,12 @@ namespace LOGGER {
 			va_end(ap);
 			msg[pos + n] = '\n';
 			msg[pos + n + 1] = '\0';
-			if (__LOG_STARTED()) {
-				__LOG_CHECK_NOTIFY(msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
+			if (impl_->started()) {
+				impl_->notify(msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
 			}
 			else {
-				__LOG_CHECK_STDOUT(level, msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
-				__LOG_CHECK_SYNC(flag);
+				impl_->stdoutbuf(level, msg, pos + n + 1, pos, flag, stack, stack ? strlen(stack) : 0);
+				impl_->checkSync(flag);
 			}
 		}
 	}
@@ -78,25 +93,25 @@ namespace LOGGER {
 	//wait
 	void Logger::wait() {
 		AUTHORIZATION_CHECK;
-		__LOG_WAIT();
+		impl_->wait();
 	}
 
 	//enable
 	void Logger::enable() {
 		AUTHORIZATION_CHECK;
-		__LOG_CONSOLE_OPEN();
+		impl_->enable();
 	}
 
 	//disable
 	void Logger::disable() {
 		AUTHORIZATION_CHECK;
-		__LOG_CONSOLE_CLOSE();
+		impl_->disable();
 	}
 
 	//cleanup
 	void Logger::cleanup() {
 		AUTHORIZATION_CHECK;
-		__LOG_STOP();
+		impl_->stop();
 	}
 }
 

@@ -12,32 +12,27 @@
 namespace utils {
 
 	namespace INI {
-		Reader::Reader():reader_(new _Reader()) {
+		Reader::Reader() :impl_(new ReaderImpl()) {
 		}
 		Reader::~Reader() {
-			delete reader_;
+			delete impl_;
 		}
 		bool Reader::parse(char const* filename) {
 			AUTHORIZATION_CHECK_B;
-			return reader_->parse(filename);
+			return impl_->parse(filename);
 		}
 		bool Reader::parse(char const* buf, size_t len) {
 			AUTHORIZATION_CHECK_B;
-			return reader_->parse(buf, len);
+			return impl_->parse(buf, len);
 		}
 		Sections const& Reader::get() {
-			return reader_->get();
+			return impl_->get();
 		}
 		Section* Reader::get(char const* section) {
-			return reader_->get(section);
+			return impl_->get(section);
 		}
 		std::string Reader::get(char const* section, char const* key) {
-			return reader_->get(section, key);
+			return impl_->get(section, key);
 		}
-	}
-
-	void CheckVersion(std::string const& v, std::string const& url, std::string const& dir, std::function<void(int rc)> cb) {
-		AUTHORIZATION_CHECK;
-		utils::_CheckVersion(v, url, dir, cb);
 	}
 }

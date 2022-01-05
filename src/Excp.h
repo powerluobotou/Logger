@@ -10,7 +10,7 @@
 
 #include <exception>
 #include <stdexcept>
-#include "Log.h"
+#include "LoggerImpl.h"
 
 namespace excp {
 	//base_error

@@ -1,16 +1,20 @@
-#include "Multi.h"
-#include <assert.h>
-
-#include "Client.h"
+ï»¿/**
+*
+*   åŸºäºCURLåº“çš„HTTPæ“ä½œ
+*	Created by èåœ 2021.12.17
+*
+*/
+#include "MultiImpl.h"
+#include "ClientImpl.h"
 
 namespace Curl {
 
-	Multi::Multi() {
+	MultiImpl::MultiImpl() {
 		// init multi
 		curlm_ = ::curl_multi_init();
 	}
 
-	int Multi::add_handle(CURL* curl) {
+	int MultiImpl::add_handle(CURL* curl) {
 		int rc = 0;
 		do {
 			CHECKPTR_BREAK(curl);
@@ -28,12 +32,12 @@ namespace Curl {
 		return rc;
 	}
 
-	int Multi::add_handles() {
+	int MultiImpl::add_handles() {
 		int rc = 0;
 		for (std::list<CURL*>::iterator it = list_curl_.begin();
 			it != list_curl_.end();
 			++it) {
-			// easy ¼ÓÈëµ½ multi, Òì²½Ö§³Ö
+			// easy åŠ å…¥åˆ° multi, å¼‚æ­¥æ”¯æŒ
 			if (CURLM_OK != ::curl_multi_add_handle(curlm_, *it)) {
 				rc = -1;
 				break;
@@ -49,7 +53,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Multi::remove_handle(CURL* curl) {
+	int MultiImpl::remove_handle(CURL* curl) {
 		int rc = 0;
 		do {
 			CHECKPTR_BREAK(curl);
@@ -66,7 +70,7 @@ namespace Curl {
 		return rc;
 	}
 
-	int Multi::remove_handles() {
+	int MultiImpl::remove_handles() {
 		if (curlm_) {
 			for (std::list<CURL*>::iterator it = list_curl_.begin();
 				it != list_curl_.end();
@@ -79,7 +83,7 @@ namespace Curl {
 		return 0;
 	}
 
-	int Multi::select() {
+	int MultiImpl::select() {
 		REQState rc = eFailed;
 		do {
 			CHECKPTR_BREAK(curlm_);
@@ -139,12 +143,12 @@ namespace Curl {
 		return (eFailed == rc || eInterrupt == rc || eNetError == rc) ? -1 : 0;
 	}
 
-	int Multi::perform() {
+	int MultiImpl::perform() {
 		int rc = -1;
 		do {
 			CHECKPTR_BREAK(curlm_);
 
-			// easy ¼ÓÈëµ½ multi, Òì²½Ö§³Ö
+			// easy åŠ å…¥åˆ° multi, å¼‚æ­¥æ”¯æŒ
 			if (0 != (rc = add_handles())) {
 				break;
 			}
@@ -173,7 +177,7 @@ namespace Curl {
 
 			info_read();
 
-			// ÒÆ³ı multi ÖĞ easy
+			// ç§»é™¤ multi ä¸­ easy
 			remove_handles();
 
 			rc = 0;
@@ -183,11 +187,11 @@ namespace Curl {
 		return rc;
 	}
 
-	int Multi::info_read() {
+	int MultiImpl::info_read() {
 		int rc = 0;
 		int left;
 		CURLMsg* msg;
-		while ((msg = ::curl_multi_info_read(curlm_, &left))) { // »ñÈ¡µ±Ç°½âÎöµÄcurlµÄÏà¹Ø´«ÊäĞÅÏ¢
+		while ((msg = ::curl_multi_info_read(curlm_, &left))) { // è·å–å½“å‰è§£æçš„curlçš„ç›¸å…³ä¼ è¾“ä¿¡æ¯
 			if (CURLMSG_DONE == msg->msg) {
 				if (CURLE_OK != msg->data.result) {
 					rc = -1;
@@ -200,7 +204,7 @@ namespace Curl {
 		return rc;
 	}
 
-	Multi::~Multi() {
+	MultiImpl::~MultiImpl() {
 		if (curlm_) {
 			for (std::list<CURL*>::iterator it = list_curl_.begin();
 				it != list_curl_.end();

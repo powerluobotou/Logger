@@ -1,17 +1,23 @@
+﻿/**
+*
+*   基于CURL库的HTTP操作
+*	Created by 萝卜 2021.12.17
+*
+*/
 #pragma once
 
+#include "../../Macro.h"
+#include "../SetOperation.h"
 #include "curl/curl.h"
-#include "SetOperation.h"
-#include <list>
-#include <map>
 
 namespace Curl {
 
-	class Client;
-	class Multi {
-		friend class Client;
+	class ClientImpl;
+	class MultiImpl {
+		friend class ClientImpl;
 	public:
-		Multi();
+		MultiImpl();
+		~MultiImpl();
 	protected:
 		int perform();
 		inline bool validate() { return NULL != curlm_; }
@@ -26,7 +32,5 @@ namespace Curl {
 	private:
 		int add_handles();
 		int remove_handles();
-	public:
-		~Multi();
 	};
 }

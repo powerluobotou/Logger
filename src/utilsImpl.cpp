@@ -15,7 +15,7 @@
 #include <codecvt>
 #endif
 
-#include "Log.h"
+#include "LoggerImpl.h"
 #include "excp.h"
 
 namespace utils {

@@ -6,15 +6,15 @@
 */
 #pragma once
 
-#include "../Macro.h"
-#include "IOperation.h"
+#include "../../Macro.h"
+#include "../IOperation.h"
 
 namespace Operation {
-	class MemImpl;
-	class CMemory : public IOperation {
+	
+	class MemImpl : public IOperation {
 	public:
-		CMemory();
-		~CMemory();
+		MemImpl();
+		~MemImpl();
 	public:
 		virtual bool Valid();
 		virtual bool IsFile();
@@ -35,7 +35,7 @@ namespace Operation {
 		virtual void Buffer(char* buffer, size_t size);
 		virtual void Buffer(std::string& s);
 		virtual void Buffer(std::vector<char>& buffer);
-		CMemory(void* buffer, unsigned long length);
+		MemImpl(void* buffer, unsigned long length);
 		//bool Open();
 		//bool Read(void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead);
 		//bool Write(const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten);
@@ -43,6 +43,7 @@ namespace Operation {
 		//bool Close();
 		//bool IsEmpty();
 	private:
-		MemImpl* impl_;
+		size_t pos_;
+		std::vector<char> buffer_;
 	};
 }

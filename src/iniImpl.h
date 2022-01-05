@@ -1,4 +1,4 @@
-/**
+﻿/**
 *
 *   INI配置读取
 *	Created by andy_ro@qq.com 2022.01.04
@@ -18,7 +18,7 @@ namespace utils {
 		void _readBuffer(char const* buf, Sections& sections);
 		void _readFile(char const* filename, Sections& sections);
 
-		class _Reader {
+		class ReaderImpl {
 		public:
 			bool parse(char const* filename);
 			bool parse(char const* buf, size_t len);
@@ -29,6 +29,4 @@ namespace utils {
 			Sections m_;
 		};
 	}
-
-	void _CheckVersion(std::string const& v, std::string const& url, std::string const& dir, std::function<void(int rc)> cb);
 }

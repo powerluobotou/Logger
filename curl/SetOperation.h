@@ -1,3 +1,9 @@
+﻿/**
+*
+*   抽象操作类
+*	Created by 萝卜 2021.12.17
+*
+*/
 #pragma once
 
 #include "IOperation.h"

@@ -6,7 +6,7 @@
 */
 #include "backtrace.h"
 #include "gettimeofday.h"
-#include "Log.h"
+#include "LoggerImpl.h"
 #include "Excp.h"
 #include "utilsImpl.h"
 
@@ -22,12 +22,6 @@
 #include <locale> 
 #include <codecvt>
 #endif
-
-#include "../curl/Client.h"
-#include "../curl/Mem.h"
-#include "../curl/File.h"
-
-#include "mymd5.h"
 
 namespace utils {
 	
