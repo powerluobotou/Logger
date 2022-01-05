@@ -58,14 +58,14 @@ namespace utils {
 		//周期性执行定时任务
 		t.StartTimer(10000, std::bind(EchoFunc, "timeout StartTimer1!"));
 		//std::this_thread::sleep_for(std::chrono::seconds(4));
-		__TLOG_WARN("try to expire timer!");
+		__TLOG_WARN("try to expire timer1!");
 		t.Expire();
 
 		//周期性执行定时任务
-		t.StartTimer(10000, std::bind(EchoFunc, "timeout StartTimer2!"));
+		//t.StartTimer(10000, std::bind(EchoFunc, "timeout StartTimer2!"));
 		//std::this_thread::sleep_for(std::chrono::seconds(4));
-		__TLOG_INFO("try to expire timer!");
-		t.Expire();
+		//__TLOG_INFO("try to expire timer2!");
+		//t.Expire();
 
 		//std::this_thread::sleep_for(std::chrono::seconds(2));
 
