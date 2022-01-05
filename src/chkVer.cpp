@@ -1,4 +1,4 @@
-#include "chkVer.h"
+﻿#include "chkVer.h"
 #include "chkVerImpl.h"
 #include "auth.h"
 

@@ -1,4 +1,4 @@
-#include "../ini.h"
+﻿#include "../ini.h"
 #include "iniImpl.h"
 #include "utilsImpl.h"
 #include "auth.h"
