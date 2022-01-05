@@ -50,6 +50,7 @@ namespace utils {
 					::ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 					__LOG_CONSOLE_CLOSE(5000);
 					cb(0);//成功，退出
+					return;
 				}
 			}
 			__TLOG_DEBUG("校验失败，重新下载安装包... %s", url.c_str());
