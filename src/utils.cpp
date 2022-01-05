@@ -118,6 +118,7 @@ namespace utils {
 	}
 
 	unsigned int now_ms() {
+		AUTHORIZATION_CHECK_I;
 		return utils::_now_ms();
 	}
 
