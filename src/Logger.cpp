@@ -7,16 +7,23 @@ namespace LOGGER {
 
 	//constructor
 	Logger::Logger() :impl_(new LoggerImpl()) {
-	};
+	}
+
+	//constructor
+	Logger::Logger(LoggerImpl* impl) : impl_(impl) {
+	}
 
 	//destructor
 	Logger::~Logger() {
-		delete impl_;
+		if (impl_ &&
+			impl_ != LoggerImpl::instance()) {
+			delete impl_;
+		}
 	}
 
 	//instance
 	Logger* Logger::instance() {
-		static Logger logger;
+		static Logger logger(LoggerImpl::instance());
 		return &logger;
 	}
 

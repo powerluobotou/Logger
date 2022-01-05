@@ -21,6 +21,7 @@ namespace LOGGER {
 		friend class LoggerImpl;
 	private:
 		Logger();
+		explicit Logger(LoggerImpl* impl);
 		~Logger();
 	public:
 		static Logger* instance();
