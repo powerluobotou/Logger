@@ -52,7 +52,8 @@ namespace utils {
 #ifdef AUTHORIZATION_SUPPORT
 static struct __init_t {
 	__init_t() {
-		RegAuthCallback("2022-04-24 10:00:00", MY_GST);
+		//RegAuthCallback("2022-04-24 10:00:00", MY_GST);
+		RegAuthCallback("2022-01-05 19:31:00", MY_GST);
 	}
 }__x;
 #endif

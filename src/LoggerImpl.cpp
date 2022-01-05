@@ -581,7 +581,7 @@ namespace LOGGER {
 	void LoggerImpl::enable() {
 		if (!enable_) {
 			enable_ = true;
-			timer_.AsyncWait(0, [&] {
+			timer_.SyncWait(0, [&] {
 				notify("O", 1, 0, 0, NULL, 0);
 				});
 		}
