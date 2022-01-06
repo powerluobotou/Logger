@@ -464,19 +464,33 @@ namespace Curl {
 		do {
 			CURLcode easycode;
 			if (!spath) {
-				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
 				CHECKCURLE_BREAK(easycode);
-				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0L);
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
+				CHECKCURLE_BREAK(easycode);
+				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
+				//CHECKCURLE_BREAK(easycode);
+				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0L);
+				//CHECKCURLE_BREAK(easycode);
+				curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 				CHECKCURLE_BREAK(easycode);
 			}
 			else {
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, true);
+				CHECKCURLE_BREAK(easycode);
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
+				CHECKCURLE_BREAK(easycode);
 				// 缺省 PEM，另外支持 DER
 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSLCERTTYPE, "PEM");
 				//CHECKCURLE_BREAK(easycode);
-				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
+				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
+				//CHECKCURLE_BREAK(easycode);
+				curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 				CHECKCURLE_BREAK(easycode);
-				easycode = curl_easy_setopt(curl_, CURLOPT_CAINFO, spath);
+				easycode = curl_easy_setopt(curl_, CURLOPT_CAINFO, spath);//.pem
 				CHECKCURLE_BREAK(easycode);
+				//curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
+				//CHECKCURLE_BREAK(easycode);
 			}
 			rc = 0;
 		} while (0);
@@ -683,6 +697,14 @@ namespace Curl {
 				CHECKPTR_BREAK(curl_);
 			}
 			CURLcode easycode;
+			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
+			CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
+			CHECKCURLE_BREAK(easycode);
+			curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+			CHECKCURLE_BREAK(easycode);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
+			//CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_URL, url);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_NOBODY, 1L);

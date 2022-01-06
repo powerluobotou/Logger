@@ -19,6 +19,7 @@ namespace utils {
 			Sections const& get();
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);
+			std::string get(char const* section, char const* key, bool& hasKey);
 		private:
 			Sections m_;
 		};

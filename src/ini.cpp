@@ -28,5 +28,8 @@ namespace utils {
 		std::string Reader::get(char const* section, char const* key) {
 			return impl_->get(section, key);
 		}
+		std::string Reader::get(char const* section, char const* key, bool& hasKey) {
+			return impl_->get(section, key, hasKey);
+		}
 	}
 }

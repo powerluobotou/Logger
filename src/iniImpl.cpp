@@ -204,5 +204,22 @@ namespace utils {
 			}
 			return "";
 		}
+
+		std::string ReaderImpl::get(char const* section, char const* key, bool& hasKey) {
+			if (section && section[0]) {
+				Sections::iterator it = m_.find(section);
+				if (it != m_.end()) {
+					Section& ref = it->second;
+					if (key && key[0]) {
+						Section::iterator ir = ref.find(key);
+						if (ir != ref.end()) {
+							hasKey = true;
+							return ir->second;
+						}
+					}
+				}
+			}
+			return "";
+		}
 	}
 }

@@ -292,7 +292,7 @@ namespace LOGGER {
 
 	//start
 	bool LoggerImpl::start() {
-		if (!starting_.test_and_set() && !started_) {
+		if (!started_ && !starting_.test_and_set()) {
 			thread_ = std::thread([this](LoggerImpl* logger) {
 				struct tm tm = { 0 };
 				struct timeval tv = { 0 };
