@@ -21,7 +21,7 @@ namespace utils {
 		std::string filename = url.substr(pos + 1, -1);
 		if (!utils::_mkDir(dir.c_str())) {
 			__PLOG_ERROR("创建下载目录失败..%s\n\t1.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!", dir.c_str());
-			__LOG_CONSOLE_CLOSE(5000);
+			__LOG_CONSOLE_CLOSE(10000, true);
 			cb(-1);//失败，退出
 			return;
 		}
@@ -107,14 +107,55 @@ namespace utils {
 				}
 			}, NULL, false, stdout) < 0) {
 			__PLOG_ERROR("更新失败，失败原因可能：\n\t1.下载包打开失败，目录or文件?\n\t2.下载包可能被占用，请关闭后重试.\n\t3.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!\n\t4.检查下载链接%s是否有效!\n\t5.请检查本地网络.", url.c_str());
-			__LOG_CONSOLE_CLOSE(5000);
+			__LOG_CONSOLE_CLOSE(10000, true);
 			cb(-1);//失败，退出
 		}
 		__MY_CATCH();
 	}
 
-	//-1失败，退出 0成功，退出 1失败，继续
-	void _checkVersion(std::string const& v, std::string const& url, std::string const& dir, std::function<void(int rc)> cb) {
+	int _getConfigList(
+		Curl::ClientImpl& req,
+		utils::INI::ReaderImpl& reader,
+		std::map<std::string, std::string>& m, int& total) {
+		m.clear();
+		total = 0;
+		int i = 0, n = 0;
+		do {
+			std::string key = "url." + std::to_string(++i);
+			bool hasKey = false;
+			std::string cfg = reader.get("config", key.c_str(), hasKey);
+			if (hasKey) {
+				if (!cfg.empty()) {
+					++total;
+					double size;
+					if (req.check(cfg.c_str(), size) == 0) {
+						++n;
+						m[key] = cfg;
+						__TLOG_DEBUG("[有效]%s=%s size=%.0f", key.c_str(), cfg.c_str(), size);
+					}
+					else {
+						__TLOG_WARN("[失效]%s=%s", key.c_str(), cfg.c_str());
+					}
+				}
+			}
+			else {
+				break;
+			}
+		} while (true);
+		return n;
+	}
+
+	//v [IN] 当前版本号
+	//url [IN] 版本服务器url
+	//dir [IN] 下载安装文件保存路径
+	//cb [IN] 回调函数 -1失败，退出 0成功，退出 1失败，继续
+	//m [OUT] 线路配置列表
+	void _checkVersion(
+		std::string const& v,
+		std::string const& url,
+		std::string const& dir,
+		std::function<void(int rc)> cb,
+		std::map<std::string, std::string>& m) {
 		__LOG_CONSOLE_OPEN();
 		__TLOG_DEBUG("正在检查版本信息 %s", url.c_str());
 		__PLOG_DEBUG("当前版本号 %s", v.c_str());
@@ -129,15 +170,25 @@ namespace utils {
 		Curl::ClientImpl req;
 		if (req.get(url.c_str(), &header, &vi) < 0) {
 			__PLOG_ERROR("下载失败，失败原因可能：\n\t1.检查链接%s是否有效!\n\t2.请检查本地网络.", url.c_str());
-			__LOG_CONSOLE_CLOSE(5000);
+			__LOG_CONSOLE_CLOSE(10000);
 			cb(1);//失败，继续
 		}
 		else {
 			//__LOG_WARN(vi.c_str());
-			utils::INI::Section* version = NULL;
 			utils::INI::ReaderImpl reader;
 			if (reader.parse(vi.c_str(), vi.length())) {
-				version = reader.get("version");
+				int total = 0;
+				int n = _getConfigList(req, reader, m, total);
+				if (m.empty()) {
+					__PLOG_ERROR("共检查 %d 条线路，均不可用", total);
+					__LOG_CONSOLE_CLOSE(10000, true);
+					cb(-1);//失败，退出
+					return;
+				}
+				else {
+					__PLOG_DEBUG("共检查 %d 条线路 %d 条可用", total, n);
+				}
+				utils::INI::Section* version = reader.get("version");
 				if (version && v != (*version)["no"]) {
 					__PLOG_WARN("发现新版本 %s\n文件大小 %s 字节\nMD5值 %s\n准备更新...",
 						(*version)["no"].c_str(),
@@ -147,12 +198,12 @@ namespace utils {
 					return;
 				}
 				__PLOG_INFO("版本检查完毕，没有发现新版本.");
-				__LOG_CONSOLE_CLOSE(2000);
+				__LOG_CONSOLE_CLOSE(5000);
 				cb(1);//失败，继续
 			}
 			else {
 				__PLOG_ERROR("版本配置解析失败.");
-				__LOG_CONSOLE_CLOSE(5000);
+				__LOG_CONSOLE_CLOSE(10000);
 				cb(1);//失败，继续
 			}
 		}
