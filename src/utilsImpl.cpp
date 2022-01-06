@@ -1,6 +1,5 @@
 ﻿#include "utilsImpl.h"
 #include "gettimeofday.h"
-#include "auth.h"
 
 #ifdef _windows_
 //#include <DbgHelp.h>

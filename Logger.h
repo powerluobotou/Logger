@@ -34,7 +34,7 @@ namespace LOGGER {
 		void write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg);
 		void wait();
 		void enable();
-		void disable(int delay = 0);
+		void disable(int delay = 0, bool sync = false);
 		void cleanup();
 	private:
 		LoggerImpl* impl_;

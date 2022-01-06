@@ -33,7 +33,7 @@ namespace LOGGER {
 	public:
 		static LoggerImpl* instance();
 		void enable();
-		void disable(int delay = 0);
+		void disable(int delay = 0, bool sync = false);
 		void set_timezone(int64_t timezone = MY_CCT);
 		void set_level(int level);
 		char const* get_level();

@@ -346,9 +346,10 @@ namespace LOGGER {
 						std::make_pair(msg, stack ? stack : ""),
 						std::make_pair(pos, flag)));
 				cond_.notify_all();
+				std::this_thread::yield();
 			}
 		}
-		std::this_thread::yield();
+		//std::this_thread::yield();
 	}
 
 	//getlevel
@@ -395,7 +396,7 @@ namespace LOGGER {
 				}
 				case 'O':
 				case 'X': {
-					doConsole(level);
+					doConsole((char const)level);
 					break;
 				}
 				}
@@ -581,20 +582,27 @@ namespace LOGGER {
 	void LoggerImpl::enable() {
 		if (!enable_) {
 			enable_ = true;
-			timer_.SyncWait(0, [&] {
+			//timer_.SyncWait(0, [&] {
 				notify("O", 1, 0, 0, NULL, 0);
-				});
+			//	});
 		}
 	}
 
 	//disable
-	void LoggerImpl::disable(int delay) {
+	void LoggerImpl::disable(int delay, bool sync) {
 		if (enable_) {
 			enable_ = false;
-			__TLOG_WARN("disable after %d milliseconds ...", delay);
-			timer_.AsyncWait(delay, [&] {
-				notify("X", 1, 0, 0, NULL, 0);
-				});
+			//__TLOG_WARN("disable after %d milliseconds ...", delay);
+			if (sync) {
+				timer_.SyncWait(delay, [&] {
+					notify("X", 1, 0, 0, NULL, 0);
+					});
+			}
+			else {
+				timer_.AsyncWait(delay, [&] {
+					notify("X", 1, 0, 0, NULL, 0);
+					});
+			}
 		}
 	}
 
