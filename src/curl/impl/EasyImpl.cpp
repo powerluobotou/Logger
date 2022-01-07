@@ -9,18 +9,16 @@
 namespace Curl {
 
 	void EasyImpl::dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
-		size_t i;
-		size_t c;
 		unsigned int width = 0x10;
 
 		fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
 			text, (long)size, (long)size);
 
-		for (i = 0; i < size; i += width) {
+		for (size_t i = 0; i < size; i += width) {
 			fprintf(stream, "%4.4lx: ", (long)i);
 
 			/* show hex to the left */
-			for (c = 0; c < width; c++) {
+			for (size_t c = 0; c < width; ++c) {
 				if (i + c < size)
 					fprintf(stream, "%02x ", ptr[i + c]);
 				else
@@ -28,7 +26,7 @@ namespace Curl {
 			}
 
 			/* show data on the right */
-			for (c = 0; (c < width) && (i + c < size); c++) {
+			for (size_t c = 0; (c < width) && (i + c < size); ++c) {
 				char x = (ptr[i + c] >= 0x20 && ptr[i + c] < 0x80) ? ptr[i + c] : '.';
 				fputc(x, stream);
 			}
