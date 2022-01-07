@@ -61,6 +61,8 @@ namespace LOGGER {
 		bool valid();
 		void sync();
 		void timezoneInfo();
+		void openConsole();
+		void closeConsole();
 		void doConsole(char const cmd);
 	private:
 #ifdef _windows_
@@ -91,8 +93,9 @@ namespace LOGGER {
 		bool sync_ = false;
 		std::mutex sync_mutex_;
 		std::condition_variable sync_cond_;
-		bool enable_ = false;
 		bool isConsoleOpen_ = false;
+		std::atomic_bool enable_{ false };
+		std::atomic_flag isDoing_{ ATOMIC_FLAG_INIT };
 		utils::Timer timer_;
 	};
 }

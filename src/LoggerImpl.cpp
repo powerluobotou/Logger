@@ -432,6 +432,9 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
+		if (!started() && enable_.load()) {
+			openConsole();
+		}
 		if (!isConsoleOpen_) {
 			return;
 		}
@@ -530,6 +533,9 @@ namespace LOGGER {
 		}
 		}
 		//::CloseHandle(h);
+		if (!started() && !enable_.load()) {
+			closeConsole();
+		}
 #else
 		switch (level) {
 		case LVL_FATAL:
@@ -580,47 +586,63 @@ namespace LOGGER {
 
 	//enable
 	void LoggerImpl::enable() {
-		if (!enable_) {
-			enable_ = true;
-			//timer_.SyncWait(0, [&] {
-				notify("O", 1, 0, 0, NULL, 0);
-			//	});
+		if (!enable_.load()) {
+			enable_.store(true);
+			if (started()) {
+				//timer_.SyncWait(0, [&] {
+					notify("O", 1, 0, 0, NULL, 0);
+					//});
+			}
 		}
 	}
 
 	//disable
 	void LoggerImpl::disable(int delay, bool sync) {
-		if (enable_) {
-			enable_ = false;
+		if (enable_.load()) {
+			enable_.store(false);
 			//__TLOG_WARN("disable after %d milliseconds ...", delay);
-			if (sync) {
-				timer_.SyncWait(delay, [&] {
-					notify("X", 1, 0, 0, NULL, 0);
-					});
-			}
-			else {
-				timer_.AsyncWait(delay, [&] {
-					notify("X", 1, 0, 0, NULL, 0);
-					});
+			if (started()) {
+				if (sync) {
+					timer_.SyncWait(delay, [&] {
+						notify("X", 1, 0, 0, NULL, 0);
+						});
+				}
+				else {
+					timer_.AsyncWait(delay, [&] {
+						notify("X", 1, 0, 0, NULL, 0);
+						});
+				}
 			}
 		}
 	}
-
+	
+	//openConsole
+	void LoggerImpl::openConsole() {
+		if (!isConsoleOpen_ && !isDoing_.test_and_set()) {
+			utils::_initConsole();
+			isConsoleOpen_ = true;
+			isDoing_.clear();
+		}
+	}
+	
+	//closeConsole
+	void LoggerImpl::closeConsole() {
+		if (isConsoleOpen_ && !isDoing_.test_and_set()) {
+			utils::_closeConsole();
+			isConsoleOpen_ = false;
+			isDoing_.clear();
+		}
+	}
+	
 	//doConsole
 	void LoggerImpl::doConsole(char const cmd) {
 		switch (cmd) {
 		case 'O': {
-			if (!isConsoleOpen_) {
-				utils::_initConsole();
-				isConsoleOpen_ = true;
-			}
+			openConsole();
 			break;
 		}
 		case 'X': {
-			if (isConsoleOpen_) {
-				utils::_closeConsole();
-				isConsoleOpen_ = false;
-			}
+			closeConsole();
 			break;
 		}
 		}
