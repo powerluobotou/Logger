@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "utilsImpl.h"
+#include "../Macro.h"
 
 #define AUTHORIZATION_SUPPORT
 
