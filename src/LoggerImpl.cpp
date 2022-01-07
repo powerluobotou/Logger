@@ -432,9 +432,9 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
-		if (!started() && enable_.load()) {
-			openConsole();
-		}
+		//if (!started() && enable_.load()) {
+		//	openConsole();
+		//}
 		if (!isConsoleOpen_) {
 			return;
 		}
@@ -533,9 +533,9 @@ namespace LOGGER {
 		}
 		}
 		//::CloseHandle(h);
-		if (!started() && !enable_.load()) {
-			closeConsole();
-		}
+		//if (!started() && !enable_.load()) {
+		//	closeConsole();
+		//}
 #else
 		switch (level) {
 		case LVL_FATAL:
@@ -588,11 +588,15 @@ namespace LOGGER {
 	void LoggerImpl::enable() {
 		if (!enable_.load()) {
 			enable_.store(true);
-			if (started()) {
-				//timer_.SyncWait(0, [&] {
-					notify("O", 1, 0, 0, NULL, 0);
-					//});
-			}
+			//if (started()) {
+			//	//timer_.SyncWait(0, [&] {
+			//		notify("O", 1, 0, 0, NULL, 0);
+			//		//});
+			//}
+			//else {
+			//	openConsole();
+			//}
+			openConsole();
 		}
 	}
 
@@ -600,18 +604,31 @@ namespace LOGGER {
 	void LoggerImpl::disable(int delay, bool sync) {
 		if (enable_.load()) {
 			enable_.store(false);
-			//__TLOG_WARN("disable after %d milliseconds ...", delay);
-			if (started()) {
-				if (sync) {
-					timer_.SyncWait(delay, [&] {
-						notify("X", 1, 0, 0, NULL, 0);
-						});
-				}
-				else {
-					timer_.AsyncWait(delay, [&] {
-						notify("X", 1, 0, 0, NULL, 0);
-						});
-				}
+			__TLOG_WARN("disable after %d milliseconds ...", delay);
+			//if (started()) {
+			//	if (sync) {
+			//		timer_.SyncWait(delay, [&] {
+			//			notify("X", 1, 0, 0, NULL, 0);
+			//			});
+			//	}
+			//	else {
+			//		timer_.AsyncWait(delay, [&] {
+			//			notify("X", 1, 0, 0, NULL, 0);
+			//			});
+			//	}
+			//}
+			//else {
+			//	closeConsole();
+			//}
+			if (sync) {
+				timer_.SyncWait(delay, [&] {
+					closeConsole();
+					});
+			}
+			else {
+				timer_.AsyncWait(delay, [&] {
+					closeConsole();
+					});
 			}
 		}
 	}
