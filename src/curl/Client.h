@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Args.h"
-#include "Operation.h"
+#include "../op/Operation.h"
 
 namespace Curl {
 

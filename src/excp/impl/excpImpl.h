@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "../Macro.h"
+#include "../../Macro.h"
 
 #include <exception>
 #include <stdexcept>
-#include "LoggerImpl.h"
+#include "../../log/impl/LoggerImpl.h"
 
 namespace excp {
 	//base_error

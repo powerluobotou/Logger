@@ -1,6 +1,6 @@
 ﻿#include "../chkVer.h"
 #include "chkVerImpl.h"
-#include "auth.h"
+#include "../../auth/auth.h"
 
 namespace utils {
 	//v [IN] 当前版本号

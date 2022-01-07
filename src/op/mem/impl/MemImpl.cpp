@@ -1,4 +1,5 @@
 ﻿#include "MemImpl.h"
+#include "../../../log/impl/LoggerImpl.h"
 
 namespace Operation {
 

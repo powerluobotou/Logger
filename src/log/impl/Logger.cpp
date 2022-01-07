@@ -1,7 +1,7 @@
 ﻿#include "../Logger.h"
 #include "LoggerImpl.h"
-#include "../utils.h"
-#include "auth.h"
+#include "../../utils/utils.h"
+#include "../../auth/auth.h"
 
 namespace LOGGER {
 

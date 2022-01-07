@@ -1,10 +1,10 @@
 ﻿#include "LoggerImpl.h"
-#include "utilsImpl.h"
-#include "Console.h"
+#include "../../utils/impl/utilsImpl.h"
+#include "../../utils/impl/Console.h"
 
 #ifdef _windows_
 #include <process.h>
-#include "gettimeofday.h"
+#include "../../utils/impl/gettimeofday.h"
 #endif
 
 #ifdef QT_SUPPORT

@@ -1,15 +1,15 @@
 ﻿#include "chkVerImpl.h"
-#include "utilsImpl.h"
-#include "iniImpl.h"
+#include "../../utils/impl/utilsImpl.h"
+#include "../../ini/impl/iniImpl.h"
 
-#include "LoggerImpl.h"
-#include "excp.h"
+#include "../../log/impl/LoggerImpl.h"
+#include "../../excp/impl/excpImpl.h"
 
-#include "../curl/impl/ClientImpl.h"
-//#include "../curl/impl/MemImpl.h"
-#include "../curl/impl/FileImpl.h"
+#include "../../curl/impl/ClientImpl.h"
+//#include "../../op/mem/impl/MemImpl.h"
+#include "../../op/file/impl/FileImpl.h"
 
-#include "mymd5.h"
+#include "../../crypt/mymd5.h"
 
 namespace utils {
 

@@ -1,7 +1,7 @@
 ﻿#include "backtrace.h"
 #include "gettimeofday.h"
-#include "LoggerImpl.h"
-#include "Excp.h"
+#include "../../log/impl/LoggerImpl.h"
+#include "../../excp/impl/excpImpl.h"
 #include "utilsImpl.h"
 
 #ifdef _windows_

@@ -1,6 +1,6 @@
 ﻿#include "auth.h"
-#include "utilsImpl.h"
-#include "LoggerImpl.h"
+#include "../utils/impl/utilsImpl.h"
+#include "../log/impl/LoggerImpl.h"
 
 namespace utils {
 

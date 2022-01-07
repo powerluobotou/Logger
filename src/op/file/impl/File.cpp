@@ -1,6 +1,6 @@
-﻿#include "File.h"
-#include "impl/FileImpl.h"
-#include "../src/auth.h"
+﻿#include "../File.h"
+#include "FileImpl.h"
+#include "../../../auth/auth.h"
 
 namespace Operation {
 

@@ -1,6 +1,6 @@
-﻿#include "Client.h"
-#include "impl/ClientImpl.h"
-#include "../src/auth.h"
+﻿#include "../Client.h"
+#include "ClientImpl.h"
+#include "../../auth/auth.h"
 
 namespace Curl {
 

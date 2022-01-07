@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "IOperation.h"
+#include "../op/IOperation.h"
 
 namespace Curl {
 	enum REQState {

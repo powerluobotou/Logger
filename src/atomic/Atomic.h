@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Macro.h"
+#include "../Macro.h"
 #include <atomic>
 
 #ifdef _windows_

@@ -1,7 +1,7 @@
 ﻿#include "../ini.h"
 #include "iniImpl.h"
-#include "utilsImpl.h"
-#include "auth.h"
+#include "../../utils/impl/utilsImpl.h"
+#include "../../auth/auth.h"
 
 namespace utils {
 

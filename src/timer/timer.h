@@ -7,7 +7,7 @@
 #include <thread>
 #include <condition_variable>
 
-#include "Atomic.h"
+#include "../atomic/Atomic.h"
 
 namespace utils {
 	class Timer {

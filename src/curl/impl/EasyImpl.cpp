@@ -1,5 +1,5 @@
-﻿#include "../../src/utilsImpl.h"
-#include "../../src/LoggerImpl.h"
+﻿#include "../../utils/impl/utilsImpl.h"
+#include "../../log/impl/LoggerImpl.h"
 #include "EasyImpl.h"
 #include "ClientImpl.h"
 

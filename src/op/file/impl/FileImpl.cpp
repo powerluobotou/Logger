@@ -1,5 +1,5 @@
 ﻿#include "FileImpl.h"
-#include "../../src/LoggerImpl.h"
+#include "../../../log/impl/LoggerImpl.h"
 
 namespace Operation {
 

@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "Macro.h"
+#include "../Macro.h"
 
 #include <exception>
 #include <stdexcept>
-#include "utils.h"
-#include "Logger.h"
+#include "../utils/utils.h"
+#include "../log/Logger.h"
 
 #ifdef QT_SUPPORT
 #include <QException>

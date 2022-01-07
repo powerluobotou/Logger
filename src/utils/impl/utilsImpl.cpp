@@ -14,8 +14,8 @@
 #include <codecvt>
 #endif
 
-#include "LoggerImpl.h"
-#include "excp.h"
+#include "../../log/impl/LoggerImpl.h"
+#include "../../excp/impl/excpImpl.h"
 
 namespace utils {
 	

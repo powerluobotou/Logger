@@ -1,6 +1,6 @@
-﻿#include "Mem.h"
-#include "impl/MemImpl.h"
-#include "../src/auth.h"
+﻿#include "../Mem.h"
+#include "MemImpl.h"
+#include "../../../auth/auth.h"
 
 namespace Operation {
 

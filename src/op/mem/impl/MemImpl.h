@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "../../Macro.h"
-#include "../IOperation.h"
+#include "../../../Macro.h"
+#include "../../IOperation.h"
 
 namespace Operation {
 	

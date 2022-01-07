@@ -1,8 +1,8 @@
 ﻿#include "../utils.h"
 #include "utilsImpl.h"
 #include "backtrace.h"
-#include "mymd5.h"
-#include "auth.h"
+#include "../../crypt/mymd5.h"
+#include "../../auth/auth.h"
 
 #ifdef _windows_
 //#include <DbgHelp.h>
