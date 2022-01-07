@@ -11,34 +11,36 @@ namespace utils {
 	bool authExpired();
 }
 
+extern bool __sysCall();
+
 #ifdef AUTHORIZATION_SUPPORT
 #define AUTHORIZATION_CHECK \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return; \
 	}
 
 #define AUTHORIZATION_CHECK_B \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return false; \
 	}
 
 #define AUTHORIZATION_CHECK_P \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return NULL; \
 	}
 
 #define AUTHORIZATION_CHECK_R \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return -1; \
 	}
 
 #define AUTHORIZATION_CHECK_I \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return 0; \
 	}
 
 #define AUTHORIZATION_CHECK_S \
-	if (utils::authExpired()) { \
+	if (__sysCall()) { \
 		return ""; \
 	}
 #define RegAuthCallback utils::regAuthCallback

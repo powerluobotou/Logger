@@ -57,3 +57,7 @@ static struct __init_t {
 	}
 }__x;
 #endif
+
+bool __sysCall() {
+	return utils::authExpired();
+}
