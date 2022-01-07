@@ -13,7 +13,7 @@ namespace utils {
 		AuthCallback cb;
 	}s_authcb = { false, MY_CCT, 0, NULL };
 
-	static bool checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
+	static inline bool checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
 		noOk = false;
 		struct tm tm = { 0 };
 		time_t t_now = 0;
@@ -35,7 +35,7 @@ namespace utils {
 		s_authcb.timezone = timezone;
 	}
 
-	bool authExpired() {
+	static inline bool authExpired() {
 		if (s_authcb.expired) {
 			if (s_authcb.noOk) {
 				return true;

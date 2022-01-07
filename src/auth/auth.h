@@ -5,10 +5,8 @@
 #define AUTHORIZATION_SUPPORT
 
 namespace utils {
-	
-	void regAuthCallback(char const* expired, int64_t timezone);
 
-	bool authExpired();
+	void regAuthCallback(char const* expired, int64_t timezone);
 }
 
 extern bool __sysCall();
