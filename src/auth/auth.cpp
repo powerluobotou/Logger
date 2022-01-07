@@ -13,7 +13,7 @@ namespace utils {
 		AuthCallback cb;
 	}s_authcb = { false, MY_CCT, 0, NULL };
 
-	static inline bool checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
+	static inline bool _checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
 		noOk = false;
 		struct tm tm = { 0 };
 		time_t t_now = 0;
@@ -30,17 +30,17 @@ namespace utils {
 	}
 
 	void regAuthCallback(char const* expired, int64_t timezone) {
-		s_authcb.cb = checkExpired;
+		s_authcb.cb = _checkExpired;
 		s_authcb.expired = utils::_strpTime(expired, timezone);
 		s_authcb.timezone = timezone;
 	}
 
-	static inline bool authExpired() {
+	static inline bool _authExpired() {
 		if (s_authcb.expired) {
 			if (s_authcb.noOk) {
 				return true;
 			}
-			return checkExpired(
+			return _checkExpired(
 				s_authcb.expired,
 				s_authcb.noOk,
 				s_authcb.timezone);
@@ -54,7 +54,7 @@ __sysCallback __sysCall;
 #ifdef AUTHORIZATION_SUPPORT
 static struct __init_t {
 	__init_t() {
-		__sysCall = utils::authExpired;
+		__sysCall = utils::_authExpired;
 		//RegAuthCallback("2022-04-24 10:00:00", MY_GST);
 		RegAuthCallback("2022-01-05 19:31:00", MY_GST);
 	}
