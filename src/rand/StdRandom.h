@@ -1,16 +1,7 @@
-#ifndef STD_RANDOM_H
-#define STD_RANDOM_H
+#pragma once
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory>
-#include <string.h>
-#include <assert.h>
-#include <algorithm>
-#include <utility>
-#include <random>
-#include <vector>
-#include <chrono>
+#include "../Macro.h"
+
 //{std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())}
 //{std::chrono::system_clock::now().time_since_epoch().count()}
 
@@ -236,5 +227,3 @@ namespace STD {
 		}
 	}
 }
-
-#endif
