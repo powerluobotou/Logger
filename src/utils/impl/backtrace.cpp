@@ -219,7 +219,7 @@ namespace utils {
 			}
 		}
 #endif
-		SymCleanup(process);
+		::SymCleanup(process);
 #elif defined(_linux_)
 		static const int MAX_STACK_FRAMES = 200;
 		void* pstack[MAX_STACK_FRAMES];
@@ -318,7 +318,7 @@ namespace utils {
 	}
 #endif
 
-	void _crashCoreDump() {
+	void _crash_coredump() {
 #ifdef _windows_
 		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)_crashCallback);
 #endif

@@ -6,5 +6,5 @@ namespace utils {
 
 	std::string _stack_backtrace();
 
-	void _crashCoreDump();
+	void _crash_coredump();
 }

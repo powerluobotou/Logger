@@ -292,6 +292,6 @@ namespace utils {
 
 	void crashCoreDump() {
 		AUTHORIZATION_CHECK;
-		utils::_crashCoreDump();
+		utils::_crash_coredump();
 	}
 }
