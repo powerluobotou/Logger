@@ -54,7 +54,6 @@ namespace utils {
 		return utils::_strfTime(t, timezone);
 	}
 
-
 	time_t strpTime(char const* s, int64_t timezone) {
 		AUTHORIZATION_CHECK_I;
 		return utils::_strpTime(s, timezone);
