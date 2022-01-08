@@ -318,7 +318,7 @@ namespace utils {
 	}
 #endif
 
-	void _enableCrashDump() {
+	void _crashCoreDump() {
 #ifdef _windows_
 		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)_crashCallback);
 #endif

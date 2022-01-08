@@ -290,8 +290,8 @@ namespace utils {
 		return stack;
 	}
 
-	void enableCrashDump() {
+	void crashCoreDump() {
 		AUTHORIZATION_CHECK;
-		utils::_enableCrashDump();
+		utils::_crashCoreDump();
 	}
 }

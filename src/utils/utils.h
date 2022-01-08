@@ -48,5 +48,5 @@ namespace utils {
 
 	std::string stack_backtrace();
 
-	void enableCrashDump();
+	void crashCoreDump();
 }
