@@ -289,8 +289,8 @@ namespace utils {
 		return stack;
 	}
 
-	void crashCoreDump() {
+	void crashCoreDump(std::function<void()> cb) {
 		AUTHORIZATION_CHECK;
-		utils::_crash_coredump();
+		utils::_crash_coredump(cb);
 	}
 }

@@ -266,10 +266,17 @@ namespace utils {
 		return stack;
 	}
 
+	static struct _cleanup_t {
+		std::function<void()> cb;
+	}s_cleanupcb_;
+
 #ifdef _windows_
 	static long _stdcall _crashCallback(EXCEPTION_POINTERS* excp) {
+		if (s_cleanupcb_.cb) {
+			s_cleanupcb_.cb();
+		}
 		EXCEPTION_RECORD* rec = excp->ExceptionRecord;
-		__LOG_FATAL_SYN(
+		__TLOG_FATAL_SYN(
 			"\nExceptionCode:%d" \
 			"\nExceptionAddress:%#x" \
 			"\nExceptionFlags:%d" \
@@ -318,7 +325,8 @@ namespace utils {
 	}
 #endif
 
-	void _crash_coredump() {
+	void _crash_coredump(std::function<void()> cb) {
+		s_cleanupcb_.cb = cb;
 #ifdef _windows_
 		::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)_crashCallback);
 #endif
