@@ -113,28 +113,28 @@ namespace utils {
 		__MY_CATCH();
 	}
 
-	int _getConfigList(
+	static int _getConfigList(
 		Curl::ClientImpl& req,
 		utils::INI::ReaderImpl& reader,
-		std::map<std::string, std::string>& m, int& total) {
-		m.clear();
+		std::map<std::string, std::string>& configs, int& total) {
+		configs.clear();
 		total = 0;
 		int i = 0, n = 0;
 		do {
 			std::string key = "url." + std::to_string(++i);
 			bool hasKey = false;
-			std::string cfg = reader.get("config", key.c_str(), hasKey);
+			std::string config = reader.get("config", key.c_str(), hasKey);
 			if (hasKey) {
-				if (!cfg.empty()) {
+				if (!config.empty()) {
 					++total;
 					double size;
-					if (req.check(cfg.c_str(), size) == 0) {
+					if (req.check(config.c_str(), size) == 0) {
 						++n;
-						m[key] = cfg;
-						__TLOG_DEBUG("[有效]%s=%s size=%.0f", key.c_str(), cfg.c_str(), size);
+						configs[key] = config;
+						__TLOG_DEBUG("[有效]%s=%s size=%.0f", key.c_str(), config.c_str(), size);
 					}
 					else {
-						__TLOG_WARN("[失效]%s=%s", key.c_str(), cfg.c_str());
+						__TLOG_WARN("[失效]%s=%s", key.c_str(), config.c_str());
 					}
 				}
 			}
@@ -145,18 +145,54 @@ namespace utils {
 		return n;
 	}
 
+	static inline void _getPlatConfig(utils::INI::ReaderImpl& reader, config_t& conf) {
+		conf.server_url = reader.get("config", "SERVER_URL");
+		conf.kefu_server_url = reader.get("config", "KEFU_SERVER_URL");
+		conf.upload_url = reader.get("config", "UPLOAD_URL");
+		conf.app_key = reader.get("config", "APP_KEY");
+		conf.secret = reader.get("config", "SECRET");
+		conf.app_name = reader.get("config", "APP_NAME");
+		conf.app_nickname = reader.get("config", "APP_NICK_NAME");
+		conf.nim_data_pc = reader.get("config", "NIM_DATA_PC");
+		__PLOG_INFO("server_url %s", conf.server_url.c_str());
+		__PLOG_INFO("kefu_server_url %s", conf.kefu_server_url.c_str());
+		__PLOG_INFO("upload_url %s", conf.upload_url.c_str());
+		__PLOG_INFO("app_key %s", conf.app_key.c_str());
+		__PLOG_INFO("secret %s", conf.secret.c_str());
+		__PLOG_INFO("app_name %s", conf.app_name.c_str());
+		__PLOG_INFO("app_nickname %s", conf.app_nickname.c_str());
+		__PLOG_INFO("nim_data_pc %s", conf.nim_data_pc.c_str());
+	}
+
 	//v [IN] 当前版本号
-	//url [IN] 版本服务器url
+	//name [IN] 7C/WD/NG/1H/28Q/BYQ/WW
+	//path [IN] 版本服务器url配置路径
 	//dir [IN] 下载安装文件保存路径
 	//cb [IN] 回调函数 -1失败，退出 0成功，退出 1失败，继续
-	//m [OUT] 线路配置列表
+	//conf [OUT] 线路配置列表
 	void _checkVersion(
 		std::string const& v,
-		std::string const& url,
+		std::string const& name,
+		std::string const& path,
 		std::string const& dir,
 		std::function<void(int rc)> cb,
-		std::map<std::string, std::string>& m) {
+		config_t& conf) {
 		__LOG_CONSOLE_OPEN();
+		//版本服务器url
+		std::string url;
+		{
+			//std::string path = utils::GetModulePath() + "/pc.conf";
+			utils::INI::ReaderImpl reader;
+			if (reader.parse(path.c_str())) {
+				url = reader.get(name.c_str(), "VERSION_URL");
+			}
+		}
+		if (url.empty()) {
+			__PLOG_ERROR("VERSION_URL 为空，失败原因可能：\n\t1.请检查 %s\n\t2.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!", path.c_str());
+			__LOG_CONSOLE_CLOSE(10000, true);
+			cb(-1);//失败，退出
+			return;
+		}
 		__TLOG_DEBUG("正在检查版本信息 %s", url.c_str());
 		__PLOG_DEBUG("当前版本号 %s", v.c_str());
 		__MY_TRY();
@@ -177,9 +213,11 @@ namespace utils {
 			//__LOG_WARN(vi.c_str());
 			utils::INI::ReaderImpl reader;
 			if (reader.parse(vi.c_str(), vi.length())) {
+				_getPlatConfig(reader, conf);
+#if 1
 				int total = 0;
-				int n = _getConfigList(req, reader, m, total);
-				if (m.empty()) {
+				int n = _getConfigList(req, reader, conf.configs, total);
+				if (conf.configs.empty()) {
 					__PLOG_ERROR("共检查 %d 条线路，均不可用", total);
 					__LOG_CONSOLE_CLOSE(10000, true);
 					cb(-1);//失败，退出
@@ -188,6 +226,7 @@ namespace utils {
 				else {
 					__PLOG_DEBUG("共检查 %d 条线路 %d 条可用", total, n);
 				}
+#endif
 				utils::INI::Section* version = reader.get("version");
 				if (version && v != (*version)["no"]) {
 					__PLOG_WARN("发现新版本 %s\n文件大小 %s 字节\nMD5值 %s\n准备更新...",
