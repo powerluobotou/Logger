@@ -25,30 +25,33 @@
 #define _PARAM_DEBUG     5,__FILE__,__LINE__,__FUNC__,NULL
 
 namespace LOGGER {
-
+	
+	class Logger;
 	class LoggerImpl {
-	public:
+		friend class Logger;
+	private:
 		LoggerImpl();
 		~LoggerImpl();
 	public:
 		static LoggerImpl* instance();
-		void enable();
-		void disable(int delay = 0, bool sync = false);
 		void set_timezone(int64_t timezone = MY_CCT);
 		void set_level(int level);
 		char const* get_level();
 		void set_color(int level, int title, int text);
-		bool started();
-		bool check(int level);
-		void wait();
 		void init(char const* dir, int level, char const* prename, size_t logsize);
 		void write(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, char const* fmt, ...);
 		void write_s(int level, char const* file, int line, char const* func, char const* stack, uint8_t flag, std::string const& msg);
+		void wait();
+		void enable();
+		void disable(int delay = 0, bool sync = false);
+		void stop();
+	private:
+		bool started();
+		bool check(int level);
 		size_t format(int level, char const* file, int line, char const* func, uint8_t flag, char* buffer, size_t size);
 		void notify(char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack, size_t stacklen);
 		void stdoutbuf(int level, char const* msg, size_t len, size_t pos, uint8_t flag, char const* stack = NULL, size_t stacklen = 0);
 		void checkSync(uint8_t flag);
-		void stop();
 	private:
 		void open(char const* path);
 		void write(char const* msg, size_t len, size_t pos, uint8_t flag);
@@ -94,7 +97,7 @@ namespace LOGGER {
 		std::mutex sync_mutex_;
 		std::condition_variable sync_cond_;
 		bool isConsoleOpen_ = false;
-		std::atomic_bool enable_{ false };
+		//std::atomic_bool enable_{ false };
 		std::atomic_flag isDoing_{ ATOMIC_FLAG_INIT };
 		utils::Timer timer_;
 	};

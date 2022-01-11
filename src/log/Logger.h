@@ -18,7 +18,6 @@ namespace LOGGER {
 
 	class LoggerImpl;
 	class Logger {
-		friend class LoggerImpl;
 	private:
 		Logger();
 		explicit Logger(LoggerImpl* impl);
