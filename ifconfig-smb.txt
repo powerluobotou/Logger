@@ -1,0 +1,88 @@
+cd /etc/sysconfig/network-scripts/
+gedit ifcfg-ens33
+service network restart
+
+HWADDR=00:50:56:38:BA:7F
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+IPADDR=192.168.31.154
+NETMASK=255.255.255.0
+GATEWAY=192.168.31.255
+DNS1=8.8.8.8
+DNS2=8.8.4.4
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME="Wired connection 1"
+UUID=61aac930-a8e3-390c-868c-d36fe266e954
+ONBOOT=yes
+AUTOCONNECT_PRIORITY=-999
+
+
+
+
+find / -name smb.conf
+vim /etc/samba/smb.conf
+gedit /etc/samba/smb.conf
+systemctl enable smb
+systemctl start smb
+systemctl status smb
+systemctl restart smb
+
+
+[global]
+	workgroup = WORKGROUP
+	security = user
+        server string = Samba Server Version %v
+        map to guest = Bad User
+	#passdb backend = tdbsam
+
+	#printing = cups
+	#printcap name = cups
+	#load printers = yes
+	#cups options = raw
+
+[home]
+	comment = Home Directories
+        path = /home
+#	valid users = %S, %D%w%S
+	available = yes
+	browseable = yes
+	writable = yes
+        public = yes
+	guest ok = yes
+	create mask = 0777
+	directory mask = 0777
+
+[usr]
+       comment = Usr Directories
+       path = /usr
+       available = yes 
+       browseable = yes
+       writable = yes 
+       public = yes
+       guest ok = yes
+       create mask = 0777
+       directory mask = 0777
+
+#[printers]
+#	comment = All Printers
+#	path = /var/tmp
+#	printable = Yes
+#	create mask = 0600
+#	browseable = No
+
+#[print$]
+#	comment = Printer Drivers
+#	path = /var/lib/samba/drivers
+#	write list = @printadmin root
+#	force group = @printadmin
+#	create mask = 0664
+#	directory mask = 0775
