@@ -14,7 +14,7 @@
 namespace utils {
 
 	//-1失败，退出 0成功，退出 1失败，继续
-	void _updateVersion(INI::Section& version, std::string const& dir, std::function<void(int rc)> cb) {
+	static void _updateVersion(INI::Section& version, std::string const& dir, std::function<void(int rc)> cb) {
 		__MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
