@@ -20,7 +20,7 @@ namespace utils {
 		std::string::size_type pos = url.find_last_of('/');
 		std::string filename = url.substr(pos + 1, -1);
 		if (!utils::_mkDir(dir.c_str())) {
-			__PLOG_ERROR("创建下载目录失败..%s\n\t1.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!", dir.c_str());
+			__PLOG_ERROR("创建下载目录失败..%s\n\t1.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!\n\t2.不要安装在中文文件夹", dir.c_str());
 			__LOG_CONSOLE_CLOSE(10000, true);
 			cb(-1);//失败，退出
 			return;
@@ -188,7 +188,7 @@ namespace utils {
 			}
 		}
 		if (url.empty()) {
-			__PLOG_ERROR("VERSION_URL 为空，失败原因可能：\n\t1.请检查 %s\n\t2.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!", path.c_str());
+			__PLOG_ERROR("VERSION_URL 为空，失败原因可能：\n\t1.请检查 %s\n\t2.可能权限不够，请选择其它盘重新安装，不要安装在C盘，或以管理员身份重新启动!\n\t3.不要安装在中文文件夹", path.c_str());
 			__LOG_CONSOLE_CLOSE(10000, true);
 			cb(-1);//失败，退出
 			return;
