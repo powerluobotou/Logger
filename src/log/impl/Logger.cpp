@@ -28,7 +28,7 @@ namespace LOGGER {
 	}
 
 	//set_timezone
-	void Logger::set_timezone(int64_t timezone/* = MY_CCT*/) {
+	void Logger::set_timezone(int64_t timezone/* = MY_CST*/) {
 		AUTHORIZATION_CHECK;
 		impl_->set_timezone(timezone);
 	}

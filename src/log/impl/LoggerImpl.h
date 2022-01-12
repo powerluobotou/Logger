@@ -34,7 +34,7 @@ namespace LOGGER {
 		~LoggerImpl();
 	public:
 		static LoggerImpl* instance();
-		void set_timezone(int64_t timezone = MY_CCT);
+		void set_timezone(int64_t timezone = MY_CST);
 		void set_level(int level);
 		char const* get_level();
 		void set_color(int level, int title, int text);
@@ -79,7 +79,7 @@ namespace LOGGER {
 		std::atomic<int> level_{ LVL_DEBUG };
 		char prefix_[256] = { 0 };
 		char path_[512] = { 0 };
-		int64_t timezone_ = MY_CCT;
+		int64_t timezone_ = MY_CST;
 		struct timeval tv_ = { 0 };
 		struct tm tm_ = { 0 };
 		mutable std::shared_mutex tm_mutex_;

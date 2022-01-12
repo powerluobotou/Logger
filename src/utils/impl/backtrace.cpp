@@ -286,7 +286,7 @@ namespace utils {
 			rec->ExceptionFlags,
 			rec->NumberParameters);
 		struct tm tm = { 0 };
-		utils::_convertUTC(time(NULL), tm, NULL, MY_CCT);
+		utils::_convertUTC(time(NULL), tm, NULL, MY_CST);
 		char date[256];
 		snprintf(date, sizeof(date), "_%04d-%02d-%02d_%02d_%02d_%02d",
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);

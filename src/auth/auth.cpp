@@ -11,7 +11,7 @@ namespace utils {
 		int64_t timezone;
 		time_t expired;
 		AuthCallback cb;
-	}s_authcb = { false, MY_CCT, 0, NULL };
+	}s_authcb = { false, MY_CST, 0, NULL };
 
 	static inline bool _checkExpired(time_t const expired, bool& noOk, int64_t timezone) {
 		noOk = false;

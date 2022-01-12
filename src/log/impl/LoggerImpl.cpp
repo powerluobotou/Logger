@@ -29,7 +29,7 @@ namespace LOGGER {
 	}
 	
 	//set_timezone
-	void LoggerImpl::set_timezone(int64_t timezone/* = MY_CCT*/) {
+	void LoggerImpl::set_timezone(int64_t timezone/* = MY_CST*/) {
 		timezone_ = timezone;
 	}
 	
@@ -143,6 +143,18 @@ namespace LOGGER {
 		return level <= level_.load();
 	}
 
+	//_chr_tmz
+	static inline char const* _chr_tmz(int64_t timezone) {
+		switch (timezone) {
+		case MY_EST: return "EST";
+		case MY_BST: return "BST";
+		case MY_GST: return "GST";
+		case MY_CST: return "CST";
+		case MY_JST: return "JST";
+		}
+		return "";
+	}
+
 	//format
 	size_t LoggerImpl::format(int level, char const* file, int line, char const* func, uint8_t flag, char* buffer, size_t size) {
 		struct tm tm;
@@ -150,14 +162,16 @@ namespace LOGGER {
 		update(tm, tv);
 		static char const chr[] = { 'F','E','W','I','T','D' };
 		size_t pos = (flag & F_DETAIL) ?
-			snprintf(buffer, size, "%c%d %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
+			snprintf(buffer, size, "%c%d %s%02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				chr[level],
 				pid_,
+				_chr_tmz(timezone_),
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::_gettid().c_str(),
 				utils::_trim_file(file).c_str(), line, utils::_trim_func(func).c_str()) :
-			snprintf(buffer, size, "%c%02d:%02d:%02d.%.6lu] ",
+			snprintf(buffer, size, "%c%s%02d:%02d:%02d.%.6lu] ",
 				chr[level],
+				_chr_tmz(timezone_),
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 		return pos;
 	}

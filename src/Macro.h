@@ -45,7 +45,7 @@
 //(UTC+04:00) Asia/Dubai
 #define MY_GST (+4)
 //(UTC+08:00) Asia/shanghai, Beijing(China)
-#define MY_CCT (+8)
+#define MY_CST (+8)
 #define MY_JST (+9)
 
 #define LVL_FATAL       0

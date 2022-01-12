@@ -26,7 +26,7 @@ namespace utils {
 
 	std::string str_error(unsigned errnum);
 
-	void convertUTC(time_t const t, struct tm& tm, time_t* tp = NULL, int64_t timezone = MY_CCT);
+	void convertUTC(time_t const t, struct tm& tm, time_t* tp = NULL, int64_t timezone = MY_CST);
 
 	std::string strfTime(time_t const t, int64_t timezone);
 	

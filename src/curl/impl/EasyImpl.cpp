@@ -191,8 +191,8 @@ namespace Curl {
 				break;
 			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
-			if (0 != setTimeout())
-				break;
+			//if (0 != setTimeout())
+			//	break;
 			if (0 != setSSLCA(spath))
 				break;
 #if 0
@@ -235,8 +235,8 @@ namespace Curl {
 				break;
 			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
-			if (0 != setTimeout())
-				break;
+			//if (0 != setTimeout())
+			//	break;
 			if (0 != setProxy(NULL, NULL))
 				break;
 			if (0 != setSSLCA(spath))
@@ -281,8 +281,8 @@ namespace Curl {
 				break;
 			if (0 != setCallback(/*NULL*/(void*)readCallback_, (void*)writeCallback_, /*NULL*/(void*)progressCallback_))
 				break;
-			if (0 != setTimeout())
-				break;
+			//if (0 != setTimeout())
+			//	break;
 			if (0 != setProxy(NULL, NULL))
 				break;
 			if (0 != setSSLCA(spath))
@@ -345,15 +345,15 @@ namespace Curl {
 	int EasyImpl::setTimeout() {
 		int rc = -1;
 		do {
-//			CURLcode easycode;
-//			//timeout
-//			easycode = curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
-//			CHECKCURLE_BREAK(easycode);
-//			easycode = curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 3);
-//			CHECKCURLE_BREAK(easycode);
-//			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 3); //recv timeout
-//			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT_MS, 30);
-//			CHECKCURLE_BREAK(easycode);
+			CURLcode easycode;
+			//timeout
+			easycode = curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
+			CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 3);
+			CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 3); //recv timeout
+			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT_MS, 30);
+			CHECKCURLE_BREAK(easycode);
 			rc = 0;
 		} while (0);
 		return rc;

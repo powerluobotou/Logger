@@ -24,7 +24,7 @@ namespace LOGGER {
 		~Logger();
 	public:
 		static Logger* instance();
-		void set_timezone(int64_t timezone = MY_CCT);
+		void set_timezone(int64_t timezone = MY_CST);
 		void set_level(int level);
 		char const* get_level();
 		void set_color(int level, int title, int text);

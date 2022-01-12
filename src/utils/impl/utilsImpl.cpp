@@ -81,7 +81,7 @@ namespace utils {
 		case MY_EST:
 		case MY_BST:
 		case MY_GST:
-		case MY_CCT:
+		case MY_CST:
 		case MY_JST:
 		default: {
 			struct tm tm_utc = { 0 };
@@ -92,7 +92,7 @@ namespace utils {
 #endif
 			//tm -> time_t
 			time_t t_utc = mktime(&tm_utc);
-			//(UTC+08:00) Asia/shanghai, Beijing(China) (tm_hour + MY_CCT) % 24
+			//(UTC+08:00) Asia/shanghai, Beijing(China) (tm_hour + MY_CST) % 24
 			time_t t_zone = t_utc + timezone * 3600;
 #ifdef _windows_
 			//time_t -> tm
@@ -131,7 +131,7 @@ namespace utils {
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
 		}
-		case MY_CCT: {
+		case MY_CST: {
 			__TLOG_INFO("Beijing (China) %04d-%02d-%02d %02d:%02d:%02d",
 				tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 			break;
