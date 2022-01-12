@@ -4,7 +4,7 @@
 namespace Curl {
 
 	MultiImpl::MultiImpl() {
-		// init multi
+		//init multi
 		curlm_ = ::curl_multi_init();
 	}
 
@@ -31,7 +31,7 @@ namespace Curl {
 		for (std::list<CURL*>::iterator it = list_curl_.begin();
 			it != list_curl_.end();
 			++it) {
-			// easy 加入到 multi, 异步支持
+			//easy 加入到 multi, 异步支持
 			if (CURLM_OK != ::curl_multi_add_handle(curlm_, *it)) {
 				rc = -1;
 				break;
@@ -142,12 +142,12 @@ namespace Curl {
 		do {
 			CHECKPTR_BREAK(curlm_);
 
-			// easy 加入到 multi, 异步支持
+			//easy 加入到 multi, 异步支持
 			if (0 != (rc = add_handles())) {
 				break;
 			}
 
-			// run curl_multi_perform
+			//run curl_multi_perform
 			int running = 0;
 			while (CURLM_CALL_MULTI_PERFORM == ::curl_multi_perform(curlm_, &running)) {
 				assert(false);
@@ -171,7 +171,7 @@ namespace Curl {
 
 			info_read();
 
-			// 移除 multi 中 easy
+			//移除 multi 中 easy
 			remove_handles();
 
 			rc = 0;
@@ -185,7 +185,7 @@ namespace Curl {
 		int rc = 0;
 		int left;
 		CURLMsg* msg;
-		while ((msg = ::curl_multi_info_read(curlm_, &left))) { // 获取当前解析的curl的相关传输信息
+		while ((msg = ::curl_multi_info_read(curlm_, &left))) { //获取当前解析的curl的相关传输信息
 			if (CURLMSG_DONE == msg->msg) {
 				if (CURLE_OK != msg->data.result) {
 					rc = -1;

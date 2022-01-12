@@ -48,11 +48,11 @@ namespace Curl {
 			fprintf(fd, "== Info: %s", data);
 		default: /* in case a new one is introduced to shock us */
 			return 0;
-			// 请求头
+			//请求头
 		case CURLINFO_HEADER_OUT:
 			text = "=> Send header";
 			break;
-			// 请求体
+			//请求体
 		case CURLINFO_DATA_OUT:
 			text = "=> Send data";
 			if (false == debug_flag) {
@@ -64,11 +64,11 @@ namespace Curl {
 		case CURLINFO_SSL_DATA_OUT:
 			text = "=> Send SSL data";
 			break;
-			// 响应头
+			//响应头
 		case CURLINFO_HEADER_IN:
 			text = "<= Recv header";
 			break;
-			// 响应体
+			//响应体
 		case CURLINFO_DATA_IN:
 			text = "<= Recv data";
 			break;
@@ -105,13 +105,13 @@ namespace Curl {
 	}
 
 	size_t EasyImpl::writeCallback(void* buffer, size_t size, size_t nmemb) {
-		// CURLINFO_CONTENT_LENGTH_DOWNLOAD
-		// CURLINFO_CONTENT_LENGTH_UPLOAD
-		// CURLINFO_FILETIME
-		// CURLINFO_CONTENT_TYPE
-		// CURLINFO_TOTAL_TIME
-		// CURLINFO_SPEED_DOWNLOAD
-		// CURLINFO_SIZE_DOWNLOAD
+		//CURLINFO_CONTENT_LENGTH_DOWNLOAD
+		//CURLINFO_CONTENT_LENGTH_UPLOAD
+		//CURLINFO_FILETIME
+		//CURLINFO_CONTENT_TYPE
+		//CURLINFO_TOTAL_TIME
+		//CURLINFO_SPEED_DOWNLOAD
+		//CURLINFO_SIZE_DOWNLOAD
 		int retcode = 0;
 		CURLcode easycode = curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &retcode);
 		if (CURLE_OK != easycode || retcode != 200) {
@@ -321,7 +321,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			CURLcode easycode;
-			// header
+			//header
 			if (headerlist_) {
 				::curl_slist_free_all(headerlist_);
 				headerlist_ = NULL; /* init to NULL is important */
@@ -346,12 +346,12 @@ namespace Curl {
 		int rc = -1;
 		do {
 //			CURLcode easycode;
-//			// timeout
+//			//timeout
 //			easycode = curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
 //			CHECKCURLE_BREAK(easycode);
 //			easycode = curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 3);
 //			CHECKCURLE_BREAK(easycode);
-//			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 3); // recv timeout
+//			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 3); //recv timeout
 //			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT_MS, 30);
 //			CHECKCURLE_BREAK(easycode);
 			rc = 0;
@@ -363,7 +363,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			CURLcode easycode;
-			// url
+			//url
 			easycode = curl_easy_setopt(curl_, CURLOPT_URL, url);
 			CHECKCURLE_BREAK(easycode);
 			rc = 0;
@@ -377,7 +377,7 @@ namespace Curl {
 		debug_data_.dump_flag_ = dump;
 		int rc = -1;
 		do {
-			// debug
+			//debug
 			if (dump) {
 				CURLcode easycode;
 				easycode = curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
@@ -478,7 +478,7 @@ namespace Curl {
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
 				CHECKCURLE_BREAK(easycode);
-				// 缺省 PEM，另外支持 DER
+				//缺省 PEM，另外支持 DER
 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSLCERTTYPE, "PEM");
 				//CHECKCURLE_BREAK(easycode);
 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
@@ -498,7 +498,7 @@ namespace Curl {
 	int EasyImpl::addPost(std::list<Operation::Args> const* args, char const* spost) {
 		int rc = -1;
 		do {
-			// form post
+			//form post
 			if (args) {
 				if (!formAdd(curl_, *args)) {
 					break;
@@ -559,43 +559,43 @@ namespace Curl {
 		//multipart/form-data
 		return CURLE_OK == ::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, args.key.c_str(),    			// name=""
-			CURLFORM_STREAM, args.value,						// CURLOPT_READFUNCTION
+			CURLFORM_COPYNAME, args.key.c_str(),    			//name=""
+			CURLFORM_STREAM, args.value,						//CURLOPT_READFUNCTION
 			CURLFORM_CONTENTSLENGTH, size,
-			CURLFORM_FILENAME, args.fi.filename,		        // filename=""
+			CURLFORM_FILENAME, args.fi.filename,		        //filename=""
 			CURLFORM_CONTENTTYPE, "application/octet-stream",
 			CURLFORM_END);
 #if 0
 		::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, "submit",						// name=""
-			CURLFORM_COPYCONTENTS, "submit",					// value=""
+			CURLFORM_COPYNAME, "submit",						//name=""
+			CURLFORM_COPYCONTENTS, "submit",					//value=""
 			CURLFORM_END);
 #endif
 
 #if 0
-		// https://curl.haxx.se/libcurl/c/curl_formadd.html
+		//https://curl.haxx.se/libcurl/c/curl_formadd.html
 
 		//////////////////////////////////////////////////////////////////////////
-		// 上传本地文件
+		//上传本地文件
 		//////////////////////////////////////////////////////////////////////////
 		::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, "file1",							// name=""
-			CURLFORM_FILE, "E:/svn/setup/acl-v3.1.3.zip",		// filename=""
-			CURLFORM_CONTENTTYPE, "application/octet-stream",	// Content-Type: 
+			CURLFORM_COPYNAME, "file1",							//name=""
+			CURLFORM_FILE, "E:/svn/setup/acl-v3.1.3.zip",		//filename=""
+			CURLFORM_CONTENTTYPE, "application/octet-stream",	//Content-Type: 
 			CURLFORM_END);
 		::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, "file2",							// name=""
+			CURLFORM_COPYNAME, "file2",							//name=""
 			CURLFORM_FILE, "C:/Users/Administrator/Desktop/abc.png",
-			CURLFORM_CONTENTTYPE, "application/octet-stream",	// Content-Type: 
+			CURLFORM_CONTENTTYPE, "application/octet-stream",	//Content-Type: 
 			CURLFORM_END);
 #endif
 
 #if 0
 		//////////////////////////////////////////////////////////////////////////
-		// 上传本地文件(断点续传)
+		//上传本地文件(断点续传)
 		//////////////////////////////////////////////////////////////////////////
 		FILE* fp = fopen("C:/Users/Administrator/Desktop/abc.png", "rb");
 		fseek(fp, 0L, SEEK_END);
@@ -604,17 +604,17 @@ namespace Curl {
 
 		::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, "file1",							// name=""
-			CURLFORM_STREAM, fp,								// CURLOPT_READFUNCTION
+			CURLFORM_COPYNAME, "file1",							//name=""
+			CURLFORM_STREAM, fp,								//CURLOPT_READFUNCTION
 			CURLFORM_CONTENTSLENGTH, size,
-			CURLFORM_FILENAME, "*.png",							// filename=""
+			CURLFORM_FILENAME, "*.png",							//filename=""
 			CURLFORM_CONTENTTYPE, "application/octet-stream",
 			CURLFORM_END);
 #endif
 
 #if 0
 		//////////////////////////////////////////////////////////////////////////
-		// 读取并发送文件内容
+		//读取并发送文件内容
 		//////////////////////////////////////////////////////////////////////////
 		::curl_formadd(&formpost_,
 			&lastptr_,
@@ -625,22 +625,22 @@ namespace Curl {
 
 #if 0
 		//////////////////////////////////////////////////////////////////////////
-		// 上传自定义内容文件
+		//上传自定义内容文件
 		//////////////////////////////////////////////////////////////////////////
 		char* buf = "abcdefg0123456789\r\n";
 		::curl_formadd(&formpost_,
 			&lastptr_,
-			CURLFORM_COPYNAME, "file1",							// name=""
-			CURLFORM_BUFFER, "*.txt",							// filename=""
+			CURLFORM_COPYNAME, "file1",							//name=""
+			CURLFORM_BUFFER, "*.txt",							//filename=""
 			CURLFORM_BUFFERPTR, buf,
 			CURLFORM_BUFFERLENGTH, strlen(buf),
-			CURLFORM_CONTENTTYPE, "text/plain",					// Content-Type: 
+			CURLFORM_CONTENTTYPE, "text/plain",					//Content-Type: 
 			CURLFORM_END);
 #endif
 
 #if 0
 		//////////////////////////////////////////////////////////////////////////
-		// 批量提交表单文件
+		//批量提交表单文件
 		//////////////////////////////////////////////////////////////////////////
 		struct curl_forms forms[3];
 		forms[0].option = CURLFORM_FILE;
@@ -720,13 +720,13 @@ namespace Curl {
 			if (200 == retcode) {
 				rc = 0;
 #if 0
-				// 
+				//
 				time_t file_time = 0;
 				easycode = curl_easy_getinfo(curl_, CURLINFO_FILETIME, &file_time);
 				CHECKCURLE_BREAK(easycode);
 #endif
 #if 1
-				// 
+				//
 				double file_size = 0;
 				easycode = curl_easy_getinfo(curl_, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &file_size);
 				CHECKCURLE_BREAK(easycode);

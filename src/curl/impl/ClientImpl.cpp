@@ -44,7 +44,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			EasyImpl easy;
-			// 上传模式, 则写内存
+			//上传模式, 则写内存
 			Operation::MemImpl op;
 			easy.SetOperation(&op);
 
@@ -73,7 +73,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			EasyImpl easy;
-			// 上传模式, 则写内存
+			//上传模式, 则写内存
 			Operation::MemImpl op;
 			easy.SetOperation(&op);
 
@@ -100,7 +100,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			EasyImpl easy;
-			// 上传模式, 则写内存
+			//上传模式, 则写内存
 			Operation::MemImpl op;
 			easy.SetOperation(&op);
 
@@ -171,7 +171,7 @@ namespace Curl {
 		int rc = -1;
 		do {
 			EasyImpl easy;
-			// 下载模式, 则写文件
+			//下载模式, 则写文件
 			Operation::FileImpl op(savepath);
 			easy.SetOperation(&op);
 
@@ -257,7 +257,7 @@ void onUpload(Curl::EasyImpl* easy, double ftotal, double fnow) {
 	}
 }
 
-// 测试上传
+//测试上传
 void testUpload()
 {
 	Curl::ClientImpl req;
@@ -266,7 +266,7 @@ void testUpload()
 	std::list<Args> slist;
 	IOperation::Args args;
 // 	args.strkey = "file1";
-// 	Operation::FileImpl file1("C:/Users/Administrator/Desktop/abc.png"); // 待上传文件
+// 	Operation::FileImpl file1("C:/Users/Administrator/Desktop/abc.png"); //待上传文件
 // 	args.value = &file1;
 // 	sprintf(args.fileinfo.szfilename, "*.png");
 // 	slist.push_back(args);
@@ -282,7 +282,7 @@ void testUpload()
 //	printf("返回数据1:\n%s\n", resp.c_str());
 
 // 	args.strkey = "file2";
-// 	Operation::FileImpl file2("E:/svn/setup/acl-v3.1.3.zip"); // 待上传文件
+// 	Operation::FileImpl file2("E:/svn/setup/acl-v3.1.3.zip"); //待上传文件
 // 	args.value = &file2;
 // 	sprintf(args.fileinfo.szfilename, "*.zip");
 // 	slist.push_back(args);
@@ -323,7 +323,7 @@ void onDownload(Curl::EasyImpl* easy, double ftotal, double fnow) {
 	printf("file[%s] progress[%.3f / %.3f] [%d%%]\n", filename.c_str(), fnow, ftotal, (int)((fnow / ftotal) * 100));
 }
 
-// 测试下载
+//测试下载
 void testDownload()
 {
 	Curl::ClientImpl req;
