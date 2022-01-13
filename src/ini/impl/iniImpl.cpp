@@ -4,6 +4,8 @@
 #include "../../log/impl/LoggerImpl.h"
 #include "../../excp/impl/excpImpl.h"
 
+#include "../../op/file/impl/FileImpl.h"
+
 namespace utils {
 
 	static std::string _trimLineCRLF(char* buf, size_t len) {
@@ -50,7 +52,20 @@ namespace utils {
 	}
 
 	namespace INI {
-		
+#ifndef USEKVMAP
+		std::string& Section::operator[](std::string const& key) {
+			Section::iterator ir = std::find_if(std::begin(*this), std::end(*this), [&](Item& kv) {
+				return kv.first == key;
+				});
+			if (ir != end()) {
+				return ir->second;
+			}
+			else {
+				emplace_back(std::make_pair(key, ""));
+				return back().second;
+			}
+		}
+#endif
 		void _readBuffer(char const* buf, Sections& sections) {
 			sections.clear();
 			std::string st(buf);
@@ -64,15 +79,27 @@ namespace utils {
 						if (!s.empty()) {
 							if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
 								field = s.substr(1, s.length() - 2);
-								std::map<std::string, std::string>& m = sections[field];
+								Section& ref = sections[field];
 							}
 							else if (!field.empty()) {
 								std::string::size_type pos = s.find_first_of('=');
 								if (pos != std::string::npos) {
-									std::map<std::string, std::string>& m = sections[field];
+									Section& ref = sections[field];
 									std::string key = s.substr(0, pos);
-									std::string val = s.substr(pos + 1, -1);
-									m[key] = val;
+									std::string value = s.substr(pos + 1, -1);
+#ifdef USEKVMAP
+									ref[key] = value;
+#else
+									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+										return item.first == key;
+										});
+									if (ir != ref.end()) {
+										ir->second = value;
+									}
+									else {
+										ref.emplace_back(std::make_pair(key, value));
+									}
+#endif
 								}
 							}
 						}
@@ -83,15 +110,27 @@ namespace utils {
 				if (!s.empty()) {
 					if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
 						field = s.substr(1, s.length() - 2);
-						std::map<std::string, std::string>& m = sections[field];
+						Section& ref = sections[field];
 					}
 					else if (!field.empty()) {
 						std::string::size_type pos = s.find_first_of('=');
 						if (pos != std::string::npos) {
-							std::map<std::string, std::string>& m = sections[field];
+							Section& ref = sections[field];
 							std::string key = s.substr(0, pos);
-							std::string val = s.substr(pos + 1, -1);
-							m[key] = val;
+							std::string value = s.substr(pos + 1, -1);
+#ifdef USEKVMAP
+							ref[key] = value;
+#else
+							Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+								return item.first == key;
+								});
+							if (ir != ref.end()) {
+								ir->second = value;
+							}
+							else {
+								ref.emplace_back(std::make_pair(key, value));
+							}
+#endif
 						}
 					}
 				}
@@ -116,15 +155,27 @@ namespace utils {
 						if (!s.empty()) {
 							if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
 								field = s.substr(1, s.length() - 2);
-								std::map<std::string, std::string>& m = sections[field];
+								Section& ref = sections[field];
 							}
 							else if (!field.empty()) {
 								std::string::size_type pos = s.find_first_of('=');
 								if (pos != std::string::npos) {
-									std::map<std::string, std::string>& m = sections[field];
+									Section& ref = sections[field];
 									std::string key = s.substr(0, pos);
-									std::string val = s.substr(pos + 1, -1);
-									m[key] = val;
+									std::string value = s.substr(pos + 1, -1);
+#ifdef USEKVMAP
+									ref[key] = value;
+#else
+									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+										return item.first == key;
+										});
+									if (ir != ref.end()) {
+										ir->second = value;
+									}
+									else {
+										ref.emplace_back(std::make_pair(key, value));
+									}
+#endif
 								}
 							}
 						}
@@ -141,15 +192,27 @@ namespace utils {
 					if (!s.empty()) {
 						if (s.length() > 2 && s[0] == '[' && s[s.length() - 1] == ']') {
 							field = s.substr(1, s.length() - 2);
-							std::map<std::string, std::string>& m = sections[field];
+							Section& ref = sections[field];
 						}
 						else if (!field.empty()) {
 							std::string::size_type pos = s.find_first_of('=');
 							if (pos != std::string::npos) {
-								std::map<std::string, std::string>& m = sections[field];
+								Section& ref = sections[field];
 								std::string key = s.substr(0, pos);
-								std::string val = s.substr(pos + 1, -1);
-								m[key] = val;
+								std::string value = s.substr(pos + 1, -1);
+#ifdef USEKVMAP
+								ref[key] = value;
+#else
+								Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+									return item.first == key;
+									});
+								if (ir != ref.end()) {
+									ir->second = value;
+								}
+								else {
+									ref.emplace_back(std::make_pair(key, value));
+								}
+#endif
 							}
 						}
 					}
@@ -195,7 +258,13 @@ namespace utils {
 				if (it != m_.end()) {
 					Section& ref = it->second;
 					if (key && key[0]) {
+#ifdef USEKVMAP
 						Section::iterator ir = ref.find(key);
+#else
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+							return item.first == key;
+							});
+#endif
 						if (ir != ref.end()) {
 							return ir->second;
 						}
@@ -211,7 +280,13 @@ namespace utils {
 				if (it != m_.end()) {
 					Section& ref = it->second;
 					if (key && key[0]) {
+#ifdef USEKVMAP
 						Section::iterator ir = ref.find(key);
+#else
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+							return item.first == key;
+							});
+#endif
 						if (ir != ref.end()) {
 							hasKey = true;
 							return ir->second;
@@ -220,6 +295,82 @@ namespace utils {
 				}
 			}
 			return "";
+		}
+
+		void ReaderImpl::set(char const* section, char const* key, char const* value, char const* filename) {
+			if (m_.empty()) {
+				parse(filename);
+			}
+			if (section && section[0]) {
+				Sections::iterator it = m_.find(section);
+				if (it != m_.end()) {
+					if (key && key[0]) {
+						Section& ref = it->second;
+#ifdef USEKVMAP
+						ref[key] = value;
+#else
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+							return item.first == key;
+							});
+						if (ir != ref.end()) {
+							ir->second = value;
+						}
+						else {
+							ref.emplace_back(std::make_pair(key, value));
+						}
+#endif
+						write(filename);
+					}
+				}
+				else {
+					if (key && key[0]) {
+						Section& ref = m_[section];
+#ifdef USEKVMAP
+						ref[key] = value;
+#else
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+							return item.first == key;
+							});
+						if (ir != ref.end()) {
+							ir->second = value;
+						}
+						else {
+							ref.emplace_back(std::make_pair(key, value));
+						}
+#endif
+						write(filename);
+					}
+				}
+			}
+		}
+
+		void ReaderImpl::write(char const* filename) {
+			if (filename && filename[0]) {
+				Operation::FileImpl f(filename);
+				if (f.Valid() && f.Open(Operation::Mode::M_WRITE)) {
+					for (Sections::const_iterator it = m_.begin();
+						it != m_.end(); ++it) {
+						//先写[section]
+						if (it == m_.begin()) {
+							std::string s = "[" + it->first + "]" + "\n";
+							f.Write(&s.front(), 1, s.length());
+						}
+						else {
+							std::string s = "\n[" + it->first + "]" + "\n";
+							f.Write(&s.front(), 1, s.length());
+						}
+						Section const& ref = it->second;
+						for (Section::const_iterator ir = ref.begin();
+							ir != ref.end(); ++ir) {
+							//再写key=value
+							std::string s = ir->first + "=" + ir->second + "\n";
+							f.Write(&s.front(), 1, s.length());
+						}
+					}
+					f.Flush();
+					f.Close();
+				}
+			}
 		}
 	}
 }

@@ -5,8 +5,8 @@
 namespace utils {
 	
 	namespace INI {
-		typedef std::map<std::string, std::string> Section;
-		typedef std::map<std::string, Section> Sections;
+		class Section;
+		class Sections;
 		class ReaderImpl;
 		class Reader {
 		public:
@@ -19,6 +19,7 @@ namespace utils {
 			Section* get(char const* section);
 			std::string get(char const* section, char const* key);
 			std::string get(char const* section, char const* key, bool& hasKey);
+			void set(char const* section, char const* key, char const* value, char const* filename);
 		private:
 			ReaderImpl* impl_;
 		};

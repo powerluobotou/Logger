@@ -31,5 +31,9 @@ namespace utils {
 		std::string Reader::get(char const* section, char const* key, bool& hasKey) {
 			return impl_->get(section, key, hasKey);
 		}
+		void Reader::set(char const* section, char const* key, char const* value, char const* filename) {
+			AUTHORIZATION_CHECK;
+			impl_->set(section, key, value, filename);
+		}
 	}
 }
