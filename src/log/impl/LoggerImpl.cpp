@@ -143,11 +143,14 @@ namespace LOGGER {
 		return level <= level_.load();
 	}
 
-	//_chr_tmz
-	static inline char const* _chr_tmz(int64_t timezone) {
+	//_tz
+	static inline char const* _tz(int64_t timezone) {
 		switch (timezone) {
+		case MY_PST: return "PST";
+		case MY_MST: return "MST";
 		case MY_EST: return "EST";
 		case MY_BST: return "BST";
+		case MY_UTC: return "UTC";
 		case MY_GST: return "GST";
 		case MY_CST: return "CST";
 		case MY_JST: return "JST";
@@ -165,13 +168,13 @@ namespace LOGGER {
 			snprintf(buffer, size, "%c%d %s%02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				chr[level],
 				pid_,
-				_chr_tmz(timezone_),
+				_tz(timezone_),
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec,
 				utils::_gettid().c_str(),
 				utils::_trim_file(file).c_str(), line, utils::_trim_func(func).c_str()) :
 			snprintf(buffer, size, "%c%s%02d:%02d:%02d.%.6lu] ",
 				chr[level],
-				_chr_tmz(timezone_),
+				_tz(timezone_),
 				tm.tm_hour, tm.tm_min, tm.tm_sec, (unsigned long)tv.tv_usec);
 		return pos;
 	}
