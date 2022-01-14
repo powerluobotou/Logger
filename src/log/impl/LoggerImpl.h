@@ -97,7 +97,7 @@ namespace LOGGER {
 		std::mutex sync_mutex_;
 		std::condition_variable sync_cond_;
 		bool isConsoleOpen_ = false;
-		//std::atomic_bool enable_{ false };
+		std::atomic_bool enable_{ false };
 		std::atomic_flag isDoing_{ ATOMIC_FLAG_INIT };
 		utils::Timer timer_;
 	};

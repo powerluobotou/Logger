@@ -4,7 +4,7 @@
 
 namespace Operation {
 
-	enum class Mode { M_READ, M_WRITE };
+	enum class Mode { M_READ, M_WRITE, M_APPEND };
 
 	class IOperation {
 	public:

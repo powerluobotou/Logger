@@ -603,50 +603,32 @@ namespace LOGGER {
 
 	//enable
 	void LoggerImpl::enable() {
-		if (isConsoleOpen_) {
-			return;
+		if (!enable_.load()) {
+			enable_.store(true);
+			__TLOG_WARN("enable ...");
+			openConsole();
 		}
-		//if (started()) {
-		//	//timer_.SyncWait(0, [&] {
-		//		notify("O", 1, 0, 0, NULL, 0);
-		//		//});
-		//}
-		//else {
-		//	openConsole();
-		//}
-		openConsole();
 	}
 
 	//disable
 	void LoggerImpl::disable(int delay, bool sync) {
-		if (!isConsoleOpen_) {
-			return;
-		}
-		__TLOG_WARN("disable after %d milliseconds ...", delay);
-		//if (started()) {
-		//	if (sync) {
-		//		timer_.SyncWait(delay, [&] {
-		//			notify("X", 1, 0, 0, NULL, 0);
-		//			});
-		//	}
-		//	else {
-		//		timer_.AsyncWait(delay, [&] {
-		//			notify("X", 1, 0, 0, NULL, 0);
-		//			});
-		//	}
-		//}
-		//else {
-		//	closeConsole();
-		//}
-		if (sync) {
-			timer_.SyncWait(delay, [&] {
-				closeConsole();
-				});
-		}
-		else {
-			timer_.AsyncWait(delay, [&] {
-				closeConsole();
-				});
+		if (enable_.load()) {
+			enable_.store(false);
+			__TLOG_WARN("disable after %d milliseconds ...", delay);
+			if (sync) {
+				timer_.SyncWait(delay, [&] {
+					if (!enable_.load()) {
+						closeConsole();
+					}
+					});
+			}
+			else {
+				timer_.AsyncWait(delay, [&] {
+					if (!enable_.load()) {
+						closeConsole();
+					}
+					});
+			}
 		}
 	}
 	

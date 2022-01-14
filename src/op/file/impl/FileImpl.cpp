@@ -85,15 +85,25 @@ namespace Operation {
 #pragma warning(disable:4996)
 #endif
 		Close();
-		if (mode == Mode::M_WRITE) {
+		switch (mode) {
+		case Mode::M_WRITE: {
 			stream_ = fopen(path_.c_str(), "wb+");
 			//if (!stream_) {
 			//	__PLOG_ERROR("文件可能被占用，写方式打开失败");
 			//}
 			return stream_ != NULL;
 		}
-		stream_ = fopen(path_.c_str(), "rb");
-
+		case Mode::M_APPEND: {
+			stream_ = fopen(path_.c_str(), "ab+");
+			//if (!stream_) {
+			//	__PLOG_ERROR("文件可能被占用，写方式打开失败");
+			//}
+			return stream_ != NULL;
+		}
+		default: {
+			stream_ = fopen(path_.c_str(), "rb");
+		}
+		}
 #ifdef WIN32
 #pragma warning(pop)
 #endif
