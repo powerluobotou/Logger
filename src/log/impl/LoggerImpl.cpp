@@ -605,8 +605,8 @@ namespace LOGGER {
 	void LoggerImpl::enable() {
 		if (!enable_.load()) {
 			enable_.store(true);
-			__TLOG_WARN("enable ...");
 			openConsole();
+			//__TLOG_WARN("enable ...");
 		}
 	}
 
