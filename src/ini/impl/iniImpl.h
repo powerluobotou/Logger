@@ -5,23 +5,17 @@
 namespace utils {
 	
 	namespace INI {
-#ifdef USEKVMAP
-		class Section : public std::map<std::string, std::string> {
-		};
-#else
-		typedef std::pair<std::string, std::string> Item;
-		class Section : public std::vector<Item> {
-		public:
-			std::string& operator[](std::string const& key);
-		};
-#endif
-		class Sections : public std::map<std::string, Section> {
-		};
 		
+		class Section;
+		class Sections;
+
 		void _readBuffer(char const* buf, Sections& sections);
 		void _readFile(char const* filename, Sections& sections);
 
 		class ReaderImpl {
+		public:
+			ReaderImpl();
+			~ReaderImpl();
 		public:
 			bool parse(char const* filename);
 			bool parse(char const* buf, size_t len);
@@ -33,7 +27,7 @@ namespace utils {
 		private:
 			void write(char const* filename);
 		private:
-			Sections m_;
+			Sections* m_;
 		};
 	}
 }

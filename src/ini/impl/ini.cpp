@@ -6,6 +6,20 @@
 namespace utils {
 
 	namespace INI {
+#ifndef USEKVMAP
+		std::string& Section::operator[](std::string const& key) {
+			Section::iterator ir = std::find_if(std::begin(*this), std::end(*this), [&](Item& kv) -> bool {
+				return kv.first == key;
+				});
+			if (ir != end()) {
+				return ir->second;
+			}
+			else {
+				emplace_back(std::make_pair(key, ""));
+				return back().second;
+			}
+		}
+#endif
 		Reader::Reader() :impl_(new ReaderImpl()) {
 		}
 		Reader::~Reader() {

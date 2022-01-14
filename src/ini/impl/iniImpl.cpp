@@ -1,4 +1,5 @@
-﻿#include "iniImpl.h"
+﻿#include "../ini.h"
+#include "iniImpl.h"
 #include "../../utils/impl/utilsImpl.h"
 
 #include "../../log/impl/LoggerImpl.h"
@@ -52,20 +53,6 @@ namespace utils {
 	}
 
 	namespace INI {
-#ifndef USEKVMAP
-		std::string& Section::operator[](std::string const& key) {
-			Section::iterator ir = std::find_if(std::begin(*this), std::end(*this), [&](Item& kv) {
-				return kv.first == key;
-				});
-			if (ir != end()) {
-				return ir->second;
-			}
-			else {
-				emplace_back(std::make_pair(key, ""));
-				return back().second;
-			}
-		}
-#endif
 		void _readBuffer(char const* buf, Sections& sections) {
 			sections.clear();
 			std::string st(buf);
@@ -90,7 +77,7 @@ namespace utils {
 #ifdef USEKVMAP
 									ref[key] = value;
 #else
-									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 										return item.first == key;
 										});
 									if (ir != ref.end()) {
@@ -121,7 +108,7 @@ namespace utils {
 #ifdef USEKVMAP
 							ref[key] = value;
 #else
-							Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+							Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 								return item.first == key;
 								});
 							if (ir != ref.end()) {
@@ -166,7 +153,7 @@ namespace utils {
 #ifdef USEKVMAP
 									ref[key] = value;
 #else
-									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+									Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 										return item.first == key;
 										});
 									if (ir != ref.end()) {
@@ -203,7 +190,7 @@ namespace utils {
 #ifdef USEKVMAP
 								ref[key] = value;
 #else
-								Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+								Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 									return item.first == key;
 									});
 								if (ir != ref.end()) {
@@ -221,31 +208,38 @@ namespace utils {
 			}
 #endif
 		}
-
+		
+		ReaderImpl::ReaderImpl():m_(new Sections()) {
+		}
+		
+		ReaderImpl::~ReaderImpl() {
+			delete m_;
+		}
+		
 		bool ReaderImpl::parse(char const* filename) {
-			m_.clear();
+			m_->clear();
 			if (filename && filename[0]) {
-				utils::INI::_readFile(filename, m_);
+				utils::INI::_readFile(filename, *m_);
 			}
-			return m_.size() > 0;
+			return m_->size() > 0;
 		}
 
 		bool ReaderImpl::parse(char const* buf, size_t len) {
-			m_.clear();
+			m_->clear();
 			if (buf && buf[0]) {
-				utils::INI::_readBuffer(buf, m_);
+				utils::INI::_readBuffer(buf, *m_);
 			}
-			return m_.size() > 0;
+			return m_->size() > 0;
 		}
 		
 		Sections const& ReaderImpl::get() {
-			return m_;
+			return *m_;
 		}
 
 		Section* ReaderImpl::get(char const* section) {
 			if (section && section[0]) {
-				Sections::iterator it = m_.find(section);
-				if (it != m_.end()) {
+				Sections::iterator it = m_->find(section);
+				if (it != m_->end()) {
 					return &it->second;
 				}
 			}
@@ -254,14 +248,14 @@ namespace utils {
 		
 		std::string ReaderImpl::get(char const* section, char const* key) {
 			if (section && section[0]) {
-				Sections::iterator it = m_.find(section);
-				if (it != m_.end()) {
+				Sections::iterator it = m_->find(section);
+				if (it != m_->end()) {
 					Section& ref = it->second;
 					if (key && key[0]) {
 #ifdef USEKVMAP
 						Section::iterator ir = ref.find(key);
 #else
-						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 							return item.first == key;
 							});
 #endif
@@ -276,14 +270,14 @@ namespace utils {
 
 		std::string ReaderImpl::get(char const* section, char const* key, bool& hasKey) {
 			if (section && section[0]) {
-				Sections::iterator it = m_.find(section);
-				if (it != m_.end()) {
+				Sections::iterator it = m_->find(section);
+				if (it != m_->end()) {
 					Section& ref = it->second;
 					if (key && key[0]) {
 #ifdef USEKVMAP
 						Section::iterator ir = ref.find(key);
 #else
-						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 							return item.first == key;
 							});
 #endif
@@ -298,18 +292,18 @@ namespace utils {
 		}
 
 		void ReaderImpl::set(char const* section, char const* key, char const* value, char const* filename) {
-			if (m_.empty()) {
+			if (m_->empty()) {
 				parse(filename);
 			}
 			if (section && section[0]) {
-				Sections::iterator it = m_.find(section);
-				if (it != m_.end()) {
+				Sections::iterator it = m_->find(section);
+				if (it != m_->end()) {
 					if (key && key[0]) {
 						Section& ref = it->second;
 #ifdef USEKVMAP
 						ref[key] = value;
 #else
-						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 							return item.first == key;
 							});
 						if (ir != ref.end()) {
@@ -324,11 +318,11 @@ namespace utils {
 				}
 				else {
 					if (key && key[0]) {
-						Section& ref = m_[section];
+						Section& ref = (*m_)[section];
 #ifdef USEKVMAP
 						ref[key] = value;
 #else
-						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) {
+						Section::iterator ir = std::find_if(std::begin(ref), std::end(ref), [&](Item& item) -> bool {
 							return item.first == key;
 							});
 						if (ir != ref.end()) {
@@ -348,10 +342,10 @@ namespace utils {
 			if (filename && filename[0]) {
 				Operation::FileImpl f(filename);
 				if (f.Valid() && f.Open(Operation::Mode::M_WRITE)) {
-					for (Sections::const_iterator it = m_.begin();
-						it != m_.end(); ++it) {
+					for (Sections::const_iterator it = m_->begin();
+						it != m_->end(); ++it) {
 						//先写[section]
-						if (it == m_.begin()) {
+						if (it == m_->begin()) {
 							std::string s = "[" + it->first + "]" + "\n";
 							f.Write(&s.front(), 1, s.length());
 						}

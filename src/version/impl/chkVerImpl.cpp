@@ -1,5 +1,6 @@
 ﻿#include "chkVerImpl.h"
 #include "../../utils/impl/utilsImpl.h"
+#include "../../ini/ini.h"
 #include "../../ini/impl/iniImpl.h"
 
 #include "../../log/impl/LoggerImpl.h"

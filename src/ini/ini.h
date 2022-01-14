@@ -5,8 +5,18 @@
 namespace utils {
 	
 	namespace INI {
-		class Section;
-		class Sections;
+#ifdef USEKVMAP
+		class Section : public std::map<std::string, std::string> {
+		};
+#else
+		typedef std::pair<std::string, std::string> Item;
+		class Section : public std::vector<Item> {
+		public:
+			std::string& operator[](std::string const& key);
+		};
+#endif
+		class Sections : public std::map<std::string, Section> {
+		};
 		class ReaderImpl;
 		class Reader {
 		public:
