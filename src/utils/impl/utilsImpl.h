@@ -12,7 +12,7 @@ namespace utils {
 	
 	void _replaceEscChar(std::string& s);
 
-	std::string _GetModulePath(std::string* filename = NULL);
+	std::string _GetModulePath(std::string* filename = NULL, bool exec = false);
 
 	bool _mkDir(char const* dir);
 

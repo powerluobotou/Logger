@@ -374,8 +374,8 @@ namespace utils {
 			utils::_replaceAll(s, chr[i].src, chr[i].dst);
 		}
 	}
-	
-	std::string _GetModulePath(std::string* filename) {
+
+	std::string _GetModulePath(std::string* filename, bool exec) {
 		char chr[512];
 #ifdef _windows_
 		::GetModuleFileNameA(NULL/*(HMODULE)GetModuleHandle(NULL)*/, chr, sizeof(chr));
@@ -393,7 +393,7 @@ namespace utils {
 		if (filename) {
 			*filename = s.substr(pos + 1, -1);
 		}
-		return s.substr(0, pos);
+		return exec ? s : s.substr(0, pos);
 	}
 
 	unsigned int _now_ms() {

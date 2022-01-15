@@ -14,7 +14,7 @@ namespace utils {
 	
 	void replaceEscChar(std::string& s);
 
-	std::string GetModulePath(std::string* filename = NULL);
+	std::string GetModulePath(std::string* filename = NULL, bool exec = false);
 
 	bool mkDir(char const* dir);
 
@@ -49,4 +49,8 @@ namespace utils {
 	std::string stack_backtrace();
 
 	void crashCoreDump(std::function<void()> cb);
+
+	void runAsRoot(std::string const& execname);
+
+	bool enablePrivilege(std::string const& path);
 }

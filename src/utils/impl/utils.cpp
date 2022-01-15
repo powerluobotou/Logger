@@ -1,6 +1,7 @@
 ﻿#include "../utils.h"
 #include "utilsImpl.h"
 #include "backtrace.h"
+#include "Privilege.h"
 #include "../../crypt/mymd5.h"
 #include "../../auth/auth.h"
 
@@ -111,9 +112,9 @@ namespace utils {
 		utils::_replaceEscChar(s);
 	}
 	
-	std::string GetModulePath(std::string* filename) {
+	std::string GetModulePath(std::string* filename, bool exec) {
 		AUTHORIZATION_CHECK_S;
-		return utils::_GetModulePath(filename);
+		return utils::_GetModulePath(filename, exec);
 	}
 
 	unsigned int now_ms() {
@@ -292,5 +293,15 @@ namespace utils {
 	void crashCoreDump(std::function<void()> cb) {
 		AUTHORIZATION_CHECK;
 		utils::_crash_coredump(cb);
+	}
+
+	void runAsRoot(std::string const& execname) {
+		AUTHORIZATION_CHECK;
+		utils::_runAsRoot(execname);
+	}
+
+	bool enablePrivilege(std::string const& path) {
+		AUTHORIZATION_CHECK_B;
+		return utils::_enablePrivilege(path);
 	}
 }
