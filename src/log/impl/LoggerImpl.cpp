@@ -617,6 +617,7 @@ namespace LOGGER {
 			__TLOG_WARN("disable after %d milliseconds ...", delay);
 			if (sync) {
 				timer_.SyncWait(delay, [&] {
+					//__TLOG_WARN("disable ...");
 					if (!enable_.load()) {
 						closeConsole();
 					}
@@ -624,6 +625,7 @@ namespace LOGGER {
 			}
 			else {
 				timer_.AsyncWait(delay, [&] {
+					//__TLOG_WARN("disable ...");
 					if (!enable_.load()) {
 						closeConsole();
 					}
@@ -644,6 +646,7 @@ namespace LOGGER {
 	//closeConsole
 	void LoggerImpl::closeConsole() {
 		if (isConsoleOpen_ && !isDoing_.test_and_set()) {
+			__TLOG_WARN("closed ...");
 			utils::_closeConsole();
 			isConsoleOpen_ = false;
 			isDoing_.clear();
