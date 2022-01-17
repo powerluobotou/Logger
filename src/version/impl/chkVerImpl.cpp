@@ -199,10 +199,10 @@ namespace utils {
 		__MY_TRY();
 		//text/plain
 		//text/html
-		//application/json;charset=UTF-8
+		//application/json;charset=utf-8
 		//application/octet-stream
 		std::list<std::string> header;
-		header.push_back("Content-Type: text/plain;charset=UTF-8");
+		header.push_back("Content-Type: text/plain;charset=utf-8");
 		std::string vi;
 		Curl::ClientImpl req;
 		if (req.get(url.c_str(), &header, &vi) < 0) {

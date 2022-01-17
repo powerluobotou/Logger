@@ -386,7 +386,7 @@ void testPost()
 	GBKToUTF8(body, strlen(body), utf8, sizeof(utf8));
 
 	std::list<std::string> header;
-//	header.push_back("Content-Type: application/json;charset=UTF-8"); // application/json;charset=gb2312
+//	header.push_back("Content-Type: application/json;charset=utf-8"); //application/json;charset=gb2312
 	header.push_back("x-session-key:eccbdc039d5f07cec29cd9575d4cab71");
 	header.push_back("x-udid:101:123456789");
 	header.push_back("x-result-format:json");

@@ -673,8 +673,13 @@ namespace Curl {
 			CURLcode easycode;
 			easycode = ::curl_easy_perform(curl_);
 			CHECKCURLE_BREAK(easycode);
-
-			rc = 0;
+			int retcode = 0;
+			easycode = curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &retcode);
+			CHECKCURLE_BREAK(easycode);
+			if (200 == retcode) {
+				rc = 0;
+			}
+			//rc = 0;
 		} while (0);
 #if 0
 		Close();
@@ -695,29 +700,53 @@ namespace Curl {
 				CHECKPTR_BREAK(curl_);
 			}
 			CURLcode easycode;
-			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
-			CHECKCURLE_BREAK(easycode);
-			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
-			CHECKCURLE_BREAK(easycode);
-			easycode = curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+ 			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, false);
+ 			CHECKCURLE_BREAK(easycode);
+ 			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
+ 			CHECKCURLE_BREAK(easycode);
+ 			easycode = curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
 			CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_POST, 0L);
+			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_URL, url);
+ 			CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_VERBOSE, 0L);
 			CHECKCURLE_BREAK(easycode);
-			easycode = curl_easy_setopt(curl_, CURLOPT_NOBODY, 1L);
+			struct curl_slist* headers = NULL;
+			/* Disable "Expect: 100-continue" */
+			headers = ::curl_slist_append(headers, "Expect:");
+			headers = ::curl_slist_append(headers, "Content-Type: text/plain;charset=utf-8");
+			easycode = curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
 			CHECKCURLE_BREAK(easycode);
+			//response header
+			easycode = curl_easy_setopt(curl_, CURLOPT_HEADER, 0L);
+			CHECKCURLE_BREAK(easycode);
+			//response body 500 - Internal Server Error
+			//easycode = curl_easy_setopt(curl_, CURLOPT_NOBODY, 1L);
+			//CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_FILETIME, 1L);
 			CHECKCURLE_BREAK(easycode);
-			easycode = curl_easy_setopt(curl_, CURLOPT_HEADER, 1L);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_COOKIEFILE, "cookie.txt");
+			//CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
 			CHECKCURLE_BREAK(easycode);
-			//easycode = curl_easy_setopt(curl_, CURLOPT_REFERER, "");
+			//easycode = curl_easy_setopt(curl_, CURLOPT_USERPWD, "SUREN:SUREN");
+			//CHECKCURLE_BREAK(easycode);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_REFERER, "www.baidu.com");
 			//CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 			CHECKCURLE_BREAK(easycode);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST | CURLAUTH_BASIC);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+			//CHECKCURLE_BREAK(easycode);
 			easycode = ::curl_easy_perform(curl_);
 			CHECKCURLE_BREAK(easycode);
+			::curl_slist_free_all(headers);
 			//https://its401.com/article/weixin_33802505/86253837
+			//https://blog.csdn.net/u012340794/article/details/71440604
+			//https://www.cnblogs.com/moodlxs/archive/2012/10/15/2724318.html
 			int retcode = 0;
 			easycode = curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &retcode);
 			CHECKCURLE_BREAK(easycode);
