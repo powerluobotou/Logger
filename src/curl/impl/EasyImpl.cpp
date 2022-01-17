@@ -352,6 +352,7 @@ namespace Curl {
 			easycode = curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 3);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 3); //recv timeout
+			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_TIMEOUT_MS, 30);
 			CHECKCURLE_BREAK(easycode);
 			rc = 0;
@@ -405,7 +406,6 @@ namespace Curl {
 			easycode = curl_easy_setopt(curl_, CURLOPT_AUTOREFERER, 1L);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
-			CHECKCURLE_BREAK(easycode);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_MAXREDIRS, 1L);
 			CHECKCURLE_BREAK(easycode);
@@ -470,7 +470,7 @@ namespace Curl {
 				//CHECKCURLE_BREAK(easycode);
 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0L);
 				//CHECKCURLE_BREAK(easycode);
-				curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 				CHECKCURLE_BREAK(easycode);
 			}
 			else {
@@ -483,11 +483,11 @@ namespace Curl {
 				//CHECKCURLE_BREAK(easycode);
 				//easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
 				//CHECKCURLE_BREAK(easycode);
-				curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+				easycode = curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 				CHECKCURLE_BREAK(easycode);
 				easycode = curl_easy_setopt(curl_, CURLOPT_CAINFO, spath);//.pem
 				CHECKCURLE_BREAK(easycode);
-				//curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
+				//easycode = curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
 				//CHECKCURLE_BREAK(easycode);
 			}
 			rc = 0;
@@ -699,21 +699,25 @@ namespace Curl {
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, true);
 			CHECKCURLE_BREAK(easycode);
-			curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+			easycode = curl_easy_setopt(curl_, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 			CHECKCURLE_BREAK(easycode);
-			//easycode = curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
-			//CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
+			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_URL, url);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_NOBODY, 1L);
 			CHECKCURLE_BREAK(easycode);
 			easycode = curl_easy_setopt(curl_, CURLOPT_FILETIME, 1L);
 			CHECKCURLE_BREAK(easycode);
-			easycode = curl_easy_setopt(curl_, CURLOPT_HEADER, 0L);
+			easycode = curl_easy_setopt(curl_, CURLOPT_HEADER, 1L);
+			CHECKCURLE_BREAK(easycode);
+			//easycode = curl_easy_setopt(curl_, CURLOPT_REFERER, "");
+			//CHECKCURLE_BREAK(easycode);
+			easycode = curl_easy_setopt(curl_, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 			CHECKCURLE_BREAK(easycode);
 			easycode = ::curl_easy_perform(curl_);
 			CHECKCURLE_BREAK(easycode);
-
+			//https://its401.com/article/weixin_33802505/86253837
 			int retcode = 0;
 			easycode = curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &retcode);
 			CHECKCURLE_BREAK(easycode);
