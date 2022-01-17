@@ -315,18 +315,15 @@ namespace LOGGER {
 				struct timeval tv = { 0 };
 				bool syn = false;
 				while (!done_.load()) {
-					{
-						std::unique_lock<std::mutex> lock(mutex_); {
-							cond_.wait(lock); {
-								get(tm, tv);
-								if ((syn = consume(tm, tv))) {
-									done_.store(true);
-									break;
-								}
-							}
-						}
+					std::vector<MessageT> msgs; {
+						wait(msgs);
 					}
-					std::this_thread::yield();
+					get(tm, tv);
+					if ((syn = consume(tm, tv, msgs))) {
+						done_.store(true);
+						break;
+					}
+					//std::this_thread::yield();
 				}
 				close();
 				started_ = false;
@@ -363,10 +360,20 @@ namespace LOGGER {
 						std::make_pair(msg, stack ? stack : ""),
 						std::make_pair(pos, flag)));
 				cond_.notify_all();
-				std::this_thread::yield();
+				//std::this_thread::yield();
 			}
 		}
-		//std::this_thread::yield();
+	}
+
+	//wait
+	void LoggerImpl::wait(std::vector<MessageT>& msgs) {
+		{
+			std::unique_lock<std::mutex> lock(mutex_); {
+				cond_.wait(lock); {
+					messages_.swap(msgs);
+				}
+			}
+		}
 	}
 
 	//getlevel
@@ -384,47 +391,45 @@ namespace LOGGER {
 	}
 
 	//consume
-	bool LoggerImpl::consume(struct tm const& tm, struct timeval const& tv) {
-		if (!messages_.empty()) {
-			shift(tm, tv);
-			bool syn = false;
-			for (std::vector<MessageT>::const_iterator it = messages_.begin();
-				it != messages_.end(); ++it) {
+	bool LoggerImpl::consume(struct tm const& tm, struct timeval const& tv, std::vector<MessageT>& msgs) {
+		assert(!msgs.empty());
+		shift(tm, tv);
+		bool syn = false;
+		for (std::vector<MessageT>::const_iterator it = msgs.begin();
+			it != msgs.end(); ++it) {
 #define Msg(it) ((it)->first.first)
 #define Stack(it) ((it)->first.second)
 #define Pos(it) ((it)->second.first)
 #define Flag(it) ((it)->second.second)
-				int level = getlevel(Msg(it).c_str()[0]);
-				switch (level) {
-				case LVL_FATAL:
-				case LVL_TRACE: {
-					write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
-					write(Stack(it).c_str(), Stack(it).size(), 0, 0);
-					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it), Stack(it).c_str(), Stack(it).size());
-					break;
-				}
-				case LVL_ERROR:
-				case LVL_WARN:
-				case LVL_INFO:
-				case LVL_DEBUG: {
-					write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
-					stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
-					break;
-				}
-				case 'O':
-				case 'X': {
-					doConsole((char const)level);
-					break;
-				}
-				}
-				if ((syn = (Flag(it) & F_SYNC))) {
-					break;
-				}
+			int level = getlevel(Msg(it).c_str()[0]);
+			switch (level) {
+			case LVL_FATAL:
+			case LVL_TRACE: {
+				write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+				write(Stack(it).c_str(), Stack(it).size(), 0, 0);
+				stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it), Stack(it).c_str(), Stack(it).size());
+				break;
 			}
-			messages_.clear();
-			return syn;
+			case LVL_ERROR:
+			case LVL_WARN:
+			case LVL_INFO:
+			case LVL_DEBUG: {
+				write(Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+				stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
+				break;
+			}
+			case 'O':
+			case 'X': {
+				doConsole((char const)level);
+				break;
+			}
+			}
+			if ((syn = (Flag(it) & F_SYNC))) {
+				break;
+			}
 		}
-		return false;
+		//msgs.clear();
+		return syn;
 	}
 	
 	//stop
@@ -449,9 +454,6 @@ namespace LOGGER {
 		case LVL_DEBUG: qDebug(msg); break;
 		}
 #elif defined(_windows_)
-		//if (!started() && enable_.load()) {
-		//	openConsole();
-		//}
 		if (!isConsoleOpen_) {
 			return;
 		}
@@ -550,9 +552,6 @@ namespace LOGGER {
 		}
 		}
 		//::CloseHandle(h);
-		//if (!started() && !enable_.load()) {
-		//	closeConsole();
-		//}
 #else
 		switch (level) {
 		case LVL_FATAL:
@@ -617,17 +616,25 @@ namespace LOGGER {
 			__TLOG_WARN("disable after %d milliseconds ...", delay);
 			if (sync) {
 				timer_.SyncWait(delay, [&] {
-					//__TLOG_WARN("disable ...");
 					if (!enable_.load()) {
+						__TLOG_WARN("disable ...");
+#if 0
 						closeConsole();
+#else
+						notify("X", 1, 0, 0, NULL, 0);
+#endif
 					}
 					});
 			}
 			else {
 				timer_.AsyncWait(delay, [&] {
-					//__TLOG_WARN("disable ...");
 					if (!enable_.load()) {
+						__TLOG_WARN("disable ...");
+#if 0
 						closeConsole();
+#else
+						notify("X", 1, 0, 0, NULL, 0);
+#endif
 					}
 					});
 			}

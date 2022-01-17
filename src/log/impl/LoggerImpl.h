@@ -30,6 +30,10 @@ namespace LOGGER {
 	class LoggerImpl {
 		friend class Logger;
 	private:
+		typedef std::pair<size_t, uint8_t> Flags;
+		typedef std::pair<std::string, std::string> Message;
+		typedef std::pair<Message, Flags> MessageT;
+	private:
 		LoggerImpl();
 		~LoggerImpl();
 	public:
@@ -59,7 +63,8 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		bool consume(struct tm const& tm, struct timeval const& tv);
+		void wait(std::vector<MessageT>& msgs);
+		bool consume(struct tm const& tm, struct timeval const& tv, std::vector<MessageT>& msgs);
 		bool start();
 		bool valid();
 		void sync();
@@ -89,9 +94,6 @@ namespace LOGGER {
 		std::atomic_flag starting_{ ATOMIC_FLAG_INIT };
 		std::mutex mutex_;
 		std::condition_variable cond_;
-		typedef std::pair<size_t, uint8_t> Flags;
-		typedef std::pair<std::string, std::string> Message;
-		typedef std::pair<Message, Flags> MessageT;
 		std::vector<MessageT> messages_;
 		bool sync_ = false;
 		std::mutex sync_mutex_;
