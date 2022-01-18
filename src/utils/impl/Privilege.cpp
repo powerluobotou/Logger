@@ -15,7 +15,7 @@ namespace utils {
 		if (::DsRoleGetPrimaryDomainInformation(NULL,
 			DsRolePrimaryDomainInfoBasic,
 			(PBYTE*)&info) != ERROR_SUCCESS) {
-			__TLOG_ERROR("DsRoleGetPrimaryDomainInformation: %u\n", GetLastError());
+			__TLOG_ERROR("DsRoleGetPrimaryDomainInformation: %u\n", ::GetLastError());
 			return false;
 		}
 		if (info->DomainNameDns == NULL) {
@@ -114,7 +114,7 @@ namespace utils {
 		}
 		//程序是否是管理员运行
 		if (!::CheckTokenMembership(NULL, psid, &as)) {
-			err = GetLastError();
+			err = ::GetLastError();
 			goto end_;
 		}
 	end_:
@@ -143,7 +143,7 @@ namespace utils {
 		sei.nShow = SW_SHOWDEFAULT;
 		sei.hwnd = NULL;
 		if (!::ShellExecuteEx(&sei)) {
-			DWORD err = GetLastError();
+			DWORD err = ::GetLastError();
 			if (err == ERROR_CANCELLED ||
 				err == ERROR_FILE_NOT_FOUND) {
 				return false;
@@ -161,7 +161,7 @@ namespace utils {
 #if defined(_windows_)
 		if (!utils::_isRunAsRoot()) {
 			::CreateEvent(NULL, FALSE, FALSE, _T("{29544E05-024F-4BC1-A272-452DBC8E17A4}"));
-			if (ERROR_SUCCESS != GetLastError()) {
+			if (ERROR_SUCCESS != ::GetLastError()) {
 				return;
 			}
 			else {
@@ -175,7 +175,7 @@ namespace utils {
 		else {
 			__LOG_CONSOLE_OPEN();
 			__TLOG_INFO("管理员身份启动...");
-			__LOG_CONSOLE_CLOSE(10000);
+			__LOG_CONSOLE_CLOSE(2000);
 		}
 #endif
 		__MY_CATCH();

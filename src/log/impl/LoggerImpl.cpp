@@ -360,7 +360,7 @@ namespace LOGGER {
 						std::make_pair(msg, stack ? stack : ""),
 						std::make_pair(pos, flag)));
 				cond_.notify_all();
-				//std::this_thread::yield();
+				std::this_thread::yield();
 			}
 		}
 	}
