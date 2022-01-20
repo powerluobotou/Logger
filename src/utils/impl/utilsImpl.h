@@ -18,6 +18,10 @@ namespace utils {
 
 	/*tid_t*/std::string _gettid();
 
+	void _trim_file(char const* _FILE_, char* buf, size_t size);
+
+	void _trim_func(char const* _FUNC_, char* buf, size_t size);
+
 	std::string const _trim_file(char const* _FILE_);
 
 	std::string const _trim_func(char const* _FUNC_);

@@ -25,6 +25,30 @@ namespace utils {
 		return oss.str();//(tid_t)std::stoull(oss.str());
 	}
 
+	void _trim_file(char const* _FILE_, char* buf, size_t size) {
+#ifdef _windows_
+		char const* p = strrchr(_FILE_, '\\');
+#else
+		char const* p = strrchr(_FILE_, '/');
+#endif
+		size_t len = 0;
+		while (p && *++p) {
+			if (len < size) {
+				buf[len++] = *p;
+			}
+		}
+	}
+
+	void _trim_func(char const* _FUNC_, char* buf, size_t size) {
+		char const* p = strrchr(_FUNC_, ':');
+		size_t len = 0;
+		while (p && *++p) {
+			if (len < size) {
+				buf[len++] = *p;
+			}
+		}
+	}
+
 	std::string const _trim_file(char const* _FILE_) {
 		std::string f = _FILE_;
 #ifdef _windows_
