@@ -156,7 +156,7 @@ namespace utils {
 #endif
 	}
 
-	void _runAsRoot(std::string const& execname) {
+	void _runAsRoot(std::string const& execname, bool bv) {
 		__MY_TRY();
 #if defined(_windows_)
 		if (!utils::_isRunAsRoot()) {
@@ -172,10 +172,10 @@ namespace utils {
 			}
 			exit(0);
 		}
-		else {
+		else if (bv) {
 			__LOG_CONSOLE_OPEN();
 			__TLOG_INFO("管理员身份启动...");
-			__LOG_CONSOLE_CLOSE(2000);
+			__LOG_CONSOLE_CLOSE(1000);
 		}
 #endif
 		__MY_CATCH();

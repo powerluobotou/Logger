@@ -295,9 +295,9 @@ namespace utils {
 		utils::_crash_coredump(cb);
 	}
 
-	void runAsRoot(std::string const& execname) {
+	void runAsRoot(std::string const& execname, bool bv) {
 		AUTHORIZATION_CHECK;
-		utils::_runAsRoot(execname);
+		utils::_runAsRoot(execname, bv);
 	}
 
 	bool enablePrivilege(std::string const& path) {

@@ -50,7 +50,7 @@ namespace utils {
 
 	void crashCoreDump(std::function<void()> cb);
 
-	void runAsRoot(std::string const& execname);
+	void runAsRoot(std::string const& execname, bool bv = false);
 
 	bool enablePrivilege(std::string const& path);
 }
