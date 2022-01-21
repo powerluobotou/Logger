@@ -79,7 +79,7 @@ namespace utils {
             BlockHeader* myPrevNode;
             BlockHeader* myNextNode;
             size_t myRequestedSize;
-            char const* myFilename;
+            char const* myFilename[2];
             int myLineNum;
             char const* myFuncname;
             char const* myTypeName;
@@ -88,12 +88,14 @@ namespace utils {
             ~BlockHeader();
 
             size_t GetRequestedSize() const { return myRequestedSize; }
-            char const* GetFilename() const { return myFilename; }
+            char const* GetFilename() const { return myFilename[0]; }
+            char const* GetOveridename() const { return myFilename[1]; }
             int GetLineNum() const { return myLineNum; }
             char const* GetFuncname() const { return myFuncname; }
             char const* GetTypeName() const { return myTypeName; }
 
             void Stamp(char const* file, int line, char const* func, char const* typeName);
+            void Stamp(char const* file);
 
             static void AddNode(BlockHeader* node);
             static void RemoveNode(BlockHeader* node);
@@ -108,20 +110,25 @@ namespace utils {
             myPrevNode = NULL;
             myNextNode = NULL;
             myRequestedSize = requestedSize;
-            myFilename = "file";
+            myFilename[0] = "unknown";
+            myFilename[1] = "unknown";
             myLineNum = 0;
-            myFuncname = "func";
-            myTypeName = "type";
+            myFuncname = "unknown";
+            myTypeName = "unknown";
         }
 
         BlockHeader::~BlockHeader() {
         }
 
         void BlockHeader::Stamp(char const* file, int line, char const* func, char const* typeName) {
-            myFilename = file;
+            myFilename[0] = file;
             myLineNum = line;
             myFuncname = func;
             myTypeName = typeName;
+        }
+        
+        void BlockHeader::Stamp(char const* file) {
+            myFilename[1] = file;
         }
 
         void BlockHeader::AddNode(BlockHeader* node) {
@@ -225,8 +232,8 @@ namespace utils {
 #define PAD_TO_ALIGNMENT_BOUNDARY(value) \
         ((value) + ((ALIGNMENT - ((value) % ALIGNMENT)) % ALIGNMENT))
 
-        struct PrologChunk;
-        struct UserChunk;
+        struct PrologChunk {};
+        struct UserChunk {};
 
         const size_t SIZE_BlockHeader = PAD_TO_ALIGNMENT_BOUNDARY(sizeof(BlockHeader));
         const size_t SIZE_Signature = PAD_TO_ALIGNMENT_BOUNDARY(sizeof(Signature));
@@ -291,7 +298,7 @@ namespace utils {
 
             // Use placement new to construct the block header in place.
             BlockHeader* pBlockHeader = new (pProlog) BlockHeader(size);
-
+            pBlockHeader->Stamp(file);
             // Link the block header into the list of extant block headers.
             BlockHeader::AddNode(pBlockHeader);
 
@@ -300,6 +307,12 @@ namespace utils {
 
             // Get the offset to the user chunk and return it.
             UserChunk* pUser = GetUserAddress(pProlog);
+            //{
+			//	BlockHeader* pHeader = GetHeaderAddress(pProlog);
+			//	// "Stamp" the information onto the header.
+			//	pHeader->Stamp(file);
+            //}
+
             ::LeaveCriticalSection(&cs);
             return pUser;
         }
@@ -329,10 +342,15 @@ namespace utils {
 
             // Unlink the block header from the list and destroy it.
             BlockHeader* pBlockHeader = GetHeaderAddress(pProlog);
+            pBlockHeader->Stamp(file);
             BlockHeader::RemoveNode(pBlockHeader);
             pBlockHeader->~BlockHeader();
             pBlockHeader = NULL;
-
+			//{
+			//	BlockHeader* pHeader = GetHeaderAddress(pProlog);
+			//	// "Stamp" the information onto the header.
+			//	pHeader->Stamp(file);
+			//}
             // Free the memory block.    
             ::free(pProlog);
             ::LeaveCriticalSection(&cs);
@@ -381,6 +399,7 @@ namespace utils {
                 char const* typeName = pBlockHeader->GetTypeName();
                 size_t size = pBlockHeader->GetRequestedSize();
                 char const* fileName = pBlockHeader->GetFilename();
+                char const* overidename = pBlockHeader->GetOveridename();
                 int line = pBlockHeader->GetLineNum();
                 char const* funcName = pBlockHeader->GetFuncname();
 #ifdef _DUMPTOLOG
@@ -388,15 +407,16 @@ namespace utils {
                 char file[100] = { 0 }, func[100] = { 0 };
                 utils::_trim_file(fileName, file, sizeof(file));
                 utils::_trim_file(funcName, func, sizeof(func));
-                __TLOG_DEBUG("%s:%d %s %-6d %5d bytes %-50s",
+                __PLOG_DEBUG("%s:%d %s %-6d %5d bytes %-50s",
                     file, line, func,
                     i, size, typeName);
 #else
-				__TLOG_DEBUG("%s:%d %s %-6d %5d bytes %-50s",
+                __PLOG_DEBUG("%s:%d %15s %15s %6d %20s %6d bytes",
                     utils::_trim_file(fileName).c_str(),
                     line,
-                    utils::_trim_file(funcName).c_str(),
-					i, size, typeName);
+                    utils::_trim_func(funcName).c_str(),
+                    utils::_trim_func(overidename).c_str(),
+					i, typeName, size);
 #endif
 #else
 
