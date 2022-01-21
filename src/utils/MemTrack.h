@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2002, 2008 Curtis Bartley
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,8 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-//#define _MEMORY_TRACK_
+#define _MEMORY_TRACK_
+#define _DUMPTOLOG
 
 #include "../Macro.h"
 #include <typeinfo>
@@ -40,31 +41,35 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace utils {
 
-	class MemStamp {
-	public:
-		MemStamp(char const* file, int line, char const* func);
-		~MemStamp();
-	public:
-		char const* const file;
-		int const line;
-		char const* const func;
-	};
+	namespace MemTrack {
 
-	void* trackMalloc(size_t size);
-	void trackFree(void* p);
-	void trackStamp(void* p, const MemStamp& stamp, char const* typeName);
-	void trackDumpBlocks();
-	void trackMemoryUsage();
+		class MemStamp {
+		public:
+			MemStamp(char const* file, int line, char const* func);
+			~MemStamp();
+		public:
+			char const* const file;
+			int const line;
+			char const* const func;
+		};
+		void initialize();
+		void* trackMalloc(size_t size, char const* file);
+		void trackFree(void* ptr, char const* file);
+		void trackStamp(void* ptr, const MemStamp& stamp, char const* typeName);
+		void trackDumpBlocks();
+		void trackMemoryUsage();
+		void cleanup();
 
-	template <class T> inline T* operator*(const MemStamp& stamp, T* p) {
-		trackStamp(p, stamp, typeid(T).name());
-		return p;
+		template <class T> inline T* operator*(const MemStamp& stamp, T* ptr) {
+			trackStamp(ptr, stamp, typeid(T).name());
+			return ptr;
+		}
 	}
 }
 
 #ifdef _MEMORY_TRACK_
 
-#define MEMTRACK_NEW utils::MemStamp(__FILE__, __LINE__, __FUNC__) * new
+#define MEMTRACK_NEW utils::MemTrack::MemStamp(__FILE__, __LINE__, __FUNC__) * new
 #define new MEMTRACK_NEW
 
 #endif

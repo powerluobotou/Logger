@@ -11,6 +11,18 @@
 #include <QDebug>
 #endif
 
+#define _S (6)
+#define _O (7)
+#define _X (8)
+
+#define _PARAM_S     _S,__FILE__,__LINE__,__FUNC__,__STACK__
+#define _PARAM_O     _O,__FILE__,__LINE__,__FUNC__,__STACK__
+#define _PARAM_X     _X,__FILE__,__LINE__,__FUNC__,__STACK__
+
+#define __LOG_WAIT_S   __LOG_S(_PARAM_S, F_SYNC, ""); __LOG_WAIT()
+#define __LOG_NOTIFY_O __LOG_S(_PARAM_O, F_PURE, "")
+#define __LOG_NOTIFY_X __LOG_S(_PARAM_X, F_PURE, "")
+
 namespace LOGGER {
 
 	//constructor
@@ -140,7 +152,7 @@ namespace LOGGER {
 	//check
 	bool LoggerImpl::check(int level) {
 		//打印level_及以下级别日志
-		return level <= level_.load();
+		return level <= level_.load() || level == _S || level == _O || level == _X;
 	}
 
 	//_tz
@@ -163,7 +175,7 @@ namespace LOGGER {
 		struct tm tm;
 		struct timeval tv;
 		update(tm, tv);
-		static char const chr[] = { 'F','E','W','I','T','D' };
+		static char const chr[] = { 'F','E','W','I','T','D','S','O','X' };
 		size_t pos = (flag & F_DETAIL) ?
 			snprintf(buffer, size, "%c%d %s %02d:%02d:%02d.%.6lu %s %s:%d] %s ",
 				chr[level],
@@ -315,7 +327,7 @@ namespace LOGGER {
 				struct timeval tv = { 0 };
 				bool syn = false;
 				while (!done_.load()) {
-					std::vector<MessageT> msgs; {
+					Messages msgs; {
 						wait(msgs);
 					}
 					get(tm, tv);
@@ -359,14 +371,14 @@ namespace LOGGER {
 					std::make_pair(
 						std::make_pair(msg, stack ? stack : ""),
 						std::make_pair(pos, flag)));
-				cond_.notify_all();
-				std::this_thread::yield();
+				cond_.notify_one();
+				//std::this_thread::yield();
 			}
 		}
 	}
 
 	//wait
-	void LoggerImpl::wait(std::vector<MessageT>& msgs) {
+	void LoggerImpl::wait(Messages& msgs) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
 				cond_.wait(lock); {
@@ -385,17 +397,18 @@ namespace LOGGER {
 		case 'I':return LVL_INFO;
 		case 'T':return LVL_TRACE;
 		case 'D':return LVL_DEBUG;
-		case 'O':
-		case 'X':return c;
+		case 'S':return _S;
+		case 'O':return _O;
+		case 'X':return _X;
 		}
 	}
 
 	//consume
-	bool LoggerImpl::consume(struct tm const& tm, struct timeval const& tv, std::vector<MessageT>& msgs) {
+	bool LoggerImpl::consume(struct tm const& tm, struct timeval const& tv, Messages& msgs) {
 		assert(!msgs.empty());
 		shift(tm, tv);
 		bool syn = false;
-		for (std::vector<MessageT>::const_iterator it = msgs.begin();
+		for (Messages::const_iterator it = msgs.begin();
 			it != msgs.end(); ++it) {
 #define Msg(it) ((it)->first.first)
 #define Stack(it) ((it)->first.second)
@@ -418,9 +431,12 @@ namespace LOGGER {
 				stdoutbuf(level, Msg(it).c_str(), Msg(it).size(), Pos(it), Flag(it));
 				break;
 			}
-			case 'O':
-			case 'X': {
-				doConsole((char const)level);
+			case _O:
+			case _X: {
+				doConsole(level);
+				break;
+			}
+			case _S: {
 				break;
 			}
 			}
@@ -428,16 +444,27 @@ namespace LOGGER {
 				break;
 			}
 		}
-		//msgs.clear();
+#if 0
+		Messages empty;
+		msgs.swap(empty);
+#else
+		msgs.clear();
+#endif
 		return syn;
 	}
-	
+
+	//flush
+	void LoggerImpl::flush() {
+		__LOG_WAIT_S;
+	}
+
 	//stop
 	void LoggerImpl::stop() {
-		done_.store(true);
-		if (thread_.joinable()) {
-			thread_.join();
-		}
+		flush();
+		//done_.store(true);
+		//if (thread_.joinable()) {
+		//	thread_.join();
+		//}
 	}
 
 	//stdoutbuf
@@ -583,8 +610,9 @@ namespace LOGGER {
 		{
 			std::unique_lock<std::mutex> lock(sync_mutex_); {
 				sync_ = true;
-				sync_cond_.notify_all();
+				sync_cond_.notify_one();
 			}
+			//std::this_thread::yield();
 		}
 	}
 
@@ -621,7 +649,7 @@ namespace LOGGER {
 #if 0
 						closeConsole();
 #else
-						notify("X", 1, 0, 0, NULL, 0);
+						__LOG_NOTIFY_X;
 #endif
 					}
 					});
@@ -633,7 +661,7 @@ namespace LOGGER {
 #if 0
 						closeConsole();
 #else
-						notify("X", 1, 0, 0, NULL, 0);
+						__LOG_NOTIFY_X;
 #endif
 					}
 					});
@@ -661,13 +689,13 @@ namespace LOGGER {
 	}
 	
 	//doConsole
-	void LoggerImpl::doConsole(char const cmd) {
+	void LoggerImpl::doConsole(int const cmd) {
 		switch (cmd) {
-		case 'O': {
+		case _O: {
 			openConsole();
 			break;
 		}
-		case 'X': {
+		case _X: {
 			closeConsole();
 			break;
 		}

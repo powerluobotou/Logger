@@ -31,20 +31,36 @@ namespace utils {
 #else
 		char const* p = strrchr(_FILE_, '/');
 #endif
-		size_t len = 0;
-		while (p && *++p) {
-			if (len < size) {
-				buf[len++] = *p;
+		if (!p) {
+			memcpy(buf, _FILE_, std::min<size_t>((size_t)strlen(_FILE_), size));
+		}
+		else {
+			size_t len = 0;
+			while (*++p) {
+				if (len < size) {
+					buf[len++] = *p;
+				}
+				else {
+					break;
+				}
 			}
 		}
 	}
 
 	void _trim_func(char const* _FUNC_, char* buf, size_t size) {
 		char const* p = strrchr(_FUNC_, ':');
-		size_t len = 0;
-		while (p && *++p) {
-			if (len < size) {
-				buf[len++] = *p;
+		if (!p) {
+			memcpy(buf, _FUNC_, std::min<size_t>((size_t)strlen(_FUNC_), size));
+		}
+		else {
+			while (*++p) {
+				size_t len = 0;
+				if (len < size) {
+					buf[len++] = *p;
+				}
+				else {
+					break;
+				}
 			}
 		}
 	}

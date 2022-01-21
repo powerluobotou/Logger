@@ -30,9 +30,17 @@ namespace LOGGER {
 	class LoggerImpl {
 		friend class Logger;
 	private:
+#if 0
 		typedef std::pair<size_t, uint8_t> Flags;
 		typedef std::pair<std::string, std::string> Message;
 		typedef std::pair<Message, Flags> MessageT;
+		typedef std::vector<MessageT> Messages;
+#else
+		typedef std::pair<size_t, uint8_t> Flags;
+		typedef std::pair<std::string, std::string> Message;
+		typedef std::pair<Message, Flags> MessageT;
+		typedef std::list<MessageT> Messages;
+#endif
 	private:
 		LoggerImpl();
 		~LoggerImpl();
@@ -63,15 +71,16 @@ namespace LOGGER {
 		void shift(struct tm const& tm, struct timeval const& tv);
 		void update(struct tm& tm, struct timeval& tv);
 		void get(struct tm& tm, struct timeval& tv);
-		void wait(std::vector<MessageT>& msgs);
-		bool consume(struct tm const& tm, struct timeval const& tv, std::vector<MessageT>& msgs);
+		void wait(Messages& msgs);
+		bool consume(struct tm const& tm, struct timeval const& tv, Messages& msgs);
 		bool start();
 		bool valid();
 		void sync();
+		void flush();
 		void timezoneInfo();
 		void openConsole();
 		void closeConsole();
-		void doConsole(char const cmd);
+		void doConsole(int const cmd);
 	private:
 #ifdef _windows_
 		HANDLE fd_ = INVALID_HANDLE_VALUE;
@@ -94,7 +103,7 @@ namespace LOGGER {
 		std::atomic_flag starting_{ ATOMIC_FLAG_INIT };
 		std::mutex mutex_;
 		std::condition_variable cond_;
-		std::vector<MessageT> messages_;
+		Messages messages_;
 		bool sync_ = false;
 		std::mutex sync_mutex_;
 		std::condition_variable sync_cond_;
