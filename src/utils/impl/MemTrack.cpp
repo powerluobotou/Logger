@@ -29,6 +29,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../excp/impl/excpImpl.h"
 #include "../../log/impl/LoggerImpl.h"
+#include "../../lock/mutex.h"
 #include "utilsImpl.h"
 
 #include <new>
@@ -60,9 +61,8 @@ namespace utils {
     
     namespace MemTrack {
         
-        static CRITICAL_SECTION cs;
-        static bool init;
         std::atomic_flag initing_{ ATOMIC_FLAG_INIT };
+        static utils::Mutex* mutex_;
 
         MemStamp::MemStamp(char const* file, int line, char const* func)
             : file(file), line(line), func(func) {}
@@ -273,28 +273,28 @@ namespace utils {
         }
 		
         void initialize() {
-            if (!init && !initing_.test_and_set()) {
-                ::InitializeCriticalSection(&cs);
-                init = true;
+            if (!mutex_ && !initing_.test_and_set()) {
+                static utils::Mutex s_mutex_;
+                mutex_ = &s_mutex_;
                 initing_.clear();
             }
 		}
         
         void cleanup() {
-            ::DeleteCriticalSection(&cs);
+            if (mutex_ && !initing_.test_and_set()) {
+                mutex_->~Mutex();
+                initing_.clear();
+            }
         }
 
         void* trackMalloc(size_t size, char const* file) {
             utils::MemTrack::initialize();
-            ::EnterCriticalSection(&cs);
+            utils::GuardLock lock(*mutex_);
             // Allocate the memory, including space for the prolog.
             PrologChunk* pProlog = (PrologChunk*)malloc(SIZE_PrologChunk + size);
 
             // If the allocation failed, then return NULL.
-            if (pProlog == NULL) {
-                ::LeaveCriticalSection(&cs);
-                return NULL;
-            }
+            if (pProlog == NULL) return NULL;
 
             // Use placement new to construct the block header in place.
             BlockHeader* pBlockHeader = new (pProlog) BlockHeader(size);
@@ -312,29 +312,22 @@ namespace utils {
 			//	// "Stamp" the information onto the header.
 			//	pHeader->Stamp(file);
             //}
-
-            ::LeaveCriticalSection(&cs);
             return pUser;
         }
 
         void trackFree(void* ptr, char const* file) {
             utils::MemTrack::initialize();
-            ::EnterCriticalSection(&cs);
+            utils::GuardLock lock(*mutex_);
             // It's perfectly valid for "p" to be null; return if it is.
-            if (ptr == NULL) {
-                ::LeaveCriticalSection(&cs);
-                return;
-            }
+            if (ptr == NULL) return;
+            
             // Get the prolog address for this memory block.
             UserChunk* pUser = reinterpret_cast<UserChunk*>(ptr);
             PrologChunk* pProlog = GetPrologAddress(pUser);
 
             // Check the signature, and if it's invalid, return immediately.
             Signature* pSignature = GetSignatureAddress(pProlog);
-            if (!Signature::IsValidSignature(pSignature)) {
-                ::LeaveCriticalSection(&cs);
-                return;
-            }
+            if (!Signature::IsValidSignature(pSignature)) return;
 
             // Destroy the signature.
             pSignature->~Signature();
@@ -353,12 +346,11 @@ namespace utils {
 			//}
             // Free the memory block.    
             ::free(pProlog);
-            ::LeaveCriticalSection(&cs);
         }
 
         void trackStamp(void* ptr, const MemStamp& stamp, char const* typeName) {
             utils::MemTrack::initialize();
-            ::EnterCriticalSection(&cs);
+            utils::GuardLock lock(*mutex_);
             // Get the header and signature address for this pointer.
             UserChunk* pUser = reinterpret_cast<UserChunk*>(ptr);
             PrologChunk* pProlog = GetPrologAddress(pUser);
@@ -366,19 +358,15 @@ namespace utils {
             Signature* pSignature = GetSignatureAddress(pProlog);
 
             // If the signature is not valid, then return immediately.
-            if (!Signature::IsValidSignature(pSignature)) {
-                ::LeaveCriticalSection(&cs);
-                return;
-            }
+            if (!Signature::IsValidSignature(pSignature)) return;
 
             // "Stamp" the information onto the header.
             pHeader->Stamp(stamp.file, stamp.line, stamp.func, typeName);
-            ::LeaveCriticalSection(&cs);
         }
 
         void trackDumpBlocks() {
             utils::MemTrack::initialize();
-            ::EnterCriticalSection(&cs);
+            utils::GuardLock lock(*mutex_);
             // Get an array of pointers to all extant blocks.
             size_t numBlocks = BlockHeader::CountBlocks();
             BlockHeader** ppBlockHeader =
@@ -425,7 +413,6 @@ namespace utils {
 
             // Clean up.
             ::free(ppBlockHeader);
-            ::LeaveCriticalSection(&cs);
         }
 
         //MemDigest
@@ -456,13 +443,10 @@ namespace utils {
 
         void trackMemoryUsage() {
             utils::MemTrack::initialize();
-            ::EnterCriticalSection(&cs);
+            utils::GuardLock lock(*mutex_);
             // If there are no allocated blocks, then return now.
             size_t numBlocks = BlockHeader::CountBlocks();
-            if (numBlocks == 0) {
-                ::LeaveCriticalSection(&cs);
-                return;
-            }
+            if (numBlocks == 0) return;
 
             // Get an array of pointers to all extant blocks.
             BlockHeader** ppBlockHeader =
@@ -561,7 +545,6 @@ namespace utils {
 #endif
             ::free(ppBlockHeader);
             ::free(pMemDigestArray);
-            ::LeaveCriticalSection(&cs);
         }
     }
 }

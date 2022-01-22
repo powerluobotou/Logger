@@ -10,6 +10,7 @@ namespace Curl {
 
 	Client::Client(bool sync)
 		: impl_(new ClientImpl(sync)) {
+		//placement new
 	}
 
 	Client::~Client() {

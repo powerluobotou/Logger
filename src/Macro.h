@@ -81,6 +81,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <dirent.h>
+#include <pthread.h>
 #define __FUNC__ __func__
 #define INVALID_HANDLE_VALUE (-1)
 #define xsleep(t) usleep((t) * 1000)

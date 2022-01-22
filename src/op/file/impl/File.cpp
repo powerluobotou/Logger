@@ -6,6 +6,7 @@ namespace Operation {
 
 	CFile::CFile(const char* path)
 		: impl_(new FileImpl(path)) {
+		//placement new
 	}
 
 	CFile::~CFile() {

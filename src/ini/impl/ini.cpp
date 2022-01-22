@@ -21,6 +21,7 @@ namespace utils {
 		}
 #endif
 		Reader::Reader() :impl_(new ReaderImpl()) {
+			//placement new
 		}
 		Reader::~Reader() {
 			delete impl_;

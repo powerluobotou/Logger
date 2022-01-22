@@ -7,6 +7,7 @@ namespace LOGGER {
 
 	//constructor
 	Logger::Logger() :impl_(new LoggerImpl()) {
+		//placement new
 	}
 
 	//constructor

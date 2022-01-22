@@ -5,6 +5,7 @@
 namespace Operation {
 
 	CMemory::CMemory() : impl_(new MemImpl()) {
+		//placement new
 	}
 
 	CMemory::~CMemory() {
