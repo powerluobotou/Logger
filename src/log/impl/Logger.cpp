@@ -3,6 +3,18 @@
 #include "../../utils/utils.h"
 #include "../../auth/auth.h"
 
+template <class T>
+T* New(size_t size) {
+#if 0
+	void* ptr = (void*)malloc(sizeof(T));
+#else
+	void* ptr = ::operator new(sizeof(T));
+#endif
+	T* t = new(ptr) T();
+	t->T();
+	return t;
+}
+
 namespace LOGGER {
 
 	//constructor
