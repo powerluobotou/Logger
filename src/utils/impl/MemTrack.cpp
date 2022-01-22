@@ -551,7 +551,7 @@ namespace utils {
 
 #ifdef _MEMORY_TRACK_
 
-//p = new
+//p = new - ::operator new(size_t)
 void* operator new(size_t size) {
 	void* p = utils::MemTrack::trackMalloc(size, __FUNC__);
 	if (p == NULL) throw std::bad_alloc();
@@ -563,7 +563,7 @@ void operator delete(void* ptr) {
 	utils::MemTrack::trackFree(ptr, __FUNC__);
 }
 
-//p = new []
+//p = new [] - ::operator new[](size_t)
 void* operator new[](size_t size) {
 	void* p = utils::MemTrack::trackMalloc(size, __FUNC__);
 	if (p == NULL) throw std::bad_alloc();

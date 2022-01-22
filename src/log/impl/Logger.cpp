@@ -3,22 +3,10 @@
 #include "../../utils/utils.h"
 #include "../../auth/auth.h"
 
-template <class T>
-T* New(size_t size) {
-#if 0
-	void* ptr = (void*)malloc(sizeof(T));
-#else
-	void* ptr = ::operator new(sizeof(T));
-#endif
-	T* t = new(ptr) T();
-	t->T();
-	return t;
-}
-
 namespace LOGGER {
 
 	//constructor
-	Logger::Logger() :impl_(new LoggerImpl()) {
+	Logger::Logger() :impl_(New<LoggerImpl>()) {
 		//placement new
 	}
 
@@ -30,7 +18,7 @@ namespace LOGGER {
 	Logger::~Logger() {
 		if (impl_ &&
 			impl_ != LoggerImpl::instance()) {
-			delete impl_;
+			Free<LoggerImpl>(impl_);
 		}
 	}
 
