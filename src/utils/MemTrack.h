@@ -30,6 +30,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define _MEMORY_TRACK_
 #define _DUMPTOLOG
+//#define NO_PLACEMENT_NEW
 
 #include "../Macro.h"
 #include <typeinfo>
@@ -52,9 +53,10 @@ namespace utils {
 			int const line;
 			char const* const func;
 		};
+
 		void initialize();
-		void* trackMalloc(size_t size, char const* file);
-		void trackFree(void* ptr, char const* file);
+		void* trackMalloc(size_t size, char const* func);
+		void trackFree(void* ptr, char const* func);
 		void trackStamp(void* ptr, const MemStamp& stamp, char const* typeName);
 		void trackDumpBlocks();
 		void trackMemoryUsage();
@@ -69,7 +71,12 @@ namespace utils {
 
 #ifdef _MEMORY_TRACK_
 
+#ifdef NO_PLACEMENT_NEW
+#define MEMTRACK_NEW utils::MemTrack::MemStamp(__FILE__, __LINE__, __FUNC__) * new(__FILE__, __LINE__, __FUNC__)
+#else
 #define MEMTRACK_NEW utils::MemTrack::MemStamp(__FILE__, __LINE__, __FUNC__) * new
+#endif
+
 #define new MEMTRACK_NEW
 
 #endif

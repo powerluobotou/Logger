@@ -51,6 +51,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _MEMORY_TRACK_
 
+//Top of file
 #ifdef new
 #undef new //IMPORTANT!
 #endif
@@ -79,19 +80,19 @@ namespace utils {
             BlockHeader* myPrevNode;
             BlockHeader* myNextNode;
             size_t myRequestedSize;
-            char const* myFilename[2];
+            char const* myFilename;
             int myLineNum;
-            char const* myFuncname;
+            char const* myFuncname[2];
             char const* myTypeName;
         public:
             BlockHeader(size_t requestedSize);
             ~BlockHeader();
 
             size_t GetRequestedSize() const { return myRequestedSize; }
-            char const* GetFilename() const { return myFilename[0]; }
-            char const* GetOveridename() const { return myFilename[1]; }
+            char const* GetFilename() const { return myFilename; }
             int GetLineNum() const { return myLineNum; }
-            char const* GetFuncname() const { return myFuncname; }
+            char const* GetFuncname() const { return myFuncname[0]; }
+            char const* GetOveridename() const { return myFuncname[1]; }
             char const* GetTypeName() const { return myTypeName; }
 
             void Stamp(char const* file, int line, char const* func, char const* typeName);
@@ -110,10 +111,10 @@ namespace utils {
             myPrevNode = NULL;
             myNextNode = NULL;
             myRequestedSize = requestedSize;
-            myFilename[0] = "unknown";
-            myFilename[1] = "unknown";
+            myFilename = "unknown";
             myLineNum = 0;
-            myFuncname = "unknown";
+            myFuncname[0] = "unknown";
+            myFuncname[1] = "unknown";
             myTypeName = "unknown";
         }
 
@@ -121,14 +122,14 @@ namespace utils {
         }
 
         void BlockHeader::Stamp(char const* file, int line, char const* func, char const* typeName) {
-            myFilename[0] = file;
+            myFilename = file;
             myLineNum = line;
-            myFuncname = func;
+            myFuncname[0] = func;
             myTypeName = typeName;
         }
         
-        void BlockHeader::Stamp(char const* file) {
-            myFilename[1] = file;
+        void BlockHeader::Stamp(char const* func) {
+            myFuncname[1] = func;
         }
 
         void BlockHeader::AddNode(BlockHeader* node) {
@@ -287,7 +288,7 @@ namespace utils {
             }
         }
 
-        void* trackMalloc(size_t size, char const* file) {
+        void* trackMalloc(size_t size, char const* func) {
             utils::MemTrack::initialize();
             utils::GuardLock lock(*mutex_);
             // Allocate the memory, including space for the prolog.
@@ -298,7 +299,8 @@ namespace utils {
 
             // Use placement new to construct the block header in place.
             BlockHeader* pBlockHeader = new (pProlog) BlockHeader(size);
-            pBlockHeader->Stamp(file);
+            // "Stamp" the information onto the header.
+            pBlockHeader->Stamp(func);
             // Link the block header into the list of extant block headers.
             BlockHeader::AddNode(pBlockHeader);
 
@@ -307,15 +309,10 @@ namespace utils {
 
             // Get the offset to the user chunk and return it.
             UserChunk* pUser = GetUserAddress(pProlog);
-            //{
-			//	BlockHeader* pHeader = GetHeaderAddress(pProlog);
-			//	// "Stamp" the information onto the header.
-			//	pHeader->Stamp(file);
-            //}
             return pUser;
         }
 
-        void trackFree(void* ptr, char const* file) {
+        void trackFree(void* ptr, char const* func) {
             utils::MemTrack::initialize();
             utils::GuardLock lock(*mutex_);
             // It's perfectly valid for "p" to be null; return if it is.
@@ -335,19 +332,17 @@ namespace utils {
 
             // Unlink the block header from the list and destroy it.
             BlockHeader* pBlockHeader = GetHeaderAddress(pProlog);
-            pBlockHeader->Stamp(file);
+            // "Stamp" the information onto the header.
+            pBlockHeader->Stamp(func);
             BlockHeader::RemoveNode(pBlockHeader);
             pBlockHeader->~BlockHeader();
             pBlockHeader = NULL;
-			//{
-			//	BlockHeader* pHeader = GetHeaderAddress(pProlog);
-			//	// "Stamp" the information onto the header.
-			//	pHeader->Stamp(file);
-			//}
+
             // Free the memory block.    
             ::free(pProlog);
         }
 
+        //monitor [MemStamp& stamp]
         void trackStamp(void* ptr, const MemStamp& stamp, char const* typeName) {
             utils::MemTrack::initialize();
             utils::GuardLock lock(*mutex_);
@@ -552,26 +547,34 @@ namespace utils {
 #ifdef _MEMORY_TRACK_
 
 //p = new - ::operator new(size_t)
-void* operator new(size_t size) {
+#ifdef NO_PLACEMENT_NEW
+inline void* _cdecl operator new(size_t size, char const* file, int line, char const* func) {
+#else
+inline void* _cdecl operator new(size_t size) {
+#endif
 	void* p = utils::MemTrack::trackMalloc(size, __FUNC__);
 	if (p == NULL) throw std::bad_alloc();
 	return p;
 }
 
 //delete p
-void operator delete(void* ptr) {
+inline void _cdecl operator delete(void* ptr) {
 	utils::MemTrack::trackFree(ptr, __FUNC__);
 }
 
 //p = new [] - ::operator new[](size_t)
-void* operator new[](size_t size) {
+#ifdef NO_PLACEMENT_NEW
+inline void* _cdecl operator new[](size_t size, char const* file, int line, char const* func) {
+#else
+inline void* _cdecl operator new[](size_t size) {
+#endif
 	void* p = utils::MemTrack::trackMalloc(size, __FUNC__);
 	if (p == NULL) throw std::bad_alloc();
 	return p;
 }
 
 //delete[] p
-void operator delete[](void* ptr) {
+inline void _cdecl operator delete[](void* ptr) {
 	utils::MemTrack::trackFree(ptr, __FUNC__);
 }
 
