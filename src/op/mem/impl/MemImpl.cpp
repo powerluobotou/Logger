@@ -69,7 +69,7 @@ namespace Operation {
 
 			size_t index = 0;
 			szReadBuffer = str;
-			for (; index < unReaded; index++) {
+			for (; index < unReaded; ++index) {
 				memcpy(szReadBuffer + index, buffer_.data() + pos_ + index, 1);
 				if ('\n' == *(buffer_.data() + pos_ + index)) {
 					break;
@@ -93,7 +93,7 @@ namespace Operation {
 		return 0;
 	}
 
-	int MemImpl::Puts(const char* str) {
+	int MemImpl::Puts(char const* str) {
 		size_t unCount = strlen(str);
 		Write(str, sizeof(char), unCount);
 		return 0;
@@ -198,7 +198,7 @@ namespace Operation {
 		return pos_;
 	}
 
-	size_t MemImpl::Write(const void* ptr, size_t size, size_t count) {
+	size_t MemImpl::Write(void const* ptr, size_t size, size_t count) {
 		size_t unWritten = 0;
 		do {
 			size_t unNeedWrite = size * count;
@@ -289,7 +289,7 @@ namespace Operation {
 // 		return bRet;
 // 	}
 // 
-// 	bool MemImpl::Write( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
+// 	bool MemImpl::Write( void const* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
 // 	{
 // 		bool bRet = false;
 // 		unsigned long dwWritten = ulNumberOfBytesToWrite;

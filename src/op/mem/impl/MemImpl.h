@@ -20,12 +20,12 @@ namespace Operation {
 		virtual char* Gets(char* str, int num);
 		virtual bool Open(Mode mode = Mode::M_READ);
 		virtual int Putc(int character);
-		virtual int Puts(const char* str);
+		virtual int Puts(char const* str);
 		virtual size_t Read(void* ptr, size_t size, size_t count);
 		virtual int Seek(long offset, int origin);
 		virtual int Setpos(const fpos_t* pos);
 		virtual long Tell();
-		virtual size_t Write(const void* ptr, size_t size, size_t count);
+		virtual size_t Write(void const* ptr, size_t size, size_t count);
 		virtual void Rewind();
 		virtual void Buffer(char* buffer, size_t size);
 		virtual void Buffer(std::string& s);
@@ -33,7 +33,7 @@ namespace Operation {
 		MemImpl(void* buffer, unsigned long length);
 		//bool Open();
 		//bool Read(void* lpBuffer, unsigned long ulNumberOfBytesToRead, unsigned long* lpNumberOfBytesRead);
-		//bool Write(const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten);
+		//bool Write(void const* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten);
 		//unsigned long Seek( long offset, int origin );
 		//bool Close();
 		//bool IsEmpty();

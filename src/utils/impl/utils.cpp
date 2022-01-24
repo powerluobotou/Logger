@@ -76,7 +76,7 @@ namespace utils {
 		return utils::_str2ws(str);
 	}
 	
-	std::string gbk2UTF8(const char* gbk, size_t len) {
+	std::string gbk2UTF8(char const* gbk, size_t len) {
 		AUTHORIZATION_CHECK_S;
 		return gbk2UTF8(gbk, len);
 	}

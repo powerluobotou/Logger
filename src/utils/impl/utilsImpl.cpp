@@ -197,7 +197,7 @@ namespace utils {
 	}
 
 #ifdef _windows_
-	static char* strptime(const char* s, const char* fmt, struct tm* tm) {
+	static char* strptime(char const* s, char const* fmt, struct tm* tm) {
 		// Isn't the C++ standard lib nice? std::get_time is defined such that its
 		// format parameters are the exact same as strptime. Of course, we have to
 		// create a string stream first, and imbue it with the current C locale, and
@@ -279,7 +279,7 @@ namespace utils {
 	}
 	
 	//https://blog.csdn.net/u012234115/article/details/83186386
-	std::string _gbk2UTF8(const char* gbk, size_t len) {
+	std::string _gbk2UTF8(char const* gbk, size_t len) {
 #ifdef _windows_
 		size_t length = MultiByteToWideChar(CP_ACP, 0, gbk, -1, NULL, 0);
 		wchar_t* wc = new wchar_t[length + 1];

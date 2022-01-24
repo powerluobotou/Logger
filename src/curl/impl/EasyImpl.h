@@ -77,7 +77,7 @@ namespace Curl {
 		int progressCallback(double dltotal, double dlnow, double ultotal, double ulnow);
 	private:
 		static int debugCallback_(CURL* curl, curl_infotype type, char* data, size_t size, void* userp);
-		static void dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size);
+		static void dump_(char const* text, FILE* stream, unsigned char* ptr, size_t size);
 		static size_t readCallback_(void* buffer, size_t size, size_t nmemb, void* stream);
 		static size_t writeCallback_(void* buffer, size_t size, size_t nmemb, void* stream);
 		static int progressCallback_(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow);

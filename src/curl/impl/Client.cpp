@@ -5,16 +5,17 @@
 namespace Curl {
 
 	Client::Client()
-		: impl_(new ClientImpl()) {
+		: impl_(New<ClientImpl>()) {
+		//placement new
 	}
 
 	Client::Client(bool sync)
-		: impl_(new ClientImpl(sync)) {
+		: impl_(New<ClientImpl>(sync)) {
 		//placement new
 	}
 
 	Client::~Client() {
-		delete impl_;
+		Delete<ClientImpl>(impl_);
 	}
 
 	int Client::check(char const* url, double& size) {

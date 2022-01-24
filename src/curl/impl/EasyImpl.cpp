@@ -8,7 +8,7 @@
 
 namespace Curl {
 
-	void EasyImpl::dump_(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
+	void EasyImpl::dump_(char const* text, FILE* stream, unsigned char* ptr, size_t size) {
 		unsigned int width = 0x10;
 
 		fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
@@ -41,7 +41,7 @@ namespace Curl {
 
 		fd = fd ? fd : stderr;
 
-		const char* text;
+		char const* text;
 		(void)curl; /* prevent compiler warning */
 		switch (type) {
 		case CURLINFO_TEXT:

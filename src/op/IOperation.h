@@ -33,7 +33,7 @@ namespace Operation {
 		// int fputc ( int character, FILE * stream );
 		virtual int Putc(int character) = 0;
 		// int fputs ( const char * str, FILE * stream );
-		virtual int Puts(const char* str) = 0;
+		virtual int Puts(char const* str) = 0;
 		//size_t fread ( void * ptr, size_t size, size_t count, FILE * stream );
 		virtual size_t Read(void* ptr, size_t size, size_t count) = 0;
 		//int fseek ( FILE * stream, long int offset, int origin );
@@ -43,7 +43,7 @@ namespace Operation {
 		//long int ftell ( FILE * stream );	
 		virtual long Tell() = 0;
 		//size_t fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
-		virtual size_t Write(const void* ptr, size_t size, size_t count) = 0;
+		virtual size_t Write(void const* ptr, size_t size, size_t count) = 0;
 		//void rewind ( FILE * stream );
 		virtual void Rewind() = 0;
 		virtual void Buffer(char* buffer, size_t size) = 0;

@@ -7,7 +7,7 @@ namespace Operation {
 
 	class FileImpl : public IOperation {
 	public:
-		explicit FileImpl(const char* path);
+		explicit FileImpl(char const* path);
 		~FileImpl();
 		char const* Path();
 	public:
@@ -33,7 +33,7 @@ namespace Operation {
 		// int fputc ( int character, FILE * stream );
 		virtual int Putc(int character);
 		// int fputs ( const char * str, FILE * stream );
-		virtual int Puts(const char* str);
+		virtual int Puts(char const* str);
 		//size_t fread ( void * ptr, size_t size, size_t count, FILE * stream );
 		virtual size_t Read(void* ptr, size_t size, size_t count);
 		//int fseek ( FILE * stream, long int offset, int origin );
@@ -43,7 +43,7 @@ namespace Operation {
 		//long int ftell ( FILE * stream );	
 		virtual long Tell();
 		//size_t fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
-		virtual size_t Write(const void* ptr, size_t size, size_t count);
+		virtual size_t Write(void const* ptr, size_t size, size_t count);
 		//void rewind ( FILE * stream );
 		virtual void Rewind();
 		virtual void Buffer(char* buffer, size_t size);

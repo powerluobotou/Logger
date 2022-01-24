@@ -43,6 +43,19 @@ namespace Curl {
 			char const* spath = NULL,
 			bool dump = true, FILE* fd = stderr);
 	private:
+		template <class T> static inline T* New() {
+			void* ptr = (void*)malloc(sizeof(T));
+			return new(ptr) T();
+		}
+		template <class T> static inline T* New(bool sync) {
+			void* ptr = (void*)malloc(sizeof(T));
+			return new(ptr) T(sync);
+		}
+		template <class T> static inline void Delete(T* ptr) {
+			ptr->~T();
+			free(ptr);
+		}
+	private:
 		ClientImpl* impl_;
 	};
 }

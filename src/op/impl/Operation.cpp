@@ -25,7 +25,7 @@ namespace Operation {
 		}
 	}
 
-	size_t COperation::Write(const void* ptr, size_t size, size_t count) {
+	size_t COperation::Write(void const* ptr, size_t size, size_t count) {
 		if (op_) {
 			return op_->Write(ptr, size, count);
 		}

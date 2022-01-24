@@ -7,7 +7,7 @@ namespace Operation {
 	class FileImpl;
 	class CFile : public IOperation {
 	public:
-		explicit CFile(const char* path);
+		explicit CFile(char const* path);
 		~CFile();
 		virtual char const* Path();
 		virtual bool Valid();
@@ -32,7 +32,7 @@ namespace Operation {
 		// int fputc ( int character, FILE * stream );
 		virtual int Putc(int character);
 		// int fputs ( const char * str, FILE * stream );
-		virtual int Puts(const char* str);
+		virtual int Puts(char const* str);
 		//size_t fread ( void * ptr, size_t size, size_t count, FILE * stream );
 		virtual size_t Read(void* ptr, size_t size, size_t count);
 		//int fseek ( FILE * stream, long int offset, int origin );
@@ -42,7 +42,7 @@ namespace Operation {
 		//long int ftell ( FILE * stream );	
 		virtual long Tell();
 		//size_t fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
-		virtual size_t Write(const void* ptr, size_t size, size_t count);
+		virtual size_t Write(void const* ptr, size_t size, size_t count);
 		//void rewind ( FILE * stream );
 		virtual void Rewind();
 		virtual void Buffer(char* buffer, size_t size);
@@ -60,6 +60,19 @@ namespace Operation {
 		int vfprintf ( FILE * stream, const char * format, va_list arg );
 		int vfscanf ( FILE * stream, const char * format, va_list arg );
 		*/
+	private:
+		template <class T> static inline T* New() {
+			void* ptr = (void*)malloc(sizeof(T));
+			return new(ptr) T();
+		}
+		template <class T> static inline T* New(char const* path) {
+			void* ptr = (void*)malloc(sizeof(T));
+			return new(ptr) T(path);
+		}
+		template <class T> static inline void Delete(T* ptr) {
+			ptr->~T();
+			free(ptr);
+		}
 	private:
 		FileImpl* impl_;
 	};

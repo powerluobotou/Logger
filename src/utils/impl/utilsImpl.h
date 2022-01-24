@@ -42,7 +42,7 @@ namespace utils {
 	
 	bool _is_utf8(char const* str, size_t len);
 	
-	std::string _gbk2UTF8(const char* gbk, size_t len);
+	std::string _gbk2UTF8(char const* gbk, size_t len);
 
 	std::string _utf82GBK(char const* utf8, size_t len);
 

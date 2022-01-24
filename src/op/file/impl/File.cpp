@@ -4,13 +4,13 @@
 
 namespace Operation {
 
-	CFile::CFile(const char* path)
-		: impl_(new FileImpl(path)) {
+	CFile::CFile(char const* path)
+		: impl_(New<FileImpl>(path)) {
 		//placement new
 	}
 
 	CFile::~CFile() {
-		delete impl_;
+		Delete<FileImpl>(impl_);
 	}
 	
 	char const* CFile::Path() {
@@ -78,7 +78,7 @@ namespace Operation {
 		return impl_->Putc(character);
 	}
 
-	int CFile::Puts(const char* str) {
+	int CFile::Puts(char const* str) {
 		AUTHORIZATION_CHECK_I;
 		return impl_->Puts(str);
 	}
@@ -103,7 +103,7 @@ namespace Operation {
 		return impl_->Tell();
 	}
 
-	size_t CFile::Write(const void* ptr, size_t size, size_t count) {
+	size_t CFile::Write(void const* ptr, size_t size, size_t count) {
 		AUTHORIZATION_CHECK_I;
 		return impl_->Write(ptr, size, count);
 	}

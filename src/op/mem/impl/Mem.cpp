@@ -4,12 +4,12 @@
 
 namespace Operation {
 
-	CMemory::CMemory() : impl_(new MemImpl()) {
+	CMemory::CMemory() : impl_(New<MemImpl>()) {
 		//placement new
 	}
 
 	CMemory::~CMemory() {
-		delete impl_;
+		Delete<MemImpl>(impl_);
 	}
 	
 	char const* CMemory::Path() {
@@ -57,7 +57,7 @@ namespace Operation {
 		return impl_->Putc(character);
 	}
 
-	int CMemory::Puts(const char* str) {
+	int CMemory::Puts(char const* str) {
 		AUTHORIZATION_CHECK_I;
 		return impl_->Puts(str);
 	}
@@ -82,7 +82,7 @@ namespace Operation {
 		return impl_->Tell();
 	}
 
-	size_t CMemory::Write(const void* ptr, size_t size, size_t count) {
+	size_t CMemory::Write(void const* ptr, size_t size, size_t count) {
 		AUTHORIZATION_CHECK_I;
 		return impl_->Write(ptr, size, count);
 	}
@@ -107,7 +107,8 @@ namespace Operation {
 		impl_->Buffer(buffer);
 	}
 
-	CMemory::CMemory(void* buffer, unsigned long length) : impl_(new MemImpl(buffer, length)) {
+	CMemory::CMemory(void* buffer, unsigned long length) : impl_(New<MemImpl>(buffer, length)) {
+		//placement new
 	}
 // 
 // 
@@ -148,7 +149,7 @@ namespace Operation {
 // 		return bRet;
 // 	}
 // 
-// 	bool CMemory::Write( const void* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
+// 	bool CMemory::Write( void const* lpBuffer, unsigned long ulNumberOfBytesToWrite, unsigned long* lpNumberOfBytesWritten )
 // 	{
 // 		bool bRet = false;
 // 		unsigned long dwWritten = ulNumberOfBytesToWrite;

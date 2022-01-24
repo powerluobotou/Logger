@@ -61,6 +61,15 @@ namespace Curl {
 			bool dump = true, FILE* fd = stderr);
 		int perform();
 	private:
+		template <class T> static inline T* New() {
+			void* ptr = (void*)malloc(sizeof(T));
+			return new(ptr) T();
+		}
+		template <class T> static inline void Delete(T* ptr) {
+			ptr->~T();
+			free(ptr);
+		}
+	private:
 		MultiImpl* multi_;
 		std::list<EasyImpl*> list_easy_;
 	};

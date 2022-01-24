@@ -11,7 +11,7 @@ namespace Operation {
 		bool Open(Mode mode = Mode::M_READ);
 		void Flush();
 		void Close();
-		size_t Write(const void* ptr, size_t size, size_t count);
+		size_t Write(void const* ptr, size_t size, size_t count);
 		size_t Read(void* ptr, size_t size, size_t count);
 		void Buffer(char* buffer, size_t size);
 		void GetBuffer(std::string& s);

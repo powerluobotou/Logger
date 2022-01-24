@@ -27,6 +27,15 @@ namespace utils {
 		private:
 			void write(char const* filename);
 		private:
+			template <class T> static inline T* New() {
+				void* ptr = (void*)malloc(sizeof(T));
+				return new(ptr) T();
+			}
+			template <class T> static inline void Delete(T* ptr) {
+				ptr->~T();
+				free(ptr);
+			}
+		private:
 			Sections* m_;
 		};
 	}

@@ -20,11 +20,11 @@ namespace utils {
 			}
 		}
 #endif
-		Reader::Reader() :impl_(new ReaderImpl()) {
+		Reader::Reader() :impl_(New<ReaderImpl>()) {
 			//placement new
 		}
 		Reader::~Reader() {
-			delete impl_;
+			Delete<ReaderImpl>(impl_);
 		}
 		bool Reader::parse(char const* filename) {
 			AUTHORIZATION_CHECK_B;

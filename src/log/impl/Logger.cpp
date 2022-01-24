@@ -18,7 +18,7 @@ namespace LOGGER {
 	Logger::~Logger() {
 		if (impl_ &&
 			impl_ != LoggerImpl::instance()) {
-			Free<LoggerImpl>(impl_);
+			Delete<LoggerImpl>(impl_);
 		}
 	}
 

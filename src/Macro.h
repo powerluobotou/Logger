@@ -75,6 +75,7 @@
 #define strncasecmp  _strnicmp
 #define strtoull     _strtoui64
 #define xsleep(t) Sleep(t) //milliseconds
+#define clscr() system("cls")
 #elif defined(_linux_)
 #include <unistd.h>
 #include <sys/stat.h>
@@ -84,7 +85,8 @@
 #include <pthread.h>
 #define __FUNC__ __func__
 #define INVALID_HANDLE_VALUE (-1)
-#define xsleep(t) usleep((t) * 1000)
+#define xsleep(t) usleep((t) * 1000) //microseconds
+#define clscr() system("reset")
 #endif
 
 typedef int pid_t;

@@ -209,11 +209,12 @@ namespace utils {
 #endif
 		}
 		
-		ReaderImpl::ReaderImpl():m_(new Sections()) {
+		ReaderImpl::ReaderImpl():m_(New<Sections>()) {
+			//placement new
 		}
 		
 		ReaderImpl::~ReaderImpl() {
-			delete m_;
+			Delete<Sections>(m_);
 		}
 		
 		bool ReaderImpl::parse(char const* filename) {

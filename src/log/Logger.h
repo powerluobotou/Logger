@@ -36,11 +36,11 @@ namespace LOGGER {
 		void disable(int delay = 0, bool sync = false);
 		void cleanup();
 	private:
-		template <class T> static T* New() {
+		template <class T> static inline T* New() {
 			void* ptr = (void*)malloc(sizeof(T));
 			return new(ptr) T();
 		}
-		template <class T> static void Free(T* ptr) {
+		template <class T> static inline void Delete(T* ptr) {
 			ptr->~T();
 			free(ptr);
 		}

@@ -27,7 +27,8 @@ namespace Curl {
 	}
 
 	ClientImpl::ClientImpl(bool sync)
-		: multi_(sync ? (new MultiImpl()) : NULL) {
+		: multi_(sync ? (New<MultiImpl>()) : NULL) {
+		//placement new
 	}
 
 	int ClientImpl::check(char const* url, double& size) {
@@ -231,7 +232,7 @@ namespace Curl {
 
 	ClientImpl::~ClientImpl() {
 		if (multi_) {
-			delete multi_;
+			Delete<MultiImpl>(multi_);
 			multi_ = NULL;
 		}
 	}

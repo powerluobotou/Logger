@@ -180,7 +180,7 @@ namespace utils {
             size_t count = 0;
             BlockHeader* currNode = ourFirstNode;
             while (currNode != NULL) {
-                count++;
+                ++count;
                 currNode = currNode->myNextNode;
             }
             return count;
@@ -190,7 +190,7 @@ namespace utils {
             BlockHeader* currNode = ourFirstNode;
             while (currNode != NULL) {
                 *blockHeaderPP = currNode;
-                blockHeaderPP++;
+                ++blockHeaderPP;
                 currNode = currNode->myNextNode;
             }
         }
@@ -435,7 +435,7 @@ namespace utils {
             pMemDigest->blockCount = 0;
             pMemDigest->totalSize = 0;
             for (size_t i = startPost; i < endPost; ++i) {
-                pMemDigest->blockCount++;
+                ++pMemDigest->blockCount;
                 pMemDigest->totalSize += ppBlockHeader[i]->GetRequestedSize();
                 assert(strcmp(ppBlockHeader[i]->GetTypeName(), pMemDigest->typeName) == 0);
             }
@@ -465,7 +465,7 @@ namespace utils {
             for (size_t i = 1; i < numBlocks; ++i) {
                 char const* prevTypeName = ppBlockHeader[i - 1]->GetTypeName();
                 char const* currTypeName = ppBlockHeader[i]->GetTypeName();
-                if (strcmp(prevTypeName, currTypeName) != 0) numUniqueTypes++;
+                if (strcmp(prevTypeName, currTypeName) != 0) ++numUniqueTypes;
             }
 
             // Create an array of "digests" summarizing memory usage by type.
@@ -486,7 +486,7 @@ namespace utils {
                         endPost
                     );
                     startPost = endPost;
-                    uniqueTypeIndex++;
+                    ++uniqueTypeIndex;
                 }
             }
             assert(uniqueTypeIndex = numUniqueTypes);

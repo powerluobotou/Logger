@@ -3,7 +3,7 @@
 
 namespace Operation {
 
-	FileImpl::FileImpl(const char* path)
+	FileImpl::FileImpl(char const* path)
 		: stream_(NULL)
 		, path_(path) {
 		Open();
@@ -127,7 +127,7 @@ namespace Operation {
 		return EOF;
 	}
 
-	int FileImpl::Puts(const char* str) {
+	int FileImpl::Puts(char const* str) {
 		if (stream_) {
 			return fputs(str, stream_);
 		}
@@ -165,7 +165,7 @@ namespace Operation {
 		return EOF;
 	}
 
-	size_t FileImpl::Write(const void* ptr, size_t size, size_t count) {
+	size_t FileImpl::Write(void const* ptr, size_t size, size_t count) {
 		if (stream_) {
 			size_t n = fwrite(ptr, size, count, stream_);
 			if (n != 0) {
