@@ -2,6 +2,7 @@
 #include "utilsImpl.h"
 #include "backtrace.h"
 #include "Privilege.h"
+#include "regedt32.h"
 #include "../../crypt/mymd5.h"
 #include "../../auth/auth.h"
 
@@ -304,4 +305,11 @@ namespace utils {
 		AUTHORIZATION_CHECK_B;
 		return utils::_enablePrivilege(path);
 	}
+
+#if defined(_windows_)
+	std::string regQuery(HKEY hkey, char const* subkey, char const* valName) {
+		AUTHORIZATION_CHECK_S;
+		return utils::_regQuery(hkey, subkey, valName);
+	}
+#endif
 }
