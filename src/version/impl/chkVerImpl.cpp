@@ -251,20 +251,6 @@ namespace utils {
 		__MY_CATCH();
 	}
 
-	static inline void installVCRedist(utils::INI::Section& redist, std::string const& dir, std::function<void(int rc)> cb) {
-		std::string val = utils::_regQuery(HKEY_LOCAL_MACHINE,
-			"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{57a73df6-4ba9-4c1d-bbbb-517289ff6c13}",
-			"DisplayName");
-		std::string dst = "Microsoft Visual C++ 2015-2022 Redistributable";
-		if (!val.empty() && 0 == strncasecmp(val.c_str(), dst.c_str(), dst.length())) {
-			__PLOG_DEBUG("系统已安装 VC 运行时库...");
-		}
-		else {
-			__PLOG_DEBUG("检测到系统未安装 VC 运行时库，准备安装!");
-			_updateVCRedist(redist, dir, cb);
-		}
-	}
-
 	//v [IN] 当前版本号
 	//name [IN] 7C/WD/NG/1H/28Q/BYQ/WW
 	//path [IN] 版本服务器url配置路径
@@ -328,9 +314,14 @@ namespace utils {
 					__PLOG_DEBUG("共检查 %d 条线路 %d 条可用", total, n);
 				}
 #endif
-				//检查是否安装运行时库
-				utils::INI::Section* redist = reader.get("redist");
-				installVCRedist(*redist, dir, cb);
+				if (utils::_checkVCRedist()) {
+					__PLOG_DEBUG("系统已安装 VC 运行时库...");
+				}
+				else {
+					__PLOG_DEBUG("检测到系统未安装 VC 运行时库，准备安装!");
+					utils::INI::Section* redist = reader.get("redist");
+					_updateVCRedist(*redist, dir, cb);
+				}
 				utils::INI::Section* version = reader.get("version");
 				if (version && v != (*version)["no"]) {
 					__PLOG_WARN("发现新版本 %s\n文件大小 %s 字节\nMD5值 %s\n准备更新...",

@@ -54,7 +54,5 @@ namespace utils {
 
 	bool enablePrivilege(std::string const& path);
 
-#if defined(_windows_)
-	std::string regQuery(HKEY hkey, char const* subkey, char const* valName);
-#endif
+	bool checkVCRedist();
 }

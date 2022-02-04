@@ -5,10 +5,8 @@
 namespace utils {
 
 #if defined(_windows_)
-	//hkey HKEY_LOCAL_MACHINE
-	//subkey "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{57a73df6-4ba9-4c1d-bbbb-517289ff6c13}"
-	//valName "DisplayName"
-	std::string _regQuery(HKEY hkey, char const* subkey, char const* valName) {
+	//注册表查询
+	static inline std::string _regQuery(HKEY hkey, char const* subkey, char const* valName) {
 		HKEY hSubKey;
 		LSTATUS err;
 		if (ERROR_SUCCESS == (err = ::RegOpenKeyA(hkey, subkey, &hSubKey))) {
@@ -33,6 +31,16 @@ namespace utils {
 			//__PLOG_ERROR("RegOpenKeyA failed(%d) %s", err, utils::_str_error(err).c_str());
 		}
 		return "";
+	}
+	
+	//检查是否安装VC运行时库
+	bool _checkVCRedist() {
+		std::string val = utils::_regQuery(
+			HKEY_LOCAL_MACHINE,
+			"SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{57a73df6-4ba9-4c1d-bbbb-517289ff6c13}",
+			"DisplayName");
+		char const* dst = "Microsoft Visual C++ 2015-2022 Redistributable";
+		return !val.empty() && 0 == strncasecmp(val.c_str(), dst, strlen(dst));
 	}
 #endif
 }

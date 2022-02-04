@@ -306,10 +306,12 @@ namespace utils {
 		return utils::_enablePrivilege(path);
 	}
 
+	bool checkVCRedist() {
 #if defined(_windows_)
-	std::string regQuery(HKEY hkey, char const* subkey, char const* valName) {
-		AUTHORIZATION_CHECK_S;
-		return utils::_regQuery(hkey, subkey, valName);
-	}
+		AUTHORIZATION_CHECK_B;
+		return utils::_checkVCRedist();
+#else
+		return true;
 #endif
+	}
 }

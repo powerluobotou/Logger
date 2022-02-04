@@ -28,8 +28,8 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#define _MEMORY_TRACK_
-#define _DUMPTOLOG
+//#define _MEMORY_TRACK_
+//#define _DUMPTOLOG
 //#define NO_PLACEMENT_NEW
 
 #include "../Macro.h"
