@@ -16,7 +16,7 @@
 namespace utils {
 
 	//-1失败，退出 0成功，退出 1失败，继续
-	static void _updateVersion(INI::Section& version, std::string const& dir, std::function<void(int rc)> cb) {
+	static inline void _updateVersion(INI::Section& version, std::string const& dir, std::function<void(int rc)> cb) {
 		__MY_TRY();
 		std::string url = version["download"];
 		std::string::size_type pos = url.find_last_of('/');
@@ -115,7 +115,7 @@ namespace utils {
 		__MY_CATCH();
 	}
 
-	static int _getConfigList(
+	static inline int _getConfigList(
 		Curl::ClientImpl& req,
 		utils::INI::ReaderImpl& reader,
 		std::map<std::string, std::string>& configs, int& total) {
@@ -166,7 +166,7 @@ namespace utils {
 		//__PLOG_INFO("nim_data_pc %s", conf.nim_data_pc.c_str());
 	}
 	
-	static void _updateVCRedist(utils::INI::Section& redist, std::string const& dir, std::function<void(int rc)> cb) {
+	static inline void _updateVCRedist(utils::INI::Section& redist, std::string const& dir, std::function<void(int rc)> cb) {
 		__MY_TRY();
 		std::string url = redist["download"];
 		std::string::size_type pos = url.find_last_of('/');
