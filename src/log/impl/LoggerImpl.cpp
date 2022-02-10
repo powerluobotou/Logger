@@ -389,7 +389,7 @@ namespace LOGGER {
 	}
 
 	//getlevel
-	static int getlevel(char const c) {
+	static inline int getlevel(char const c) {
 		switch (c) {
 		case 'F': return LVL_FATAL;
 		case 'E':return LVL_ERROR;
