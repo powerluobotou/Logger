@@ -381,9 +381,10 @@ namespace LOGGER {
 	void LoggerImpl::wait(Messages& msgs) {
 		{
 			std::unique_lock<std::mutex> lock(mutex_); {
-				cond_.wait(lock); {
-					messages_.swap(msgs);
+				while (messages_.empty()) {
+					cond_.wait(lock);
 				}
+				messages_.swap(msgs);
 			}
 		}
 	}
