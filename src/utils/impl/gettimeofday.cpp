@@ -78,6 +78,36 @@ void gettimeofday(struct timeval* tv, struct timezone* tz) {
 #endif
 }
 
+//https://stackoverflow.com/questions/5404277/porting-clock-gettime-to-windows#comment80964594_38212960
+//clock_gettime
+int clock_gettime(int, struct timespec* tv) {
+	static LARGE_INTEGER freq = frequency();
+	static LARGE_INTEGER startCount = counter();
+	static struct _init_t {
+		_init_t() {
+			timespec_get(&x, TIME_UTC);
+		}
+		struct timespec x;
+	}tv_start;
+	time_t sec_part;
+	long nsec_part;
+
+	LARGE_INTEGER curCount = counter();
+
+	curCount.QuadPart -= startCount.QuadPart;
+	sec_part = curCount.QuadPart / freq.QuadPart;
+	nsec_part = (long)((curCount.QuadPart - (sec_part * freq.QuadPart))
+		* 1000000000UL / freq.QuadPart);
+
+	tv->tv_sec = tv_start.x.tv_sec + sec_part;
+	tv->tv_nsec = tv_start.x.tv_nsec + nsec_part;
+	if (tv->tv_nsec >= 1000000000UL) {
+		tv->tv_sec += 1;
+		tv->tv_nsec -= 1000000000UL;
+	}
+	return 0;
+}
+
 #endif
 
 //gettime

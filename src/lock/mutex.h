@@ -2,13 +2,19 @@
 
 #include "../Macro.h"
 
+#ifdef _windows_
+#include "../pthread.h"
+#include "../sched.h"
+#include "../semaphore.h"
+#endif
+
 namespace utils {
 
-#if defined(_windows_)
-	typedef CRITICAL_SECTION mutex_t;
-#elif defined(_linux_)
+//#if defined(_windows_)
+	//typedef CRITICAL_SECTION mutex_t;
+//#elif defined(_linux_)
 	typedef pthread_mutex_t  mutex_t;
-#endif
+//#endif
 
 	//Mutex
 	class Mutex {

@@ -27,6 +27,9 @@ LARGE_INTEGER counter();
 //gettickcount
 double gettickcount();
 
+//clock_gettime
+int clock_gettime(int, struct timespec* tv);
+
 //gettimeofday
 void gettimeofday(struct timeval* tv, struct timezone* tz);
 

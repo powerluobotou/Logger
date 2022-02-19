@@ -6,20 +6,20 @@
 
 namespace utils {
 	Mutex::Mutex() {
-#if defined(_windows_)
-		::InitializeCriticalSection(&mutex_);
+//#if defined(_windows_)
+		//::InitializeCriticalSection(&mutex_);
 		//::InitializeCriticalSectionAndSpinCount(&mutex_, 500);
-#elif defined(_linux_)
+//#elif defined(_linux_)
 		::pthread_mutex_init(&mutex_, NULL);
-#endif
+//#endif
 	}
 
 	Mutex::~Mutex() {
-#if defined(_windows_)
-		::DeleteCriticalSection(&mutex_);
-#elif defined(_linux_)
+//#if defined(_windows_)
+		//::DeleteCriticalSection(&mutex_);
+//#elif defined(_linux_)
 		::pthread_mutex_destroy(&mutex_);
-#endif
+//#endif
 	}
 
 	mutex_t& Mutex::Get() {
@@ -27,25 +27,25 @@ namespace utils {
 	}
 
 	bool Mutex::Try() {
-#if defined(_windows_)
-		return ::TryEnterCriticalSection(&mutex_);
-#elif defined(_linux_)
+//#if defined(_windows_)
+		//return ::TryEnterCriticalSection(&mutex_);
+//#elif defined(_linux_)
 		return 0 == ::pthread_mutex_trylock(&mutex_);
-#endif
+//#endif
 	}
 
 	void Mutex::Lock() {
-#if defined(_windows_)
-		::EnterCriticalSection(&mutex_);
-#elif defined(_linux_)
+//#if defined(_windows_)
+		//::EnterCriticalSection(&mutex_);
+//#elif defined(_linux_)
 		::pthread_mutex_lock(&mutex_);
-#endif
+//#endif
 	}
 	void Mutex::Unlock() {
-#if defined(_windows_)
-		::LeaveCriticalSection(&mutex_);
-#elif defined(_linux_)
+//#if defined(_windows_)
+		//::LeaveCriticalSection(&mutex_);
+//#elif defined(_linux_)
 		::pthread_mutex_unlock(&mutex_);
-#endif
+//#endif
 	}
 }
