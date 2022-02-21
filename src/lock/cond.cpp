@@ -2,7 +2,8 @@
 
 namespace utils {
 
-	Cond::Cond() {
+	Cond::Cond(Mutex& mutex)
+		: mutex_(mutex) {
 		::pthread_cond_init(&cond_, NULL);
 	}
 
@@ -10,11 +11,11 @@ namespace utils {
 		::pthread_cond_destroy(&cond_);
 	}
 
-	void wait(Mutex& mutex) {
-		::pthread_cond_wait(&cond_, mutex.Get());
+	void wait() {
+		::pthread_cond_wait(&cond_, mutex_.Get());
 	}
 
-	void Cond::wait(Mutex& mutex, double seconds) {
+	void Cond::wait(double seconds) {
 		timespec abstime;
 #ifdef _windows_
 		clock_gettime(0, &abstime);
@@ -28,7 +29,7 @@ namespace utils {
 		abstime.tv_sec += (time_t)(abstime.tv_nsec + nanosecs) / NanoSecPerSec;
 		abstime.tv_nsec = (long)(abstime.tv_nsec + nanosecs) % NanoSecPerSec;
 
-		::pthread_cond_timedwait(&cond_, mutex.Get(), &abstime);
+		::pthread_cond_timedwait(&cond_, mutex_.Get(), &abstime);
 	}
 
 	void Cond::notify() {

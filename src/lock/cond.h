@@ -8,13 +8,14 @@ namespace utils {
 	class Mutex;
 	class Cond {
 	public:
-		Cond();
+		Cond(Mutex& mutex);
 		~Cond();
-		void wait(Mutex& mutex);
-		void wait(Mutex& mutex, double seconds);
+		void wait();
+		void wait(double seconds);
 		void notify();
 		void notifyAll();
 	private:
+		Mutex& mutex_;
 		pthread_cond_t cond_;
 	};
 }
