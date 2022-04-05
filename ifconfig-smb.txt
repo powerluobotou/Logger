@@ -54,6 +54,7 @@ systemctl restart smb
 	comment = Home Directories
         path = /home
 #	valid users = %S, %D%w%S
+	read only = no
 	available = yes
 	browseable = yes
 	writable = yes
