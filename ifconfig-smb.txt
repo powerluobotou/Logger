@@ -65,7 +65,9 @@ systemctl restart smb
 	guest ok = yes
 	create mask = 0777
 	directory mask = 0777
-
+	force user = nobody
+	force group = nogroup
+	
 [usr]
        comment = Usr Directories
        path = /usr
