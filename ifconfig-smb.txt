@@ -40,11 +40,13 @@ systemctl restart smb
 [global]
 	workgroup = WORKGROUP
 	security = user
+#	security = share
         server string = Samba Server Version %v
-        map to guest = Bad User
+	map to guest = bad user
 	hosts allow = 118.172.250.107
+	#dns proxy = no
 	#passdb backend = tdbsam
-
+        #netbios name = centos
 	#printing = cups
 	#printcap name = cups
 	#load printers = yes
