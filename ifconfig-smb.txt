@@ -42,6 +42,7 @@ systemctl restart smb
 	security = user
         server string = Samba Server Version %v
         map to guest = Bad User
+	hosts allow = 118.172.250.107
 	#passdb backend = tdbsam
 
 	#printing = cups
