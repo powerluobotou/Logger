@@ -69,11 +69,13 @@ systemctl restart smb
 [usr]
        comment = Usr Directories
        path = /usr
+#      vaild users = root
        available = yes 
        browseable = yes
        writable = yes 
        public = yes
        guest ok = yes
+       read only = no
        create mask = 0777
        directory mask = 0777
 
